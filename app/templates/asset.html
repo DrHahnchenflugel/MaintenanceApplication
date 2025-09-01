@@ -1,5 +1,5 @@
 {% extends "base.html" %}{% block body %}
-  <h1>{{ asset[2] }} - {{ asset[3] }} ({{ asset[4] }})</h1>
+  <h1>{{ asset[2] }} - {{ asset[3] }}</h1>
 
   <h2>Open tickets</h2>
     <ul>
@@ -13,7 +13,14 @@
   <h2>Closed Tickets</h2>
     <ul>
       {% for work_order in closed_work_orders %}
-        <li>Ticket- {{ work_order[0] }} - closed {{ work_order[4] }}</li>
+        <li>Ticket- {{ work_order[0] }} - {{ work_order[2] }} closed {{ work_order[4] }}</li>
       {% endfor %}
     </ul>
+
+  <h2>New ticket</h2>
+    <form method="post" action="{{ url_for('app.create_wo', asset_uuid=asset[1]) }}" enctype="multipart/form-data">
+      <textarea name="issue" rows="3" placeholder="Describe the issue" style="width:100%"></textarea><br>
+      <input type="file" name="photo" accept="image/*"><br>
+      <button type="submit">Submit</button>
+  </form>
 {% endblock %}
