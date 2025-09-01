@@ -18,7 +18,7 @@
     </ul>
 
   <h2>New ticket</h2>
-    <form method="post" action="{{ url_for('app.create_issue', uuid_str=asset[1]) }}" enctype="multipart/form-data">
+    <form method="post" action="{{ url_for('app.create_issue', asset_uuid=asset[1]) }}" enctype="multipart/form-data">
       <textarea name="issue" rows="3" placeholder="Describe the issue" style="width:100%"></textarea><br>
       <input type="file" name="photo" accept="image/*"><br>
       <button type="submit">Submit</button>
