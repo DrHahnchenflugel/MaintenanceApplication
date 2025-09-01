@@ -1,7 +1,3 @@
-# Load environment vars from /app/.env
-from dotenv import load_dotenv
-load_dotenv()
-
 # Initialise the app
 from app import initialise_application
 maintenance_app = initialise_application()
