@@ -1,0 +1,26 @@
+{% extends "base.html" %}{% block body %}
+<h1>WO-{{ work_order[0] }} - {{ work_order[5] }} {{ work_order[6] }}</h1>
+<p>Status: {{ work_order[1] }} | Opened: {{ work_order[3] }}{% if work_order[4] %} | Closed: {{ work_order[4] }}{% endif %}</p>
+<p><strong>Issue:</strong> {{ work_order[2] }}</p>
+
+<h2>Attachments</h2>
+<ul>
+  {% for attachment in attachments %}
+    {# attachment: (id, path, mime, orig_name, uploaded_at) #}
+    <li>
+      {% if attachment[2] and attachment[2].startswith('image/') %}
+        <div>
+          <img src="{{ url_for('app.attachment', att_id=attachment[0]) }}"
+               alt="{{ attachment[3] }}" style="max-width: 480px; height: auto; border:1px solid #ddd; border-radius:6px;">
+        </div>
+        <small>{{ attachment[3] }} - {{ attachment[5] }}</small>
+      {% else %}
+        <a href="{{ url_for('app.attachment', att_id=a[0]) }}">{{ attachment[3] or 'file' }}</a>
+        <small>({{ attachment[2] or 'unknown' }}, {{ attachment[5] }})</small>
+      {% endif %}
+    </li>
+  {% else %}
+    <li>None</li>
+  {% endfor %}
+</ul>
+{% endblock %}

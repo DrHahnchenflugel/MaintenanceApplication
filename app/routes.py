@@ -1,4 +1,5 @@
-from flask import Blueprint, jsonify, abort, render_template, request, redirect, url_for, flash
+import os, hashlib, time
+from flask import Blueprint, jsonify, abort, render_template, request, redirect, url_for, flash, current_app, send_from_directory
 from .db import query_one, query_all, execute_returning_one, execute
 from uuid import UUID
 
@@ -6,6 +7,31 @@ bp = Blueprint("app", __name__)
 
 def _normalise_issue(s: str) -> str:
     return " ".join((s or "").lower().split())
+
+def _save_attachment_if_any(request, work_order_id: int):
+    file = request.files.get("photo")
+
+    if not file or not file.filename:
+        return
+
+    data = file.read()
+    hash = hashlib.sha256(data).hexdigest()
+
+    root = current_app.config["ATTACHMENT_ROOT"]
+    subdir = f"wo-{work_order_id}"
+    os.makedirs(os.path.join(root, subdir), exist_ok=True)
+
+    fileName = f"{int(time.time())}_{file.filename}"
+    relativePath = os.path.join(subdir, fileName)
+
+    with open(os.path.join(root, relativePath), "wb") as out:
+        out.write(data)
+
+    execute(
+        "insert into attachment (work_order_id, storage_path, uploaded_at, mime_type)"+
+        "values (%s,%s,%s, %s)",
+        (work_order_id, relativePath, file.filename, file.mimetype)
+    )
 
 @bp.get("/ping")
 def ping():
@@ -90,3 +116,63 @@ def create_issue(uuid_str:UUID):
     )[0]
     flash(f"Opened Issue - {work_order_id}")
     return redirect(url_for("app.asset_page", uuid_str=uuid_str))
+
+@bp.get("/attachments/<int:attachment_id>")
+def attachment(attachment_id: int):
+    row = query_one(
+        "select storage_path, mime_type, original_filename from attachment where attachment_id = %s",
+        (attachment_id,)
+    )
+
+    if not row:
+        abort(404)
+
+    relativePath, mime, originalName = row
+
+    # harden path: ensure it stays under ATTACH_ROOT
+    root = os.path.abspath(current_app.config["ATTACH_ROOT"])
+    abspath = os.path.abspath(os.path.join(root, relativePath))
+    if not abspath.startswith(root + os.sep):
+        abort(403)
+
+    directory = os.path.dirname(abspath)
+    filename = os.path.basename(abspath)
+
+    # TODO: switch to nginx or similar for prod
+    # Inline by default (as_attachment=False). Flask ≥2.2: download_name
+    return send_from_directory(
+        directory,
+        filename,
+        mimetype=mime or None,
+        as_attachment=False,
+        download_name=originalName,
+        conditional=True,  # supports Range/If-Modified-Since
+        etag=True
+    )
+
+@bp.get("/issues/<int:work_order_id>")
+def work_order_page(work_order_id: int):
+    work_order = query_one(
+        """
+        select wo.work_order_id, wo.status, wo.raw_issue_description, wo.created_at, wo.closed_at, a.friendly_tag
+        from work_order wo
+        join asset a on a.asset_id = wo.asset_id
+        where wo.work_order_id = %s
+        """,
+        (work_order_id,)
+    )
+
+    if not work_order:
+        abort(404)
+
+    attachments = query_all(
+        """
+        select attachment_id, storage_path, mime_type, original_filename, uploaded_at
+        from attachment
+        where work_order_id = %s
+        order by uploaded_at asc
+        """,
+        (work_order_id,)
+    )
+
+    return render_template("work_order.html", work_order=work_order, attachments=attachments)

@@ -26,7 +26,7 @@ def query_all(sql:str, params:(str) = ()) -> str|None:
             rows = cursor.fetchall()
             return rows
 
-def execute(sql:str, params:(str) = ()) -> None:
+def execute(sql:str, params:str|(str) = ()) -> None:
     with POOL.connection() as connection:
         with connection.cursor() as cursor:
             cursor.execute(sql, params)
