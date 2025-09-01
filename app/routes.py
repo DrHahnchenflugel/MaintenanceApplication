@@ -39,11 +39,11 @@ def asset_page(uuid_str):
 
     asset_id = asset[0]
     open_work_orders = query_all(
-        "select work_order_id, status, issue, created_at from work_order where asset_id=%s and status <> 'CLOSED",
+        "select work_order_id, status, issue, created_at from work_order where asset_id=%s and status <> 'CLOSED'",
         (asset_id,)
     )
     closed_work_orders = query_all(
-        "select work_order_id, status, issue, created_at from work_order where asset_id=%s and status = 'CLOSED",
+        "select work_order_id, status, issue, created_at from work_order where asset_id=%s and status = 'CLOSED'",
         (asset_id,)
     )
     return render_template("asset.html",
