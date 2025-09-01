@@ -2,6 +2,7 @@ import os, hashlib, time
 from flask import Blueprint, jsonify, abort, render_template, request, redirect, url_for, flash, current_app, send_from_directory
 from .db import query_one, query_all, execute_returning_one, execute
 from uuid import UUID
+from werkzeug.utils import secure_filename
 
 bp = Blueprint("app", __name__)
 
@@ -9,28 +10,28 @@ def _normalise_issue(s: str) -> str:
     return " ".join((s or "").lower().split())
 
 def _save_attachment_if_any(request, work_order_id: int):
-    file = request.files.get("photo")
+    imageFile = request.files.get("photo")
 
-    if not file or not file.filename:
+    if not imageFile or not imageFile.filename:
         return
 
-    data = file.read()
-    hash = hashlib.sha256(data).hexdigest()
+    data = imageFile.read()
 
     root = current_app.config["ATTACHMENT_ROOT"]
     subdir = f"wo-{work_order_id}"
     os.makedirs(os.path.join(root, subdir), exist_ok=True)
 
-    fileName = f"{int(time.time())}_{file.filename}"
+    safe = secure_filename(imageFile.filename) or "upload"
+    fileName = f"{int(time.time())}_{safe}"
     relativePath = os.path.join(subdir, fileName)
 
     with open(os.path.join(root, relativePath), "wb") as out:
         out.write(data)
 
     execute(
-        "insert into attachment (work_order_id, storage_path, uploaded_at, mime_type)"+
+        "insert into attachment (work_order_id, storage_path, original_filename, mime_type)"+
         "values (%s,%s,%s, %s)",
-        (work_order_id, relativePath, file.filename, file.mimetype)
+        (work_order_id, relativePath, imageFile.filename, imageFile.mimetype)
     )
 
 @bp.get("/ping")
@@ -107,6 +108,8 @@ def create_issue(uuid_str:UUID):
                 "insert into work_log (work_order_id, action, result) values (%s,%s,%s)",
                 (existing_id, f"REPORT: {issue}", None)
             )
+            _save_attachment_if_any(request, existing_id)
+            _save_attachment_if_any()
             flash(f"Similar ticket exists; appended your report to WO-{existing_id}.")
             return redirect(url_for("app.asset_page", uuid_str=uuid_str))
 
@@ -114,6 +117,7 @@ def create_issue(uuid_str:UUID):
         "insert into work_order (asset_id, status, raw_issue_description) values (%s, 'OPEN', %s) returning work_order_id",
         (asset_id, issue)
     )[0]
+    _save_attachment_if_any(request, existing_id)
     flash(f"Opened Issue - {work_order_id}")
     return redirect(url_for("app.asset_page", uuid_str=uuid_str))
 
