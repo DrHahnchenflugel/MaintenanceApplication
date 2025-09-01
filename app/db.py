@@ -8,14 +8,15 @@ POOL = ConnectionPool(
     kwargs = {"options":"-c search_path=maintenance,pg_catalog"}
 )
 
-def query_one(sql:str, params:(str) = ()) -> str:
+def query_one(sql:str, params:(str) = ()) -> str|None:
     with POOL.connection() as connection:
-        with connection.cursor as cursor:
+        with connection.cursor() as cursor:
             cursor.execute(sql, params)
             single_row = cursor.fetchone()
             return single_row
 
 def execute(sql:str, params:(str) = ()) -> None:
     with POOL.connection() as connection:
-        with connection.cursor as cursor:
+        with connection.cursor() as cursor:
             cursor.execute(sql, params)
+            # autocommits, as psycopg_pool opens in autocommit
