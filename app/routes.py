@@ -24,7 +24,8 @@ def asset_page(uuid_str):
     print('|',uuid_str,'|')
     try:
         u = UUID(uuid_str)
-    except ValueError:
+    except ValueError as e:
+        print(e)
         print("NOT A UUID")
         abort(404) # TODO: cleaner handling
 
