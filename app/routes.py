@@ -1,5 +1,6 @@
 from flask import Blueprint, jsonify, abort, render_template
 from .db import query_one, query_all
+from uuid import UUID
 
 bp = Blueprint("app", __name__)
 
@@ -17,8 +18,15 @@ def db_ping():
 
     return jsonify(ok=True, postgres=version, site_count=site_count)
 
-@bp.get("/a/<uuid_str>")
+@bp.get("/asset/<uuid_str>")
 def asset_page(uuid_str):
+    # validate & normalise uuid
+    try:
+        u = UUID(uuid_str)
+    except ValueError:
+        abort(404) # TODO: cleaner handling
+
+
     asset = query_one(
         "select asset_id, uuid, friendly_tag, status from asset where uuid=%s", (uuid_str,)
     )
