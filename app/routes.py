@@ -26,6 +26,7 @@ def asset_page(uuid_str):
     except ValueError:
         abort(404) # TODO: cleaner handling
 
+    #
 
     asset = query_one(
         "select asset_id, uuid, friendly_tag, status from asset where uuid=%s", (uuid_str,)
