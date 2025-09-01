@@ -25,6 +25,7 @@ def asset_page(uuid_str):
     try:
         u = UUID(uuid_str)
     except ValueError:
+        print("NOT A UUID")
         abort(404) # TODO: cleaner handling
 
     asset = query_one(
@@ -32,6 +33,7 @@ def asset_page(uuid_str):
     )
 
     if asset == None:
+        print("NOT AN ASSET")
         abort(404) #TODO: Cleaner handling?
 
     asset_id = asset[0]
