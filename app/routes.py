@@ -55,7 +55,7 @@ def asset_page(uuid_str):
                            closed_work_orders=closed_work_orders)
 
 @bp.post("/a/<uuid_str>/issue")
-def create_issue(asset_uuid:UUID):
+def create_issue(uuid_str:UUID):
     asset = query_one("select asset_id from asset where uuid=%s", (asset_uuid,))
     if asset == None:
         abort(404)
