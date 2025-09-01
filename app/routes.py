@@ -133,8 +133,8 @@ def attachment(attachment_id: int):
 
     relativePath, mime, originalName = row
 
-    # harden path: ensure it stays under ATTACH_ROOT
-    root = os.path.abspath(current_app.config["ATTACH_ROOT"])
+    # harden path: ensure it stays under ATTACHMENT_ROOT
+    root = os.path.abspath(current_app.config["ATTACHMENT_ROOT"])
     abspath = os.path.abspath(os.path.join(root, relativePath))
     if not abspath.startswith(root + os.sep):
         abort(403)
