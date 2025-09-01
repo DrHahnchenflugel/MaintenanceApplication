@@ -22,7 +22,7 @@
     {% with msg = get_flashed_messages() %}
         {% if msg %}
             <div class="flash">
-                {{ m[0] }}
+                {{ msg[0] }}
             </div>
         {% endif %}
     {% endwith %}
