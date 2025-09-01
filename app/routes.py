@@ -109,7 +109,6 @@ def create_issue(uuid_str:UUID):
                 (existing_id, f"REPORT: {issue}", None)
             )
             _save_attachment_if_any(request, existing_id)
-            _save_attachment_if_any()
             flash(f"Similar ticket exists; appended your report to WO-{existing_id}.")
             return redirect(url_for("app.asset_page", uuid_str=uuid_str))
 
@@ -117,7 +116,7 @@ def create_issue(uuid_str:UUID):
         "insert into work_order (asset_id, status, raw_issue_description) values (%s, 'OPEN', %s) returning work_order_id",
         (asset_id, issue)
     )[0]
-    _save_attachment_if_any(request, existing_id)
+    _save_attachment_if_any(request, work_order_id)
     flash(f"Opened Issue - {work_order_id}")
     return redirect(url_for("app.asset_page", uuid_str=uuid_str))
 
