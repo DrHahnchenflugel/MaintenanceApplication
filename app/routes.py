@@ -21,6 +21,7 @@ def db_ping():
 @bp.get("/a/<uuid_str>")
 def asset_page(uuid_str):
     # validate & normalise uuid
+    print('|',uuid_str,'|')
     try:
         u = UUID(uuid_str)
     except ValueError:
