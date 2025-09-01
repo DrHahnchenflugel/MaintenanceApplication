@@ -3,6 +3,7 @@ from psycopg_pool import ConnectionPool
 
 # Load environment vars from /app/.env
 from dotenv import load_dotenv
+load_dotenv()
 
 POOL = ConnectionPool(
     conninfo = os.environ["DATABASE_URL"],
