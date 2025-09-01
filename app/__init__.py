@@ -4,7 +4,7 @@ from .routes import bp
 
 def initialise_application():
     app = Flask(__name__)
-    app.secret_key = "tbd"
+    app.secret_key = os.environ["FLASK_SECRET"]
     app.register_blueprint(bp)
 
     app.config.update(

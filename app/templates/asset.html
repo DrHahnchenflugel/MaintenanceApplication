@@ -1,0 +1,19 @@
+{% extends "base.html" %}{% block body %}
+  <h1>{{ asset[2] }} - {{ asset[3] }} ({{ asset[4] }})</h1>
+
+  <h2>Open tickets</h2>
+    <ul>
+      {% for work_order in open_work_orders %}
+        <li>Ticket - {{ work_order[0] }} - {{ work_order[2] }} ({{ work_order[1] }})</li>
+      {% else %}
+        <li>None</li>
+      {% endfor %}
+    </ul>
+
+  <h2>Closed Tickets</h2>
+    <ul>
+      {% for work_order in closed_work_orders %}
+        <li>Ticket- {{ work_order[0] }} - closed {{ work_order[4] }}</li>
+      {% endfor %}
+    </ul>
+{% endblock %}

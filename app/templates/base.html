@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{title or "Maintenance"}}</title>
+    <style>
+        body {
+        font-family:sans-serif;
+        max-width:800px;
+        margin:2rem auto
+        }
+
+        .flash{
+        background:#ffe7a1;
+        padding:.5rem;
+        border-radius:6px;
+        margin-bottom:1rem
+        }
+    </style>
+</head>
+<body>
+    {% with msg = get_flashed_messages() %}
+        {% if msg %}
+            <div class="flash">
+                {{ m[0] }}
+            </div>
+        {% endif %}
+    {% endwith %}
+
+    {% block body %}{% endblock %}
+</body>
+</html>
