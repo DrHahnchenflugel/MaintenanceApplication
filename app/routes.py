@@ -68,7 +68,7 @@ def create_issue(uuid_str:UUID):
 
     # Check for recent issues, see if similar issues exist to avoid duplicates
     recent = query_one(
-        "select work_order_id, issue from work_order where asset_id = %s and status <> 'CLOSED' "
+        "select work_order_id, raw_issue_description from work_order where asset_id = %s and status <> 'CLOSED' "
         +"and created_at >= now() - interval '2 hours'"
         +"order by created_at desc limit 1",
         (asset_id,)
@@ -85,7 +85,7 @@ def create_issue(uuid_str:UUID):
             return redirect(url_for("app.asset_page", uuid_str=uuid_str))
 
     work_order_id = execute_returning_one(
-        "insert into work_order (asset_id, status, issue) values (%s, 'OPEN', %s) returning work_order_id",
+        "insert into work_order (asset_id, status, raw_issue_description) values (%s, 'OPEN', %s) returning work_order_id",
         (asset_id, issue)
     )[0]
     flash(f"Opened Issue - {work_order_id}")
