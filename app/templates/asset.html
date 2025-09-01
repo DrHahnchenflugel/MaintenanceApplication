@@ -5,8 +5,8 @@
     <ul>
       {% for work_order in open_work_orders %}
         <li>
-          <a href="{{ url_for('app.work_order_page', wo_id=wo[0]) }}">WO-{{ wo[0] }}</a>
-          — {{ wo[2] }} ({{ wo[1] }})
+          <a href="{{ url_for('app.work_order_page', work_order_id=work_order[0]) }}">WO-{{ work_order[0] }}</a>
+          — {{ work_order[2] }} ({{ work_order[1] }})
         </li>
       {% else %}
         <li>None</li>
@@ -17,8 +17,8 @@
     <ul>
       {% for work_order in closed_work_orders %}
         <li>
-          <a href="{{ url_for('app.work_order_page', wo_id=wo[0]) }}">WO-{{ wo[0] }}</a>
-          — {{ wo[2] }} ({{ wo[1] }})
+          <a href="{{ url_for('app.work_order_page', work_order_id=work_order[0]) }}">WO-{{ work_order[0] }}</a>
+          — {{ work_order[2] }} ({{ work_order[1] }})
         </li>
       {% endfor %}
     </ul>
