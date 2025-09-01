@@ -164,6 +164,7 @@ def work_order_page(work_order_id: int):
 
     if not work_order:
         abort(404)
+        #
 
     attachments = query_all(
         """
