@@ -71,3 +71,7 @@ def new_issue_for_asset(asset_uuid):
     if row is None:
         abort(404)
     return render_template("issues/new.html", asset=row[0])
+
+@bp.get("/issues/new")
+def new_issue():
+    return render_template("issues/new.html")
