@@ -55,6 +55,5 @@ def dashboard():
 
 @bp.get("/issues/active")
 def issues_active():
-    issues = query_all("select (work_order_id, asset_id, raw_issue_description, created_at, status) from work_order where status = 'OPEN'")
-    print(issues)
+    issues = query_all("SELECT (w.work_order_id, w.asset_id, w.raw_issue_description, w.created_at, w.status, a.friendly_tag, a.site_id, a.make, a.model, a.variant, a.status) FROM work_order w JOIN asset a ON w.asset_id = a.asset_id WHERE w.status = 'OPEN'")
     return render_template("issues/active.html", issues=issues)
