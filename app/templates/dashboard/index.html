@@ -1,5 +1,6 @@
 {% extends "base.html" %}
 {% block title %} Dashboard {% endblock %}
+{% block page_title %} Dashboard {% endblock %}
 
 {% block content %}
     <div class="row">
@@ -25,11 +26,11 @@
     </div>
 
     <div class="card" style="margin-top:16px;">
-        <h3 style="margin:0 0 8px 0;"Assets (summary)</h3>
+        <h3 style="margin:0 0 8px 0;"> Assets (summary)</h3>
         <div>EV3: RC 20 - EV3: MIND 15 - VEX: 5</div>
     </div>
 {% endblock %}
 
-{% block footer %}
-    <button class="btn"New Issue +</button>
+{% block footer_center_right %}
+    <button class="btn"> New Issue +</button>
 {% endblock %}
