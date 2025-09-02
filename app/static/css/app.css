@@ -175,3 +175,43 @@ a{
     border-radius:10px;
     cursor:pointer;
 }
+
+.table {
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.thead,
+.trow {
+  display: grid;
+  grid-template-columns: 80px 1fr 180px 120px 180px;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+.thead {
+  font-weight: 600;
+  background: var(--surface-2);
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+.trow {
+  text-decoration: none;
+  color: inherit;
+}
+
+.trow:hover {
+  background: var(--surface-1);
+}
+
+.badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: var(--chip);
+  font-size: 0.85rem;
+}
