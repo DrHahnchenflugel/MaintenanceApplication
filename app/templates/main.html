@@ -1,9 +1,11 @@
 {% extends "base.html" %}{% block body %}
     <h1> Maintenance Page</h1>
         {% for asset in active_assets %}
-            {{asset[0]}} : {{asset[1]}}, {{asset[2]}},{{asset[3]}}, {{asset[4]}}
+            {{asset[0]}} : {{asset[1]}}, {{asset[2]}},{{asset[8]}}, {{asset[9]}}
+            <br>
         {% endfor %}
         {% for issue in active_issues %}
             {{issue[0]}} : {{issue[1]}}, {{issue[2]}},{{issue[3]}}, {{issue[4]}}
+            <br>
         {% endfor %}
 {% endblock %}
