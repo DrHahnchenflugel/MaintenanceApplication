@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title} Maintenance {% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+    {% block head_extra %}{% endblock %}
+</head>
+<body>
+    <div class="layout">
+
+        <div class="main">
+            <header class="app-header-left">
+                <h1> MAINTENANCE </h1>
+            </header>
+
+            <main class="content">
+                {% block content_header %}{% endblock %}
+                {% block content %}{% endblock %}
+
+                <div class="footer">
+                    <div>{% block footer-left %}{% endblock %}</div>
+                    <div>{% block footer-center-right %}{% endblock %}</div>
+                </div>
+            </main>
+        </div>
+    </div>
+</body>
+</html>
