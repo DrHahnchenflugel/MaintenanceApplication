@@ -48,6 +48,13 @@ def db_ping():
 
     return jsonify(ok=True, postgres=version, site_count=site_count)
 
+@bp.get("/")
+def main_page():
+    issues = query_all("select * from work_order where status <> 'CLOSED'")
+    active_assets = query_all("select * from asset where status = 'ACTIVE'")
+    print(issues)
+    print(active_assets)
+
 @bp.get("/a/<uuid_str>")
 def asset_page(uuid_str):
     # validate & normalise uuid
