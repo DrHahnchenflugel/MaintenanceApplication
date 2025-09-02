@@ -50,10 +50,16 @@ def db_ping():
 
 @bp.get("/")
 def main_page():
-    issues = query_all("select * from work_order where status <> 'CLOSED'")
+    active_issues = query_all("select * from work_order where status <> 'CLOSED'")
     active_assets = query_all("select * from asset where status = 'ACTIVE'")
-    print(issues)
+    print(active_issues)
     print(active_assets)
+
+    return render_template(
+        "main.html",
+        active_issues=active_issues,
+        active_assets=active_assets
+    )
 
 @bp.get("/a/<uuid_str>")
 def asset_page(uuid_str):
