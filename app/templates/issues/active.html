@@ -13,13 +13,12 @@
         <div>Status</div>
         <div>Opened</div>
       </div>
-      {% for w in issues %}
-        <a class="trow" href="{{ url_for('issues.detail', issue_id=w.id) if 'issues.detail' in current_app.view_functions else '#' }}">
-          <div>#{{ w.id }}</div>
-          <div>{{ w.title }}</div>
-          <div>{{ w.location or '—' }}</div>
-          <div class="badge">{{ w.status }}</div>
-          <div>{{ w.created_at.strftime("%Y-%m-%d") }}</div>
+      {% for issue in issues %}
+        <a class="trow" href="#">
+          <div>#{{ issue[1] }}</div>
+          <div>{{ issue[2] }}</div>
+          <div>{{ issue[3].strftime("%Y-%m-%d") }}</div>
+          <div class="badge">{{ issue[4] }}</div>
         </a>
       {% endfor %}
     </div>
