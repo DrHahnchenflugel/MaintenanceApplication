@@ -74,4 +74,12 @@ def new_issue_for_asset(asset_uuid):
 
 @bp.get("/issues/new")
 def new_issue():
-    return render_template("issues/new.html")
+    assets = query_all("""SELECT (a.uuid, a.friendly_tag, a.site_id, a.make, a.model, a.variant, a.status,
+                        s.location_shorthand, s.friendly_name) 
+                        FROM asset a
+                        JOIN site s
+                        ON a.site_id = s.site_id
+                        ORDER BY friendly_tag ASC;
+                        """)
+
+    return render_template("issues/new_issue_asset_selector.html", assets=assets)

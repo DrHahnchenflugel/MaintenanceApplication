@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %} Maintenance - New Issue - Select Asset {% endblock %}
+{% block page_title %} New Issue — Select Asset {% endblock %}
+
+{% block content %}
+    {% if not assets %}
+        <p>No assets found.</p>
+        <a class="btn" href="{{ url_for('app.dashboard') }}"> Back</a>
+    {% else %}
+        <div class="table">
+            <div class="thead">
+                <div>Name</div>
+                <div>Location</div>
+                <div>Make</div>
+                <div>Model</div>
+                <div>Variant</div>
+                <div>Status</div>
+            </div>
+
+            {% for a in assets %}
+            <a class="trow" href="{{ url_for('app.new_issue_for_asset, asset_uuid=a[0]) }}">
+                <div> {{ a[1] }}</div>
+                <div> {{ a[1] }}</div>
+                <div> {{ a[3] }}</div>
+                <div> {{ a[4] }}</div>
+                <div> {{ a[5] }}</div>
+                <div> {{ a[6] }}</div>
+            </a>
+            {% endfor %}
+        </div>
+
+        <div class="actions" style="margin-top:1rem">
+            <a class="btn secondary" href="{{ url_for('app.dashboard') }}">Cancel</a>
+        </div>
+    {% endif %}
+{% endblock %}

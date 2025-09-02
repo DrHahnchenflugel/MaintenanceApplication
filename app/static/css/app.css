@@ -163,6 +163,11 @@ a{
     font-weight:700;
     cursor:pointer;
 }
+
+.btn.secondary {
+  background: transparent;
+  color: var(--text);
+}
 .btn--lg{
     padding: 18px 28px;
     font-size: 1.2rem;
@@ -214,4 +219,11 @@ a{
   border-radius: 999px;
   background: var(--chip);
   font-size: 0.85rem;
+}
+
+.actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end; /* or center, depending on how you like buttons laid out */
+  margin-top: 1rem;
 }
