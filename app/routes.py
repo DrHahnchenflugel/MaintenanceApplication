@@ -64,7 +64,7 @@ def issues_active():
                             ORDER BY w.created_at DESC;""")
     return render_template("issues/active.html", issues=issues)
 
-@bp.get("/issues/new/<uuid:asset_uuid>", methods=['GET'])
+@bp.get("/issues/new/<uuid:asset_uuid>")
 def new_issue_for_asset(asset_uuid):
     asset = query_one(f"select (asset_id) from asset where asset_id = {asset_uuid}")
     print(asset[0])
