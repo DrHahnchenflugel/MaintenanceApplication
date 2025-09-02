@@ -73,3 +73,20 @@ a{
     flex-direction:column;
     gap:6px
 }
+
+.nav a{
+    padding:8px 10px;
+    border-radius: 8px;
+    color:var(--muted)
+}
+
+.nav a:hover{
+    background:#1f2430;
+    color:var(--text)
+}
+
+.nav a.is-active{
+    background:#1e293b;
+    color:var(--text);
+    font-weight:600
+}
