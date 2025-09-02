@@ -5,7 +5,7 @@
 {% block content %}
     {% if not assets %}
         <p>No assets found.</p>
-        <a class="btn" href="{{ url_for('app.dashboard') }}"> Back</a>
+        <a class="btn" href="{{ url_for('dashboard') }}"> Back</a>
     {% else %}
         <div class="table">
             <div class="thead">
@@ -30,7 +30,7 @@
         </div>
 
         <div class="actions" style="margin-top:1rem">
-            <a class="btn secondary" href="{{ url_for('app.dashboard') }}">Cancel</a>
+            <a class="btn secondary" href="{{ url_for('dashboard') }}">Cancel</a>
         </div>
     {% endif %}
 {% endblock %}
