@@ -70,5 +70,4 @@ def new_issue_for_asset(asset_uuid):
     print(asset[0])
     if (not asset[0]):
         abort(404)
-
-#
+    return render_template("issues/new_issue.html", asset=asset)
