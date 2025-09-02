@@ -2,7 +2,7 @@
     <div class="brand">EXCEED</div>
     <nav class="nav">
         <a href="#" class="is-active">Dashboard</a>
-        <a href="{{ url_for('issues_active') }}" class="{{ 'is-active' if request.endpoint == 'issues_active' else 'not-active' }}">>Active Issues</a>
+        <a href="{{ url_for('app.issues_active') }}" class="{{ 'is-active' if request.endpoint == 'app.issues_active' else 'not-active' }}">>Active Issues</a>
         <a href="#" class="not-active">Past Issues</a>
         <a href="#" class="not-active">Blocked Issues</a>
         <a href="#" class="not-active">Assets</a>
