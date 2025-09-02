@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %} Maintenance - Active Issues {% endblock %}
+{% block page_title %} Active Issues {% endblock %}
+
+
+{% block content %}
+  {% if issues %}
+    <div class="table">
+      <div class="thead">
+        <div>ID</div>
+        <div>Title</div>
+        <div>Location</div>
+        <div>Status</div>
+        <div>Opened</div>
+      </div>
+      {% for w in issues %}
+        <a class="trow" href="{{ url_for('issues.detail', issue_id=w.id) if 'issues.detail' in current_app.view_functions else '#' }}">
+          <div>#{{ w.id }}</div>
+          <div>{{ w.title }}</div>
+          <div>{{ w.location or '—' }}</div>
+          <div class="badge">{{ w.status }}</div>
+          <div>{{ w.created_at.strftime("%Y-%m-%d") }}</div>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No active issues.</p>
+  {% endif %}
+{% endblock %}

@@ -51,3 +51,8 @@ def db_ping():
 @bp.get("/")
 def dashboard():
     return render_template("dashboard/index.html")
+
+@bp.get("/issues/active")
+def issues_active():
+    issues = []
+    return render_template("issues/active.html", issues=issues)
