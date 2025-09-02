@@ -184,7 +184,7 @@ a{
 .thead,
 .trow {
   display: grid;
-  grid-template-columns: 80px 1fr 180px 120px 180px;
+  grid-template-columns: 180px 1fr 180px 120px;
   gap: 12px;
   align-items: center;
   padding: 10px 14px;
