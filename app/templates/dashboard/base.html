@@ -14,11 +14,17 @@
         <div class="main">
             <header class="header">
                 <div class="top">
-                    <span class="badge"> 00:00 AM</span>
-                    <span class="badge"> THO</span>
-                    <span class="badge"> {% block header_right %} Monday, September 1 {%endblock %}</span>
+                    <span class="badge">00:00 AM</span>
+                    <span class="badge">THO</span>
                 </div>
-                    <h1>MAINTENANCE</h1>
+
+                <h1>MAINTENANCE</h1>
+
+                <div class="meta">
+                    <span class="badge">
+                        {% block header_right %} Monday, September 1 {% endblock %}
+                    </span>
+                </div>
             </header>
 
             <main class="content">

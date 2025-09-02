@@ -47,30 +47,30 @@ a{
 
 .header{
     display:grid;
-    grid-template-columns: 1fr auto 1fr; /* left | center | right */
+    grid-template-columns: 1fr auto 1fr;
     align-items:center;
     padding:12px 20px;
     border-bottom:1px solid var(--line);
 }
 
+.header .top{
+    grid-column:1;
+    justify-self:start;
+    display:flex;
+    gap:8px;
+}
+
 .header h1{
-    grid-column: 3;         /* right cell */
-    justify-self:end;
+    grid-column:2;
+    justify-self:center;
     margin:0;
     letter-spacing:.12em;
     font-size:1.5rem;
 }
 
-.header .top{
-    grid-column: 2;         /* center cell */
-    justify-self:center;    /* center the whole block */
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    gap:6px;
-    /* remove these so you don't get a second line + weird spacing */
-    padding:0;
-    border:0;
+.header .meta{
+    grid-column:3;
+    justify-self:end;
 }
 
 .footer{
