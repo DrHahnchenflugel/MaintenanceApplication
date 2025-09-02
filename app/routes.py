@@ -56,4 +56,5 @@ def dashboard():
 @bp.get("/issues/active")
 def issues_active():
     issues = query_all("select (work_order_id, asset_id, raw_issue_description, created_at, status) from work_order where status = 'OPEN'")
+    print(issues)
     return render_template("issues/active.html", issues=issues)
