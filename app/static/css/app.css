@@ -50,3 +50,26 @@ a{
     justify-content:space-between;
     align-items:center
 }
+
+.sidebar {
+    background:var(--panel);
+    border-right:1px solid var(--line);
+    padding:16px;
+    position:sticky;
+    top:0;
+    height:100vh;
+}
+
+.brand{
+    font-weight:700;
+    letter-spacing:.12em;
+    color:var(--brand);
+    margin-bottom:12px;
+    font-size:.9rem
+}
+
+.nav{
+    display:flex;
+    flex-direction:column;
+    gap:6px
+}
