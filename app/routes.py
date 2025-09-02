@@ -66,8 +66,8 @@ def issues_active():
 
 @bp.get("/issues/new/<uuid:asset_uuid>")
 def new_issue_for_asset(asset_uuid):
-    asset = query_one(f"select (asset_id) from asset where asset_id = {asset_uuid}")
-    print(asset[0])
-    if (not asset[0]):
+    row = query_one(f"select (asset_id) from asset where uuid = %s", (asset_uuid,))
+    print(row)
+    if row is None:
         abort(404)
-    return render_template("issues/new.html", asset=asset)
+    return render_template("issues/new.html", asset=row[0])
