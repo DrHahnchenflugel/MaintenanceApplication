@@ -49,6 +49,7 @@ def db_ping():
     return jsonify(ok=True, postgres=version, site_count=site_count)
 
 @bp.get("/")
+@bp.get("/dashboard")
 def dashboard():
     return render_template("dashboard/index.html")
 
