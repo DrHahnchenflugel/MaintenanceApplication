@@ -43,12 +43,26 @@ a{
 
 .header{
     display:flex;
+    justify-content:space-between;
     align-items:center;
-    gap:10px;
+    padding:12px 20px;
+    border-bottom:1px solid var(--line);
+}
+
+.header h1{
+    margin:0;
+    letter-spacing:.12em;
+    font-size:1.5rem;
 }
 
 .content{
     padding:20px;
+}
+
+.title{
+    display:flex;
+    align-items:center;
+    gap:10px;
 }
 
 .footer{
@@ -99,8 +113,12 @@ a{
 }
 
 .badge{
+    display:inline-flex;
+    align-items:center;
     padding:2px 8px;
     border:1px solid var(--line);
     border-radius:6px;
     font-size:.8rem;
+    line-height:1;
+    background:rgba(255,255,255,0.02);
 }
