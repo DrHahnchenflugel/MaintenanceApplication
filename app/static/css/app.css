@@ -41,30 +41,36 @@ a{
     flex-direction:column;
 }
 
+.content{
+    padding:20px;
+}
+
 .header{
-    display:flex;
-    justify-content:space-between;
+    display:grid;
+    grid-template-columns: 1fr auto 1fr; /* left | center | right */
     align-items:center;
     padding:12px 20px;
     border-bottom:1px solid var(--line);
 }
 
 .header h1{
+    grid-column: 3;         /* right cell */
+    justify-self:end;
     margin:0;
     letter-spacing:.12em;
     font-size:1.5rem;
 }
 
-.content{
-    padding:20px;
-}
-
 .header .top{
+    grid-column: 2;         /* center cell */
+    justify-self:center;    /* center the whole block */
     display:flex;
     flex-direction:column;
     align-items:center;
-    padding: 12px 20px;
-    border-bottom:1px solid var(--line);
+    gap:6px;
+    /* remove these so you don't get a second line + weird spacing */
+    padding:0;
+    border:0;
 }
 
 .footer{
