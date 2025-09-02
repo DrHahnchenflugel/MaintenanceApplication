@@ -50,4 +50,4 @@ def db_ping():
 
 @bp.get("/")
 def dashboard():
-    return render_template("dashboard/base.html")
+    return render_template("dashboard/index.html")

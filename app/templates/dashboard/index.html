@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %} Dashboard {% endblock %}
+
+{% block content %}
+    <div class="row">
+        <div class="card" style="flex:1">
+            <div>Open Issues</div>
+            <div class="kpi">3</div>
+        </div>
+
+        <div class="card" style="flex:1">
+            <div>Oldest Open Issue</div>
+            <div class="kpi">3d 4h</div>
+        </div>
+
+        <div class="card" style="flex:1">
+            <div>Blocked Issues</div>
+            <div class="kpi">27</div>
+        </div>
+
+        <div class="card" style="flex:2; min-height:160px">
+            <div>Open Issues (trend) </div>
+            <div style="height:120px; border:1px dashed var(--line); border-radius:8px; margin-top:8px;"></div>
+        </div>
+    </div>
+
+    <div class="card" style="margin-top:16px;">
+        <h3 style="margin:0 0 8px 0;"Assets (summary)</h3>
+        <div>EV3: RC 20 - EV3: MIND 15 - VEX: 5</div>
+    </div>
+{% endblock %}
+
+{% block footer %}
+    <button class="btn"New Issue +</button>
+{% endblock %}
