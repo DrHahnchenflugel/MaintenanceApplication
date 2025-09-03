@@ -1,10 +1,49 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "base.html" %}
+{% block title %} Maintenance - New Issue {% endblock %}
+{% block page_title %} Maintenance - New Issue {% endblock %}
 
-</body>
-</html>
+{% block content %}
+  <form class="form-card" method="post" action="{{ url_for('app.create_issue_for_asset', asset_uuid=asset.uuid) }}" enctype="multipart/form-data">
+    <div class="form-grid">
+
+      <div class="field">
+        <label>Asset</label>
+        <div class="pill">
+          #{{ asset[0] }} — {{ asset[2] }} {{ asset[3] }} {{ asset[4] }} {{ asset[5] }}
+        </div>
+        <div class="hint">This issue will be attached to the asset above.</div>
+      </div>
+
+      <div class="field field-colspan">
+        <label for="description">Description</label>
+        <textarea id="description" name="description" rows="6">{{ form.get('description','') }}</textarea>
+      </div>
+
+      <div class="field">
+        <label for="photo">Photo</label>
+        <input id="photo" name="photo" type="file" accept="image/*">
+        <div class="hint">Optional. JPG/PNG. Max ~10 MB recommended.</div>
+        <img id="preview" class="preview" alt="" style="display:none;">
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="btn" type="submit">Create Issue</button>
+      <a class="btn secondary" href="{{ url_for('app.list_issues') }}">Cancel</a>
+    </div>
+
+    <script>
+      const input = document.getElementById('photo');
+      const img = document.getElementById('preview');
+      if (input) {
+        input.addEventListener('change', () => {
+          const f = input.files && input.files[0];
+          if (!f) { img.style.display = 'none'; return; }
+          const url = URL.createObjectURL(f);
+          img.src = url;
+          img.style.display = 'block';
+        });
+      }
+    </script>
+  </form>
+{% endblock %}
