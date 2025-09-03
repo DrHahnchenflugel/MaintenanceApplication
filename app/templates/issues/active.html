@@ -6,7 +6,7 @@
 {% block content %}
   {% if issues %}
     <div class="table">
-      <div class="thead-four">
+      <div class="thead--four">
         <div>Asset Name</div>
         <div>Title</div>
         <div>Opened</div>
@@ -14,7 +14,7 @@
       </div>
 
       {% for issue in issues %}
-        <a class="trow-four" href="#">
+        <a class="trow--four" href="#">
             <div>#{{ issue[0][5] }}</div>
             <div>{{ issue[0][2] }}</div>
             <div>{{ issue[0][3] }}</div>
