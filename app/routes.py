@@ -64,14 +64,6 @@ def issues_active():
                             ORDER BY w.created_at DESC;""")
     return render_template("issues/active.html", issues=issues)
 
-@bp.get("/issues/new/<uuid:asset_uuid>")
-def new_issue_for_asset(asset_uuid):
-    row = query_one(f"select (asset_id) from asset where uuid = %s", (asset_uuid,))
-    print(row)
-    if row is None:
-        abort(404)
-    return render_template("issues/new.html", asset=row[0])
-
 @bp.get("/issues/new")
 def new_issue():
     assets = query_all("""SELECT (a.uuid, a.friendly_tag, a.site_id, a.make, a.model, a.variant, a.status,
@@ -83,3 +75,53 @@ def new_issue():
                         """)
 
     return render_template("issues/new_issue_asset_selector.html", assets=assets)
+
+@bp.get("/issues/new/<uuid:asset_uuid>")
+def new_issue_for_asset(asset_uuid):
+    asset = query_one("""SELECT (a.uuid, a.friendly_tag, a.site_id, a.make, a.model, a.variant, a.status,
+                        s.location_shorthand, s.friendly_name) 
+                        FROM asset a
+                        JOIN site s
+                        ON a.site_id = s.site_id
+                        WHERE a.uuid = %s;
+                        """, (str(asset_uuid),))
+    if asset is None:
+        abort(404)
+
+    return render_template("issues/new.html", asset=asset, form={})
+
+@bp.post("/issues/new/<uuid:asset_uuid>")
+def create_issue_for_asset(asset_uuid):
+    asset = query_one("select asset_id from asset where uuid = %s", (str(asset_uuid),))
+    if asset is None:
+        abort(404)
+    asset_id = asset[0]
+
+    description = (request.form.get("description") or "").strip()
+
+    errors = []
+    if not description:
+        errors.append("Description is required.")
+
+    if errors:
+        for e in errors:
+            flash(e, "error")
+
+        # Re-render with entered values
+        asset = query_one("""
+            select asset_id where from asset where uuid = %s
+            """, (str(asset_uuid),))
+        return render_template(f"issues/new/{asset_uuid}.html", asset=asset, form=request.form)
+
+    row = execute_returning_one("""
+        insert into work_order (asset_id, raw_issue_description, status)
+        values (%s, %s, 'OPEN')
+        returning work_order_id
+        """, (asset_id, description))
+
+    work_order_id = row[0]
+
+    _save_attachment_if_any(request, work_order_id)
+
+    flash("Issue created.", "ok")
+    return redirect(url_for("app.view_issue", work_order_id=work_order_id))
