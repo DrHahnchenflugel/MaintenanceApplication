@@ -206,7 +206,8 @@ a{
   border-bottom: 1px solid var(--line);
 }
 
-.thead {
+.thead--six,
+.thead--four {
   font-weight: 600;
   background: var(--surface-2);
   position: sticky;
@@ -214,12 +215,14 @@ a{
   z-index: 1;
 }
 
-.trow {
+.trow--six,
+.trow--four {
   text-decoration: none;
   color: inherit;
 }
 
-.trow:hover {
+.trow--six:hover,
+.trow--four:hover {
   background: var(--surface-1);
 }
 
