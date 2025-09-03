@@ -92,7 +92,7 @@ def new_issue_for_asset(asset_uuid):
 
 @bp.post("/issues/new/<uuid:asset_uuid>")
 def create_issue_for_asset(asset_uuid):
-    asset = query_one("select friendly_tag, site_id, make, model, variant, status from asset where uuid = %s", (str(asset_uuid),))
+    asset = query_one("select friendly_tag, site_id, make, model, variant, status from asset where uuid = %s;", (str(asset_uuid),))
     if asset is None:
         abort(404)
     asset_id = asset[0]
@@ -109,14 +109,14 @@ def create_issue_for_asset(asset_uuid):
 
         # Re-render with entered values
         asset = query_one("""
-            select friendly_tag, site_id, make, model, variant, status where from asset where uuid = %s
+            select friendly_tag, site_id, make, model, variant, status where from asset where uuid = %s;
             """, (str(asset_uuid),))
         return render_template(f"issues/new/{asset_uuid}.html", asset=asset, form=request.form)
 
     row = execute_returning_one("""
         insert into work_order (asset_id, raw_issue_description, status)
         values (%s, %s, 'OPEN')
-        returning work_order_id
+        returning work_order_id;
         """, (asset_id, description))
 
     work_order_id = row[0]
