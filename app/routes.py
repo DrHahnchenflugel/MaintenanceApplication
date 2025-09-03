@@ -112,7 +112,7 @@ def create_issue_for_asset(asset_uuid):
         asset = query_one("""
             select friendly_tag, site_id, make, model, variant, status where from asset where uuid = %s;
             """, (str(asset_uuid),))
-        return render_template(f"issues/new/{asset_uuid}.html", asset=asset, form=request.form)
+        return render_template(f"issues/new/ASD{asset_uuid}.html", asset=asset, form=request.form)
 
     row = execute_returning_one("""
         insert into work_order (asset_id, raw_issue_description, status)
