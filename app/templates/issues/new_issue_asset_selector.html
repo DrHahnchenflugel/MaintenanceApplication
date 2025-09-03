@@ -18,7 +18,7 @@
             </div>
 
             {% for a in assets %}
-            <a class="trow" href="{{ url_for('app.new_issue_for_asset, asset_uuid=a[0]) }}">
+            <a class="trow" href="{{ url_for('app.new_issue_for_asset', asset_uuid=a[0]) }}">
                 <div> {{ a[1] }}</div>
                 <div> {{ a[1] }}</div>
                 <div> {{ a[3] }}</div>
