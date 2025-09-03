@@ -88,6 +88,7 @@ def new_issue_for_asset(asset_uuid):
     if asset is None:
         abort(404)
 
+    print("new html")
     return render_template("issues/new.html", asset=asset, form={})
 
 @bp.post("/issues/new/<uuid:asset_uuid>")
@@ -111,7 +112,6 @@ def create_issue_for_asset(asset_uuid):
         asset = query_one("""
             select friendly_tag, site_id, make, model, variant, status where from asset where uuid = %s;
             """, (str(asset_uuid),))
-        print(f"returning w asset id {asset_uuid}")
         return render_template(f"issues/new/{asset_uuid}.html", asset=asset, form=request.form)
 
     row = execute_returning_one("""
@@ -125,4 +125,5 @@ def create_issue_for_asset(asset_uuid):
     _save_attachment_if_any(request, work_order_id)
 
     flash("Issue created.", "ok")
+    print("app.issues_active")
     return redirect(url_for("app.issues_active", work_order_id=work_order_id))
