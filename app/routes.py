@@ -78,22 +78,42 @@ def new_issue():
 
 @bp.get("/issues/new/<uuid:asset_uuid>")
 def new_issue_for_asset(asset_uuid):
-    asset = query_one("""SELECT (a.uuid, a.friendly_tag, a.site_id, a.make, a.model, a.variant, a.status,
-                        s.location_shorthand, s.friendly_name) 
-                        FROM asset a
-                        JOIN site s
-                        ON a.site_id = s.site_id
-                        WHERE a.uuid = %s;
-                        """, (str(asset_uuid),))
+    asset = query_one("""SELECT 
+                                a.uuid, 
+                                a.friendly_tag, 
+                                a.site_id, 
+                                a.make, 
+                                a.model, 
+                                a.variant, 
+                                a.status,
+                                
+                                s.location_shorthand, 
+                                s.friendly_name 
+
+                                FROM asset a
+                                JOIN site s
+                                ON a.site_id = s.site_id
+                                WHERE a.uuid = %s;
+                                """,
+                      (str(asset_uuid),))
     if asset is None:
         abort(404)
 
-    print("new html")
-    return render_template("issues/new.html", asset=asset, form={})
+    return render_template("issues/new.html", asset=asset, asset_uuid=asset_uuid, form={})
 
 @bp.post("/issues/new/<uuid:asset_uuid>")
 def create_issue_for_asset(asset_uuid):
-    asset = query_one("select friendly_tag, site_id, make, model, variant, status from asset where uuid = %s;", (str(asset_uuid),))
+    asset = query_one("""SELECT 
+                            friendly_tag, 
+                            site_id, 
+                            make, 
+                            model, 
+                            variant, 
+                            status 
+                            
+                            FROM asset 
+                            WHERE uuid = %s;""",
+                      (str(asset_uuid),))
     if asset is None:
         abort(404)
     asset_id = asset[0]
@@ -108,22 +128,28 @@ def create_issue_for_asset(asset_uuid):
         for e in errors:
             flash(e, "error")
 
-        # Re-render with entered values
-        asset = query_one("""
-            select friendly_tag, site_id, make, model, variant, status where from asset where uuid = %s;
-            """, (str(asset_uuid),))
-        return render_template(f"issues/new/ASD{asset_uuid}.html", asset=asset, form=request.form)
+        asset = query_one("""SELECT 
+                                    friendly_tag, 
+                                    site_id, 
+                                    make, 
+                                    model, 
+                                    variant, 
+                                    status 
+
+                                    FROM asset 
+                                    WHERE uuid = %s;""",
+                          (str(asset_uuid),))
+
+        return render_template(f"issues/new.html", asset=asset, form=request.form)
 
     row = execute_returning_one("""
-        insert into work_order (asset_id, raw_issue_description, status)
-        values (%s, %s, 'OPEN')
-        returning work_order_id;
+        INSERT INTO work_order (asset_id, raw_issue_description, status)
+        VALUES (%s, %s, 'OPEN')
+        RETURNING work_order_id;
         """, (asset_id, description))
 
     work_order_id = row[0]
-
     _save_attachment_if_any(request, work_order_id)
 
     flash("Issue created.", "ok")
-    print("app.issues_active")
     return redirect(url_for("app.issues_active", work_order_id=work_order_id))
