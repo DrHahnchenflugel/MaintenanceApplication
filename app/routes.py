@@ -103,16 +103,23 @@ def new_issue_for_asset(asset_uuid):
 
 @bp.post("/issues/new/<uuid:asset_uuid>")
 def create_issue_for_asset(asset_uuid):
-    asset = query_one("""SELECT 
-                            friendly_tag, 
-                            site_id, 
-                            make, 
-                            model, 
-                            variant, 
-                            status 
-                            
-                            FROM asset 
-                            WHERE uuid = %s;""",
+
+    asset = query_one("""
+        SELECT 
+            a.asset_id,           
+            a.uuid,               
+            a.friendly_tag,       
+            a.site_id,            
+            a.make,               
+            a.model,              
+            a.variant,            
+            a.status,             
+            s.location_shorthand, 
+            s.friendly_name       
+        FROM asset a
+        JOIN site s ON a.site_id = s.site_id
+        WHERE a.uuid = %s;
+    """,
                       (str(asset_uuid),))
     if asset is None:
         abort(404)
@@ -128,19 +135,25 @@ def create_issue_for_asset(asset_uuid):
         for e in errors:
             flash(e, "error")
 
-        asset = query_one("""SELECT 
-                                    friendly_tag, 
-                                    site_id, 
-                                    make, 
-                                    model, 
-                                    variant, 
-                                    status 
+        asset = query_one("""
+                SELECT 
+                    a.asset_id,           
+                    a.uuid,               
+                    a.friendly_tag,       
+                    a.site_id,            
+                    a.make,               
+                    a.model,              
+                    a.variant,            
+                    a.status,             
+                    s.location_shorthand, 
+                    s.friendly_name       
+                FROM asset a
+                JOIN site s ON a.site_id = s.site_id
+                WHERE a.uuid = %s;
+                """,
+                (str(asset_uuid),))
 
-                                    FROM asset 
-                                    WHERE uuid = %s;""",
-                          (str(asset_uuid),))
-
-        return render_template(f"issues/new.html", asset=asset, form=request.form)
+        return render_template(f"issues/new.html", asset=asset, asset_uuid=asset_uuid, form=request.form)
 
     row = execute_returning_one("""
         INSERT INTO work_order (asset_id, raw_issue_description, status)
