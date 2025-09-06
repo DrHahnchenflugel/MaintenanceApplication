@@ -197,6 +197,15 @@ a{
   border-bottom: 1px solid var(--line);
 }
 
+.trow--four_three_position {
+  display: grid;
+  grid-template-columns: 180px 1fr 0.5fr 0.5fr;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+}
+
 .thead--four,
 .trow--four {
   display: grid;
@@ -229,6 +238,7 @@ a{
 
 .trow--six,
 .trow--four
+.trow--four_three_position
 .trow--three {
   text-decoration: none;
   color: inherit;
