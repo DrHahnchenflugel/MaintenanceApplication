@@ -81,27 +81,26 @@
 
   <!-- Attachments -->
   <div class="card" style="margin-top:16px;">
-    <h3 style="margin:0 0 8px 0;">Attachments</h3>
-    {% if not issue[20] %}
-      <div class="pill">No attachments.</div>
-    {% else %}
-      <div class="row" style="gap:12px; flex-wrap:wrap;">
-        <div class="card" style="width:260px;">
-          <div style="font-size:12px; opacity:.8; margin-bottom:6px;">
-            {{ issue[23] or "File" }} • {{ issue[21] }}
-          </div>
+      <h3 style="margin:0 0 8px 0;">Attachments</h3>
 
+      {% if not issue[20] %}
+        <div class="pill">No attachments.</div>
+      {% else %}
+        <div class="row" style="gap:12px; flex-wrap:wrap;">
           {% if issue[22] and issue[22].startswith('image/') %}
             <a href="/attachments/{{ issue[20] }}" target="_blank" rel="noopener">
-              <img src="/attachments/{{ issue[20] }}" alt="{{ issue[23] or 'attachment' }}" style="width:100%; height:160px; object-fit:cover; border-radius:8px;">
+              <img src="/attachments/{{ issue[20] }}"
+                   alt="Attachment"
+                   style="width:200px; height:150px; object-fit:cover; border-radius:8px;">
             </a>
           {% else %}
-            <a class="btn" href="/attachments/{{ issue[20] }}" target="_blank" rel="noopener">Download</a>
+            <a class="btn" href="/attachments/{{ issue[20] }}" target="_blank" rel="noopener">
+              Download Attachment
+            </a>
           {% endif %}
         </div>
-      </div>
-    {% endif %}
-  </div>
+      {% endif %}
+    </div>
 
   <!-- Actions -->
   <div class="row" style="gap:8px; margin-top:16px;">
