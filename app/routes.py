@@ -204,7 +204,7 @@ def view_issue(issue_uuid):
             att.original_filename,
             s.site_id,
             s.location_shorthand,
-            s.friendly_name,
+            s.friendly_name
             FROM work_order i
             JOIN asset a ON i.asset_id = a.asset_id
             JOIN site s ON a.site_id = s.site_id
