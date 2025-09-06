@@ -264,3 +264,8 @@ a{
   justify-content: flex-end; /* or center, depending on how you like buttons laid out */
   margin-top: 1rem;
 }
+
+.logo {
+  width: clamp(96px, 12vw, 220px);  /* guardrails */
+  height: auto;
+}
