@@ -22,21 +22,19 @@
           <label>Opened</label>
           <div class="pill">{{ issue[3] }}</div>
         </div>
-        <div class="field" style="flex:1;">
-          <label>Closed</label>
-          <div class="pill">{{ issue[4] if issue[4] else "—" }}</div>
-        </div>
-      </div>
 
-      <div class="field" style="margin-top:12px;">
-        <label>Close note</label>
-        <div class="pill" style="white-space:pre-wrap;">{{ issue[5] if issue[5] else "—" }}</div>
-      </div>
+        {% if issue[6] != 'OPEN' %}
+            <div class="field" style="flex:1;">
+              <label>Closed</label>
+              <div class="pill">{{ issue[4] if issue[4] else "—" }}</div>
+            </div>
+          </div>
 
-      <div class="field" style="margin-top:12px;">
-        <label>Issue UUID</label>
-        <div class="pill">{{ issue[7] }}</div>
-      </div>
+          <div class="field" style="margin-top:12px;">
+            <label>Close note</label>
+            <div class="pill" style="white-space:pre-wrap;">{{ issue[5] if issue[5] else "—" }}</div>
+          </div>
+        {% endif %}
     </div>
 
     <!-- Right: Asset details -->
@@ -48,34 +46,31 @@
 
       <div class="field" style="margin-top:12px;">
         <label>Tag</label>
-        <div class="pill">#{{ issue[9] if issue[9] else issue[8] }}</div>
+        <div class="pill">{{ issue[9] }}</div>
       </div>
 
       <div class="field" style="margin-top:12px;">
-        <label>Make / Model</label>
-        <div class="pill">{{ issue[11] }} {{ issue[12] }}{% if issue[13] %} ({{ issue[13] }}){% endif %}</div>
+        <label>Make / Model / Variant</label>
+        <div class="pill">{{ issue[11] }} {{ issue[12] }} {{ issue[13] }}</div>
       </div>
 
       <div class="field" style="margin-top:12px;">
         <label>Site</label>
-        <div class="pill">{{ issue[10] }}</div>
+        <div class="pill">{{ issue[26] }}</div>
       </div>
 
-      <div class="field" style="margin-top:12px;">
-        <label>Asset UUID</label>
-        <div class="pill">{{ issue[17] }}</div>
-      </div>
-
-      <div class="row" style="gap:12px; margin-top:12px;">
-        <div class="field" style="flex:1;">
-          <label>Retired at</label>
-          <div class="pill">{{ issue[14] if issue[14] else "—" }}</div>
-        </div>
-        <div class="field" style="flex:1;">
-          <label>Retired reason</label>
-          <div class="pill">{{ issue[15] if issue[15] else "—" }}</div>
-        </div>
-      </div>
+        {% if issue[16] %}
+          <div class="row" style="gap:12px; margin-top:12px;">
+            <div class="field" style="flex:1;">
+              <label>Retired at</label>
+              <div class="pill">{{ issue[14] if issue[14] else "—" }}</div>
+            </div>
+            <div class="field" style="flex:1;">
+              <label>Retired reason</label>
+              <div class="pill">{{ issue[15] if issue[15] else "—" }}</div>
+            </div>
+          </div>
+        {% endif %}
     </div>
   </div>
 
@@ -101,5 +96,6 @@
   <!-- Actions -->
   <div class="row" style="gap:8px; margin-top:16px;">
     <a class="btn" href="{{ url_for('app.issues_active') }}">Back to Issues</a>
+    <a class="btn" href="{{ url_for('app.issues_active') }}">Update/Resolve Issue</a>
   </div>
 {% endblock %}

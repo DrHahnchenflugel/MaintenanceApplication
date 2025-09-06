@@ -195,9 +195,13 @@ def view_issue(issue_uuid):
             att.storage_path,
             att.uploaded_at,
             att.mime_type,
-            att.original_filename
+            att.original_filename,
+            s.site_id,
+            s.location_shorthand,
+            s.friendly_name
             FROM work_order i
             JOIN asset a ON i.asset_id = a.asset_id
+            JOIN site s ON a.site_id = s.site_id
             LEFT JOIN attachment att ON i.work_order_id = att.work_order_id
             WHERE i.uuid = %s;
         """, (issue_uuid,)
@@ -207,10 +211,6 @@ def view_issue(issue_uuid):
         abort(404)
 
     return render_template(f"issues/specific_issue.html", issue=issue)
-
-# in your app/blueprint file
-import os
-from flask import current_app, abort, send_from_directory
 
 @bp.get("/attachments/<path:subpath>")
 def serve_attachment(subpath: str):
