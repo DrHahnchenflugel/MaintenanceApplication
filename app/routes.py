@@ -230,6 +230,7 @@ def view_issue(issue_uuid):
     )
 
     if issue is None:
+        print("no issue found")
         abort(404)
 
     return render_template(f"issues/specific_issue.html", issue=issue, work_logs=work_logs)
