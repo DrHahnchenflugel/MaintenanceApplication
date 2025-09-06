@@ -14,7 +14,7 @@
       </div>
 
       {% for issue in issues %}
-        <a class="trow--four" href="#">
+        <a class="trow--four" href="{{ url_for('app.view_issue', issue_id=issue[0][0]) }}">
             <div>#{{ issue[0][5] }}</div>
             <div>{{ issue[0][2] }}</div>
             <div>{{ issue[0][3] }}</div>
