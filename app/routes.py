@@ -166,7 +166,7 @@ def create_issue_for_asset(asset_uuid):
         INSERT INTO work_log (work_order_id, action_taken)
         VALUES (%s, 'Issue Opened.')
         RETURNING work_log_id;
-        """, (work_order_id))
+        """, (work_order_id,))
 
     _save_attachment_if_any(request, work_order_id)
 
