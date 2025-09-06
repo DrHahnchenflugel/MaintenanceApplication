@@ -166,3 +166,44 @@ def create_issue_for_asset(asset_uuid):
 
     flash("Issue created.", "ok")
     return redirect(url_for("app.issues_active", work_order_id=work_order_id))
+
+@bp.get("/issues/<issue_uuid>")
+def view_issue(issue_uuid):
+    issue = query_one(
+        """
+        SELECT
+            i.work_order_id,
+            i.asset_id,
+            i.raw_issue_description,
+            i.created_at,
+            i.closed_at,
+            i.close_note,
+            i.status,
+            i.uuid,
+            a.asset_id,
+            a.friendly_tag,
+            a.site_id,
+            a.make,
+            a.model,
+            a.variant,
+            a.retired_at,
+            a.retired_reason,
+            a.status,
+            a.uuid,
+            att.attachment_id,
+            att.work_order_id,
+            att.storage_path,
+            att.uploaded_at,
+            att.mime_type,
+            att.original_filename
+            FROM work_order i
+            JOIN asset a ON i.asset_id = a.asset_id
+            LEFT JOIN attachment att ON i.work_order_id = att.work_order_id
+            WHERE i.work_order_id = %s;
+        """, (issue_uuid,)
+    )
+
+    if issue is None:
+        abort(404)
+
+    return render_template(f"issues/specific_issue.html", issue=issue)
