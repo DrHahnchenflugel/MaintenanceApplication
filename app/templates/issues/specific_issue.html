@@ -1,3 +1,110 @@
 {% extends "base.html" %}
 {% block title %} Maintenance - Issue {{ issue[0] }} {% endblock %}
 {% block page_title %} Maintenance - Issue {{ issue[0] }} {% endblock %}
+
+
+{% block content %}
+  <div class="row" style="gap:16px; align-items:flex-start;">
+    <!-- Left: Issue details -->
+    <div class="card" style="flex:2;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h2 style="margin:0;">Issue #{{ issue[0] }}</h2>
+        <span class="badge">{{ issue[6] }}</span>
+      </div>
+
+      <div class="field" style="margin-top:12px;">
+        <label>Description</label>
+        <div class="pill" style="white-space:pre-wrap;">{{ issue[2] }}</div>
+      </div>
+
+      <div class="row" style="gap:12px; margin-top:12px;">
+        <div class="field" style="flex:1;">
+          <label>Opened</label>
+          <div class="pill">{{ issue[3] }}</div>
+        </div>
+        <div class="field" style="flex:1;">
+          <label>Closed</label>
+          <div class="pill">{{ issue[4] if issue[4] else "—" }}</div>
+        </div>
+      </div>
+
+      <div class="field" style="margin-top:12px;">
+        <label>Close note</label>
+        <div class="pill" style="white-space:pre-wrap;">{{ issue[5] if issue[5] else "—" }}</div>
+      </div>
+
+      <div class="field" style="margin-top:12px;">
+        <label>Issue UUID</label>
+        <div class="pill">{{ issue[7] }}</div>
+      </div>
+    </div>
+
+    <!-- Right: Asset details -->
+    <div class="card" style="flex:1;">
+      <div style="display:flex; justify-content:space-between; align-items:center;">
+        <h3 style="margin:0;">Asset</h3>
+        <span class="badge">{{ issue[16] }}</span>
+      </div>
+
+      <div class="field" style="margin-top:12px;">
+        <label>Tag</label>
+        <div class="pill">#{{ issue[9] if issue[9] else issue[8] }}</div>
+      </div>
+
+      <div class="field" style="margin-top:12px;">
+        <label>Make / Model</label>
+        <div class="pill">{{ issue[11] }} {{ issue[12] }}{% if issue[13] %} ({{ issue[13] }}){% endif %}</div>
+      </div>
+
+      <div class="field" style="margin-top:12px;">
+        <label>Site</label>
+        <div class="pill">{{ issue[10] }}</div>
+      </div>
+
+      <div class="field" style="margin-top:12px;">
+        <label>Asset UUID</label>
+        <div class="pill">{{ issue[17] }}</div>
+      </div>
+
+      <div class="row" style="gap:12px; margin-top:12px;">
+        <div class="field" style="flex:1;">
+          <label>Retired at</label>
+          <div class="pill">{{ issue[14] if issue[14] else "—" }}</div>
+        </div>
+        <div class="field" style="flex:1;">
+          <label>Retired reason</label>
+          <div class="pill">{{ issue[15] if issue[15] else "—" }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Attachments -->
+  <div class="card" style="margin-top:16px;">
+    <h3 style="margin:0 0 8px 0;">Attachments</h3>
+    {% if not issue[20] %}
+      <div class="pill">No attachments.</div>
+    {% else %}
+      <div class="row" style="gap:12px; flex-wrap:wrap;">
+        <div class="card" style="width:260px;">
+          <div style="font-size:12px; opacity:.8; margin-bottom:6px;">
+            {{ issue[23] or "File" }} • {{ issue[21] }}
+          </div>
+
+          {% if issue[22] and issue[22].startswith('image/') %}
+            <a href="/attachments/{{ issue[20] }}" target="_blank" rel="noopener">
+              <img src="/attachments/{{ issue[20] }}" alt="{{ issue[23] or 'attachment' }}" style="width:100%; height:160px; object-fit:cover; border-radius:8px;">
+            </a>
+          {% else %}
+            <a class="btn" href="/attachments/{{ issue[20] }}" target="_blank" rel="noopener">Download</a>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Actions -->
+  <div class="row" style="gap:8px; margin-top:16px;">
+    <a class="btn" href="{{ url_for('app.list_issues') }}">Back to Issues</a>
+  </div>
+{% endblock %}
