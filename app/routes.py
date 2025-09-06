@@ -163,8 +163,8 @@ def create_issue_for_asset(asset_uuid):
     work_order_id = workOrder[0]
 
     execute("""
-        INSERT INTO work_log (work_order_id, action_taken)
-        VALUES (%s, 'Issue Opened.')
+        INSERT INTO work_log (work_order_id, action_taken, result)
+        VALUES (%s, 'Issue Opened.', 'Issue Opened.')
         RETURNING work_log_id;
         """, (work_order_id,))
 
