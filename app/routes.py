@@ -257,13 +257,13 @@ def update_issue(issue_uuid):
 
     if new_status in ['IN_PROGRESS', 'OPEN', 'CLOSED']:
         execute(
-            "UPDATE work_order SET status = 'IN_PROGRESS' WHERE work_order_id = %s",
-            (work_order_id)
+            "UPDATE work_order SET status = %s WHERE work_order_id = %s",
+            (new_status, work_order_id)
         )
     elif new_status in ['BLOCKED']: #TODO: add something to blocked
         execute(
             "UPDATE work_order SET status = 'BLOCKED' WHERE work_order_id = %s",
-            (work_order_id)
+            (work_order_id,)
         )
 
     flash("Updated issue log.", "ok")

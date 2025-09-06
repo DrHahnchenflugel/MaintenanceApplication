@@ -135,8 +135,8 @@
               <div>
                   <select name="status">
                       <option value="OPEN">OPEN</option>
-                      <option value="IN PROGRESS">IN PROGRESS</option>
-                      <option value="RESOLVED">RESOLVED</option>
+                      <option value="IN_PROGRESS">IN PROGRESS</option>
+                      <option value="BLOCKED">BLOCKED</option>
                       <option value="CLOSED">CLOSED</option>
                       <!-- TODO: add BLOCKED as an option -->
                   </select>
@@ -154,7 +154,6 @@
   <!-- Actions -->
   <div class="row" style="gap:8px; margin-top:16px;">
     <a class="btn" href="{{ url_for('app.issues_active') }}">Back to Issues</a>
-    <a class="btn" href="{{ url_for('app.issues_active') }}">Update/Resolve Issue</a>
   </div>
 {% endblock %}
 
