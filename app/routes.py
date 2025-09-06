@@ -60,7 +60,7 @@ def issues_active():
                             FROM work_order w 
                             JOIN asset a 
                             ON w.asset_id = a.asset_id 
-                            WHERE w.status = 'OPEN' 
+                            WHERE w.status IN ('OPEN', 'IN_PROGRESS') 
                             ORDER BY w.created_at DESC;""")
     return render_template("issues/active.html", issues=issues)
 
@@ -234,9 +234,43 @@ def view_issue(issue_uuid):
 
     return render_template(f"issues/specific_issue.html", issue=issue, work_logs=work_logs)
 
+@bp.post("/issues/<uuid:issue_uuid>/update")
+def update_issue(issue_uuid):
+    action_taken = request.form.get("action_taken", "").strip()
+    result = request.form.get("result", "").strip()
+    new_status = request.form.get("status", "").strip()
+
+    # Find work_order_id from UUID
+    wo = query_one("SELECT work_order_id FROM work_order WHERE uuid = %s", (str(issue_uuid),))
+    if not wo:
+        abort(404)
+    work_order_id = wo[0]
+
+    # Insert into work_log
+    execute(
+        """
+        INSERT INTO work_log (work_order_id, action_taken, result)
+        VALUES (%s, %s, %s)
+        """,
+        (work_order_id, action_taken, result)
+    )
+
+    if new_status in ['IN_PROGRESS', 'OPEN', 'CLOSED']:
+        execute(
+            "UPDATE work_order SET status = 'IN_PROGRESS' WHERE work_order_id = %s",
+            (work_order_id)
+        )
+    elif new_status in ['BLOCKED']: #TODO: add something to blocked
+        execute(
+            "UPDATE work_order SET status = 'BLOCKED' WHERE work_order_id = %s",
+            (work_order_id)
+        )
+
+    flash("Updated issue log.", "ok")
+    return redirect(url_for("app.view_issue", issue_uuid=issue_uuid))
+
 @bp.get("/attachments/<path:subpath>")
 def serve_attachment(subpath: str):
-    # ATTACHMENT_ROOT should be an absolute path
     root = os.path.abspath(current_app.config["ATTACHMENT_ROOT"])
 
     # Prevent path traversal
@@ -246,7 +280,6 @@ def serve_attachment(subpath: str):
 
     # Let Flask set Content-Type; don’t force download (we want inline images)
     resp = send_from_directory(root, subpath, as_attachment=False, conditional=True)
-    # Optional: basic caching for images
     resp.cache_control.public = True
     resp.cache_control.max_age = 86400  # 1 day
     return resp

@@ -118,6 +118,37 @@
         </div>
       {% endfor %}
 
+       <div class="trow--three" id="new-entry-row">
+            <div colspan="3" style="text-align:center;">
+                <button class="btn" id="add-update-btn">+ Update/Resolve Issue</button>
+            </div>
+        </div>
+
+      <form method="post" action="{{ url_for('app.update_issue', issue_uuid=issue[7]) }}">
+          <div class="trow--three" id="update-form-row" style="display:none;">
+              <div>
+                  <input type="text" name="action_taken" placeholder="Action Taken" required>
+              </div>
+              <div>
+                  <input type="text" name="result" placeholder="Result" required>
+              </div>
+              <div>
+                  <select name="status">
+                      <option value="OPEN">OPEN</option>
+                      <option value="IN PROGRESS">IN PROGRESS</option>
+                      <option value="RESOLVED">RESOLVED</option>
+                      <option value="CLOSED">CLOSED</option>
+                      <!-- TODO: add BLOCKED as an option -->
+                  </select>
+              </div>
+          </div>
+
+          <div class="trow--three" id="submit-row" style="display:none;">
+              <div colspan="3" style="text-align:center;">
+                  <button type="submit" class="btn">Save</button>
+              </div>
+          </div>
+        </form>
   </div>
 
   <!-- Actions -->
@@ -126,3 +157,19 @@
     <a class="btn" href="{{ url_for('app.issues_active') }}">Update/Resolve Issue</a>
   </div>
 {% endblock %}
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const addBtn = document.getElementById("add-update-btn");
+    const newRow = document.getElementById("new-entry-row");
+    const formRow = document.getElementById("update-form-row");
+    const submitRow = document.getElementById("submit-row");
+
+    addBtn.addEventListener("click", function(e) {
+        e.preventDefault();
+        newRow.style.display = "none";   // hide the button row
+        formRow.style.display = "grid";  // show the inputs
+        submitRow.style.display = "grid"; // show submit
+    });
+});
+</script>
