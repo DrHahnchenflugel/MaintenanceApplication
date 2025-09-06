@@ -266,6 +266,6 @@ a{
 }
 
 .full-logo {
-  width: clamp(96px, 8vw, 300px);  /* guardrails */
+  width: clamp(96px, 8vw, 10000px);  /* guardrails */
   height: auto;
 }
