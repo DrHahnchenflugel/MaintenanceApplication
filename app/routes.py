@@ -207,3 +207,24 @@ def view_issue(issue_uuid):
         abort(404)
 
     return render_template(f"issues/specific_issue.html", issue=issue)
+
+# in your app/blueprint file
+import os
+from flask import current_app, abort, send_from_directory
+
+@bp.get("/attachments/<path:subpath>")
+def serve_attachment(subpath: str):
+    # ATTACHMENT_ROOT should be an absolute path
+    root = os.path.abspath(current_app.config["ATTACHMENT_ROOT"])
+
+    # Prevent path traversal
+    full = os.path.abspath(os.path.join(root, subpath))
+    if not full.startswith(root + os.sep) and full != root:
+        abort(404)
+
+    # Let Flask set Content-Type; don’t force download (we want inline images)
+    resp = send_from_directory(root, subpath, as_attachment=False, conditional=True)
+    # Optional: basic caching for images
+    resp.cache_control.public = True
+    resp.cache_control.max_age = 86400  # 1 day
+    return resp
