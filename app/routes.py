@@ -155,13 +155,19 @@ def create_issue_for_asset(asset_uuid):
 
         return render_template(f"issues/new.html", asset=asset, asset_uuid=asset_uuid, form=request.form)
 
-    row = execute_returning_one("""
+    workOrder = execute_returning_one("""
         INSERT INTO work_order (asset_id, raw_issue_description, status)
         VALUES (%s, %s, 'OPEN')
         RETURNING work_order_id;
         """, (asset_id, description))
+    work_order_id = workOrder[0]
 
-    work_order_id = row[0]
+    execute("""
+        INSERT INTO work_log (work_order_id, action_taken)
+        VALUES (%s, 'Issue Opened.')
+        RETURNING work_log_id;
+        """, (work_order_id))
+
     _save_attachment_if_any(request, work_order_id)
 
     flash("Issue created.", "ok")
