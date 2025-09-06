@@ -155,20 +155,22 @@
   <div class="row" style="gap:8px; margin-top:16px;">
     <a class="btn" href="{{ url_for('app.issues_active') }}">Back to Issues</a>
   </div>
-{% endblock %}
+
 
 <script>
-document.addEventListener("DOMContentLoaded", function() {
-    const addBtn = document.getElementById("add-update-btn");
-    const newRow = document.getElementById("new-entry-row");
-    const formRow = document.getElementById("update-form-row");
-    const submitRow = document.getElementById("submit-row");
+    document.addEventListener("DOMContentLoaded", function() {
+        const addBtn = document.getElementById("add-update-btn");
+        const newRow = document.getElementById("new-entry-row");
+        const formRow = document.getElementById("update-form-row");
+        const submitRow = document.getElementById("submit-row");
 
-    addBtn.addEventListener("click", function(e) {
-        e.preventDefault();
-        newRow.style.display = "none";   // hide the button row
-        formRow.style.display = "grid";  // show the inputs
-        submitRow.style.display = "grid"; // show submit
+        addBtn.addEventListener("click", function(e) {
+            e.preventDefault();
+            newRow.style.display = "none";   // hide the button row
+            formRow.style.display = "grid";  // show the inputs
+            submitRow.style.display = "grid"; // show submit
+        });
     });
-});
 </script>
+
+{% endblock %}
