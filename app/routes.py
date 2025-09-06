@@ -204,19 +204,35 @@ def view_issue(issue_uuid):
             att.original_filename,
             s.site_id,
             s.location_shorthand,
-            s.friendly_name
+            s.friendly_name,
             FROM work_order i
             JOIN asset a ON i.asset_id = a.asset_id
             JOIN site s ON a.site_id = s.site_id
+            JOIN work_log wl ON wl.work_order_id = i.work_order_id
             LEFT JOIN attachment att ON i.work_order_id = att.work_order_id
             WHERE i.uuid = %s;
+        """, (issue_uuid,)
+    )
+
+    work_logs = query_all(
+        """
+            SELECT
+            wl.work_log_id,
+            wl.work_order_id,
+            wl.action_taken,
+            wl.result,
+            wl.created_at
+            
+            FROM work_log wl
+            JOIN work_order wo ON wl.work_order_id = wo.work_order_id
+            WHERE wo.uuid = %s;
         """, (issue_uuid,)
     )
 
     if issue is None:
         abort(404)
 
-    return render_template(f"issues/specific_issue.html", issue=issue)
+    return render_template(f"issues/specific_issue.html", issue=issue, work_logs=work_logs)
 
 @bp.get("/attachments/<path:subpath>")
 def serve_attachment(subpath: str):

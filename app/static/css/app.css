@@ -186,6 +186,17 @@ a{
   border-radius: 10px;
   overflow: hidden;
 }
+
+.thead--three,
+.trow--three {
+  display: grid;
+  grid-template-columns: 240px 1fr 120px;
+  gap: 12px;
+  align-items: center;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+}
+
 .thead--four,
 .trow--four {
   display: grid;
@@ -207,7 +218,8 @@ a{
 }
 
 .thead--six,
-.thead--four {
+.thead--four
+.thead--three {
   font-weight: 600;
   background: var(--surface-2);
   position: sticky;
@@ -216,13 +228,15 @@ a{
 }
 
 .trow--six,
-.trow--four {
+.trow--four
+.trow--three {
   text-decoration: none;
   color: inherit;
 }
 
 .trow--six:hover,
-.trow--four:hover {
+.trow--four:hover,
+.trow--three:hover {
   background: var(--surface-1);
 }
 

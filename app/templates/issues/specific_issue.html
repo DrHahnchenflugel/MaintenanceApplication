@@ -95,6 +95,25 @@
       {% endif %}
   </div>
 
+  <!-- Work Log -->
+  <div class="table">
+      <div class="thead--three">
+        <div>Timestamp</div>
+        <div>Action Taken</div>
+        <div>Result</div>
+      </div>
+
+
+      {% for entry in work_logs %}
+        <div class="trow--three">
+            <div>entry[4]</div>
+            <div>entry[3]</div>
+            <div>entry[2]</div>
+        </div>
+      {% endfor %}
+
+  </div>
+
   <!-- Actions -->
   <div class="row" style="gap:8px; margin-top:16px;">
     <a class="btn" href="{{ url_for('app.issues_active') }}">Back to Issues</a>
