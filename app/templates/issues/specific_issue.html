@@ -28,8 +28,10 @@
               <label>Closed</label>
               <div class="pill">{{ issue[4] if issue[4] else "—" }}</div>
             </div>
+        {% endif %}
           </div>
 
+        {% if issue[6] != 'OPEN' %}
           <div class="field" style="margin-top:12px;">
             <label>Close note</label>
             <div class="pill" style="white-space:pre-wrap;">{{ issue[5] if issue[5] else "—" }}</div>
