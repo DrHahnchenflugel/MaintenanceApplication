@@ -208,7 +208,6 @@ def view_issue(issue_uuid):
             FROM work_order i
             JOIN asset a ON i.asset_id = a.asset_id
             JOIN site s ON a.site_id = s.site_id
-            JOIN work_log wl ON wl.work_order_id = i.work_order_id
             LEFT JOIN attachment att ON i.work_order_id = att.work_order_id
             WHERE i.uuid = %s;
         """, (issue_uuid,)
