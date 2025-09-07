@@ -55,30 +55,62 @@ def dashboard():
 
 @bp.get("/issues/active")
 def issues_active():
-    issues = query_all("""SELECT (w.uuid, w.asset_id, w.raw_issue_description, w.created_at, w.status, 
+    issues_sql = query_all("""SELECT (w.uuid, w.asset_id, w.raw_issue_description, w.created_at, w.status, 
                             a.friendly_tag, a.site_id, a.make, a.model, a.variant, a.status) 
                             FROM work_order w 
                             JOIN asset a 
                             ON w.asset_id = a.asset_id 
                             WHERE w.status IN ('OPEN', 'IN_PROGRESS') 
                             ORDER BY w.created_at DESC;""")
+    issues = []
+    for i in issues_sql:
+        issues.append(
+            {
+                'workOrder_uuid':i[0][0],
+                'workOrder_asset_id':i[0][1],
+                'workOrder_raw_issue_description':i[0][2],
+                'workOrder_created_at':i[0][3],
+                'workOrder_status':i[0][4],
+                'asset_friendly_tag':i[0][5],
+                'asset_site_id':i[0][6],
+                'asset_make':i[0][7],
+                'asset_model':i[0][8],
+                'asset_variant':i[0][9],
+                'asset_status':i[0][10],
+            }
+        )
+
     return render_template("issues/active.html", issues=issues)
 
 @bp.get("/issues/new")
 def new_issue():
-    assets = query_all("""SELECT (a.uuid, a.friendly_tag, a.site_id, a.make, a.model, a.variant, a.status,
+    assets_sql = query_all("""SELECT (a.uuid, a.friendly_tag, a.site_id, a.make, a.model, a.variant, a.status,
                         s.location_shorthand, s.friendly_name) 
                         FROM asset a
                         JOIN site s
                         ON a.site_id = s.site_id
                         ORDER BY friendly_tag ASC;
                         """)
-
+    assets = []
+    for asset in assets_sql:
+        assets.append(
+            {
+                'asset_uuid':asset[0][0],
+                'asset_friendly_tag':asset[0][1],
+                'asset_site_id':asset[0][2],
+                'asset_make':asset[0][3],
+                'asset_model':asset[0][4],
+                'asset_variant':asset[0][5],
+                'asset_status':asset[0][6],
+                'site_location_shorthand':asset[0][7],
+                'site_friendly_name':asset[0][8]
+            }
+        )
     return render_template("issues/new_issue_asset_selector.html", assets=assets)
 
 @bp.get("/issues/new/<uuid:asset_uuid>")
 def new_issue_for_asset(asset_uuid):
-    asset = query_one("""SELECT 
+    asset_sql = query_one("""SELECT 
                                 a.uuid, 
                                 a.friendly_tag, 
                                 a.site_id, 
@@ -96,35 +128,61 @@ def new_issue_for_asset(asset_uuid):
                                 WHERE a.uuid = %s;
                                 """,
                       (str(asset_uuid),))
-    if asset is None:
+
+    if asset_sql is None:
         abort(404)
+
+    asset = {
+        'asset_uuid':asset_sql[0],
+        'asset_friendly_tag':asset_sql[1],
+        'asset_site_id':asset_sql[2],
+        'asset_make':asset_sql[3],
+        'asset_model':asset_sql[4],
+        'asset_variant':asset_sql[5],
+        'asset_status':asset_sql[6],
+        'site_location_shorthand':asset_sql[7],
+        'site_friendly_name':asset_sql[8]
+    }
 
     return render_template("issues/new.html", asset=asset, asset_uuid=asset_uuid, form={})
 
 @bp.post("/issues/new/<uuid:asset_uuid>")
 def create_issue_for_asset(asset_uuid):
+    asset_sql = query_one("""SELECT 
+                                    a.uuid, 
+                                    a.friendly_tag, 
+                                    a.site_id, 
+                                    a.make, 
+                                    a.model, 
+                                    a.variant, 
+                                    a.status,
 
-    asset = query_one("""
-        SELECT 
-            a.asset_id,           
-            a.uuid,               
-            a.friendly_tag,       
-            a.site_id,            
-            a.make,               
-            a.model,              
-            a.variant,            
-            a.status,             
-            s.location_shorthand, 
-            s.friendly_name       
-        FROM asset a
-        JOIN site s ON a.site_id = s.site_id
-        WHERE a.uuid = %s;
-    """,
-                      (str(asset_uuid),))
-    if asset is None:
+                                    s.location_shorthand, 
+                                    s.friendly_name 
+
+                                    FROM asset a
+                                    JOIN site s
+                                    ON a.site_id = s.site_id
+                                    WHERE a.uuid = %s;
+                                    """,
+                          (str(asset_uuid),))
+
+    if asset_sql is None:
         abort(404)
-    asset_id = asset[0]
 
+    asset = {
+        'asset_uuid': asset_sql[0],
+        'asset_friendly_tag': asset_sql[1],
+        'asset_site_id': asset_sql[2],
+        'asset_make': asset_sql[3],
+        'asset_model': asset_sql[4],
+        'asset_variant': asset_sql[5],
+        'asset_status': asset_sql[6],
+        'site_location_shorthand': asset_sql[7],
+        'site_friendly_name': asset_sql[8]
+    }
+
+    asset_id = asset.get('asset_uuid')
     description = (request.form.get("description") or "").strip()
 
     errors = []
@@ -135,23 +193,39 @@ def create_issue_for_asset(asset_uuid):
         for e in errors:
             flash(e, "error")
 
-        asset = query_one("""
-                SELECT 
-                    a.asset_id,           
-                    a.uuid,               
-                    a.friendly_tag,       
-                    a.site_id,            
-                    a.make,               
-                    a.model,              
-                    a.variant,            
-                    a.status,             
-                    s.location_shorthand, 
-                    s.friendly_name       
-                FROM asset a
-                JOIN site s ON a.site_id = s.site_id
-                WHERE a.uuid = %s;
-                """,
-                (str(asset_uuid),))
+        asset_sql = query_one("""SELECT 
+                                        a.uuid, 
+                                        a.friendly_tag, 
+                                        a.site_id, 
+                                        a.make, 
+                                        a.model, 
+                                        a.variant, 
+                                        a.status,
+
+                                        s.location_shorthand, 
+                                        s.friendly_name 
+
+                                        FROM asset a
+                                        JOIN site s
+                                        ON a.site_id = s.site_id
+                                        WHERE a.uuid = %s;
+                                        """,
+                              (str(asset_uuid),))
+
+        if asset_sql is None:
+            abort(404)
+
+        asset = {
+            'asset_uuid': asset_sql[0],
+            'asset_friendly_tag': asset_sql[1],
+            'asset_site_id': asset_sql[2],
+            'asset_make': asset_sql[3],
+            'asset_model': asset_sql[4],
+            'asset_variant': asset_sql[5],
+            'asset_status': asset_sql[6],
+            'site_location_shorthand': asset_sql[7],
+            'site_friendly_name': asset_sql[8]
+        }
 
         return render_template(f"issues/new.html", asset=asset, asset_uuid=asset_uuid, form=request.form)
 
@@ -175,10 +249,10 @@ def create_issue_for_asset(asset_uuid):
 
 @bp.get("/issues/<issue_uuid>")
 def view_issue(issue_uuid):
-    issue = query_one(
+    issue_sql = query_one(
         """
         SELECT
-            i.work_order_id,
+            i.work_order_id,            
             i.asset_id,
             i.raw_issue_description,
             i.created_at,
@@ -188,7 +262,7 @@ def view_issue(issue_uuid):
             i.uuid,
             a.asset_id,
             a.friendly_tag,
-            a.site_id,
+            a.site_id,                  
             a.make,
             a.model,
             a.variant,
@@ -198,7 +272,7 @@ def view_issue(issue_uuid):
             a.uuid,
             att.attachment_id,
             att.work_order_id,
-            att.storage_path,
+            att.storage_path,           
             att.uploaded_at,
             att.mime_type,
             att.original_filename,
@@ -213,7 +287,7 @@ def view_issue(issue_uuid):
         """, (issue_uuid,)
     )
 
-    work_logs = query_all(
+    work_logs_sql = query_all(
         """
             SELECT
             wl.work_log_id,
@@ -228,9 +302,45 @@ def view_issue(issue_uuid):
         """, (issue_uuid,)
     )
 
-    if issue is None:
-        print("no issue found")
+    if issue_sql is None:
         abort(404)
+
+    issue = {
+        'work_order_id' : issue_sql[0],
+        'asset_id' : issue_sql[1],
+        'raw_issue_description' : issue_sql[2],
+        'work_order_created_at' : issue_sql[3],
+        'work_order_closed_at' : issue_sql[4],
+        'work_order_close_note' : issue_sql[5],
+        'work_order_status' : issue_sql[6],
+        'work_order_uuid' : issue_sql[7],
+        'asset_friendly_tag' : issue_sql[9],
+        'asset_make' : issue_sql[11],
+        'asset_model' : issue_sql[12],
+        'asset_variant' : issue_sql[13],
+        'asset_retired_at' : issue_sql[14],
+        'asset_retired_reason' : issue_sql[15],
+        'asset_status' : issue_sql[16],
+        'attachment_id' : issue_sql[18],
+        'attachment_storage_path' : issue_sql[20],
+        'attachment_uploaded_at' : issue_sql[21],
+        'attachment_mime_type' : issue_sql[22],
+        'attachment_original_filename' : issue_sql[23],
+        'site_id' : issue_sql[24],
+        'site_location_shorthand' : issue_sql[25],
+        'site_friendly_name' : issue_sql[26]
+    }
+
+    work_logs = []
+    for log in work_logs_sql:
+        work_logs.append(
+            {
+                'id':log[0][0],
+                'action_taken':log[0][2],
+                'result':log[0][3],
+                'created_at':log[0][4]
+            }
+        )
 
     return render_template(f"issues/specific_issue.html", issue=issue, work_logs=work_logs)
 
@@ -284,3 +394,41 @@ def serve_attachment(subpath: str):
     resp.cache_control.max_age = 86400  # 1 day
     return resp
 
+@bp.get("/assets")
+def assets():
+    assets_sql = query_all(
+        """
+        SELECT 
+            a.asset_id,
+            a.friendly_tag,
+            a.make,
+            a.model,
+            a.variant,
+            a.status,
+            a.uuid,
+            s.location_shorthand,
+            s.friendly_name
+        
+        FROM
+            asset a
+            JOIN site s ON a.site_id = s.site_id;
+        """
+    )
+
+    assets = []
+    for a in assets_sql:
+        assets.append(
+            {
+                'asset_id' : a[0][0],
+                'asset_friendly_tag' : a[0][1],
+                'asset_make' : a[0][2],
+                'asset_model' : a[0][3],
+                'asset_variant' : a[0][4],
+                'asset_status' : a[0][5],
+                'asset_uuid' : a[0][6],
+                'site_location_shorthand' : a[0][7],
+                'site_friendly_name' : a[0][8]
+            }
+        )
+
+    return render_template(f"assets/viewAssets.html", assets=assets)

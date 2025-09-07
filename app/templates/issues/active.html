@@ -17,11 +17,11 @@
       </div>
 
       {% for issue in issues %}
-        <a class="trow--four" href="{{ url_for('app.view_issue', issue_uuid=issue[0][0]) }}">
-            <div>#{{ issue[0][5] }}</div>
-            <div>{{ issue[0][2] }}</div>
-            <div>{{ issue[0][3] }}</div>
-            <div class="badge">{{ issue[0][4] }}</div>
+        <a class="trow--four" href="{{ url_for('app.view_issue', issue_uuid=issue.get('workOrder_uuid')) }}">
+            <div>#{{ issue.get('asset_friendly_tag') }}</div>
+            <div>{{ issue.get('workOrder_raw_issue_description') }}</div>
+            <div>{{ issue.get('workOrder_created_at') }}</div>
+            <div class="badge">{{ issue.get('workOrder_status') }}</div>
         </a>
       {% endfor %}
     </div>

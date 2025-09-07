@@ -3,13 +3,15 @@
 {% block page_title %} Maintenance - New Issue {% endblock %}
 
 {% block content %}
-  <form class="form-card" method="post" action="{{ url_for('app.create_issue_for_asset', asset_uuid=asset_uuid) }}" enctype="multipart/form-data">
+  <form class="form-card" method="post" action="{{ url_for('app.create_issue_for_asset', asset_uuid=asset_uuid) }}"
+        enctype="multipart/form-data">
     <div class="form-grid">
 
       <div class="field">
         <label>Asset</label>
         <div class="pill">
-          #{{ asset[0] }} — {{ asset[2] }} {{ asset[3] }} {{ asset[4] }} {{ asset[5] }}
+          {{ asset.get('asset_friendly_tag') }} — {{ asset.get('asset_make') }} {{ asset.get('asset_model') }}
+            {{ asset.get('asset_variant') }} ({{ asset.get('site_location_shorthand') }})
         </div>
         <div class="hint">This issue will be attached to the asset above.</div>
       </div>

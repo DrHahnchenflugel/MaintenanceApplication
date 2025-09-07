@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %} Maintenance - Assets {% endblock %}
+{% block page_title %} Assets {% endblock %}
+
+
+{% block content %}
+    <div class="card">
+        Filter [To be implemented]
+    </div>
+  {% if assets %}
+    <div class="table">
+      <div class="thead--six">
+        <div>Name</div>
+        <div>Site</div>
+        <div>Make</div>
+        <div>Model</div>
+        <div>Variant</div>
+        <div>Status</div>
+      </div>
+
+      {% for asset in assets %}
+        <a class="trow--six" href="#">
+            <div>#{{ asset.get('asset_friendly_tag') }}</div>
+            <div>{{ asset.get('site_friendly_name') }}</div>
+            <div>{{ asset.get('asset_make') }}</div>
+            <div>{{ asset.get('asset_model') }}</div>
+            <div>{{ asset.get('asset_variant') }}</div>
+            <div>{{ asset.get('asset_status') }}</div>
+        </a>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p>No active assets.</p>
+  {% endif %}
+{% endblock %}

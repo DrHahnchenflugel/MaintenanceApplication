@@ -18,13 +18,13 @@
             </div>
 
             {% for a in assets %}
-            <a class="trow--six" href="{{ url_for('app.new_issue_for_asset', asset_uuid=a[0][0]) }}">
-                <div> {{ a[0][1] }}</div>
-                <div> {{ a[0][7] }}</div>
-                <div> {{ a[0][3] }}</div>
-                <div> {{ a[0][4] }}</div>
-                <div> {{ a[0][5] }}</div>
-                <div> {{ a[0][6] }}</div>
+            <a class="trow--six" href="{{ url_for('app.new_issue_for_asset', asset_uuid=a.get('asset_uuid') }}">
+                <div> {{ a.get('asset_friendly_tag') }}</div>
+                <div> {{ a.get('site_location_shorthand') }}</div>
+                <div> {{ a.get('asset_make') }}</div>
+                <div> {{ a.get('asset_model') }}</div>
+                <div> {{ a.get('asset_variant') }}</div>
+                <div> {{ a.get('asset_status') }}</div>
             </a>
             {% endfor %}
         </div>
