@@ -335,10 +335,10 @@ def view_issue(issue_uuid):
     for log in work_logs_sql:
         work_logs.append(
             {
-                'id':log[0][0],
-                'action_taken':log[0][2],
-                'result':log[0][3],
-                'created_at':log[0][4]
+                'id':log[0],
+                'action_taken':log[2],
+                'result':log[3],
+                'created_at':log[4]
             }
         )
 
@@ -432,3 +432,12 @@ def assets():
         )
 
     return render_template(f"assets/viewAssets.html", assets=assets)
+
+@bp.get("/assets/<uuid:asset_uuid>")
+def view_asset(asset_uuid):
+    asset_sql = query_one(
+        """
+            SELECT
+                
+        """
+    )
