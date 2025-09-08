@@ -286,6 +286,7 @@ def view_issue(issue_uuid):
             WHERE i.uuid = %s;
         """, (issue_uuid,)
     )
+    print(issue_sql[22])
 
     work_logs_sql = query_all(
         """
