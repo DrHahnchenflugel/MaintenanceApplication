@@ -86,13 +86,13 @@
         <div class="pill">No attachments.</div>
       {% else %}
         {% set att_url = url_for('app.serve_attachment', subpath=issue.get('attachment_storage_path')) %}
-        {% if issue.get('attachment_mimetype') and issue.get('attachment_mimetype').startswith('image/') %}
+        {% if issue.get('attachment_mime_type') and issue.get('attachment_mime_type').startswith('image/') %}
           <a href="{{ att_url }}" target="_blank" rel="noopener">
             <img src="{{ att_url }}" alt="Attachment"
                  style="width:220px; height:160px; object-fit:cover; border-radius:8px;">
           </a>
         {% else %}
-          <a class="btn" href="{{ att_url }}" target="_blank" rel="noopener">{{ issue.get('attachment_mimetype') }}</a>
+          <a class="btn" href="{{ att_url }}" target="_blank" rel="noopener">{{ issue.get('attachment_mime_type') }}</a>
         {% endif %}
       {% endif %}
   </div>
