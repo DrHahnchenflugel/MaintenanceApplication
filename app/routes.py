@@ -473,4 +473,4 @@ def view_asset(asset_uuid):
         'site_friendly_name' : asset_sql[11]
     }
 
-    return render_template('specific_asset.html', asset = asset)
+    return render_template('assets/specific_asset.html', asset = asset)
