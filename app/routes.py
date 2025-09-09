@@ -51,7 +51,42 @@ def db_ping():
 @bp.get("/")
 @bp.get("/dashboard")
 def dashboard():
-    return render_template("dashboard/index.html")
+    num_open_issues_sql = query_one(
+        """
+            SELECT
+            COUNT(*)
+            FROM work_order
+            WHERE status = 'OPEN'
+                OR status = 'IN_PROGRESS;
+        """
+    )
+
+    num_blocked_issues_sql = query_one(
+        """
+            SELECT
+            COUNT(*)
+            FROM work_order
+            WHERE status = 'BLOCKED';
+        """
+    )
+
+    oldest_issue_sql = query_one(
+        """
+            SELECT 
+                created_at, raw_issue_description, work_order_id
+            FROM work_order
+            ORDER BY created_at ASC
+            LIMIT 1;
+        """
+    )
+
+    issue_info = {
+        'num_open_issues' : num_open_issues_sql[0],
+        'num_blocked_issues' : num_blocked_issues_sql[0],
+        'oldest_issue' : oldest_issue_sql[0]
+    }
+
+    return render_template("dashboard/index.html", issue_info = issue_info)
 
 @bp.get("/issues/active")
 def issues_active():
