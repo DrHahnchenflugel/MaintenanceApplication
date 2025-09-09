@@ -81,10 +81,8 @@ def dashboard():
             LIMIT 1;
         """
     )
-    print(oldest_issue_sql)
-    print(type(oldest_issue_sql))
     if oldest_issue_sql:
-        dt_utc = datetime.fromisoformat(oldest_issue_sql[0])
+        dt_utc = oldest_issue_sql[0]
         tz_minus_5 = timezone(timedelta(hours=-5))
         dt_local = dt_utc.astimezone(tz_minus_5)
         now_local = datetime.now(tz_minus_5)
