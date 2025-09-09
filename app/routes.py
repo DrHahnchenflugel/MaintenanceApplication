@@ -81,7 +81,8 @@ def dashboard():
             LIMIT 1;
         """
     )
-
+    print(oldest_issue_sql)
+    print(type(oldest_issue_sql))
     if oldest_issue_sql:
         dt_utc = datetime.fromisoformat(oldest_issue_sql[0])
         tz_minus_5 = timezone(timedelta(hours=-5))
