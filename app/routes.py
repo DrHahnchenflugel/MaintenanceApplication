@@ -57,7 +57,7 @@ def dashboard():
             COUNT(*)
             FROM work_order
             WHERE status = 'OPEN'
-                OR status = 'IN_PROGRESS;
+                OR status = 'IN_PROGRESS';
         """
     )
 
