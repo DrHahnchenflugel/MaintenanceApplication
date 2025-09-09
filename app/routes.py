@@ -437,7 +437,40 @@ def assets():
 def view_asset(asset_uuid):
     asset_sql = query_one(
         """
-            SELECT
-                
-        """
+            SELECT 
+                a.asset_id,
+                a.friendly_tag,
+                a.site_id,
+                a.make,
+                a.model,
+                a.variant,
+                a.retired_at,
+                a.retired_reason,
+                a.status,
+                a.uuid,
+                s.site_id,
+                s.location_shorthand,
+                s.friendly_name
+            FROM asset a
+            WHERE a.uuid = %s
+            JOIN site s ON a.site_id = s.site_id;
+        """,
+        (asset_uuid, )
     )
+
+    asset = {
+        'asset_asset_id' : asset_sql[0],
+        'asset_friendly_tag' : asset_sql[1],
+        'asset_site_id' : asset_sql[2],
+        'asset_make' : asset_sql[3],
+        'asset_model' : asset_sql[4],
+        'asset_variant' :  asset_sql[5],
+        'asset_retired_at' : asset_sql[6],
+        'asset_retired_reason' : asset_sql[7],
+        'asset_uuid' : asset_sql[8],
+        'site_site_id' : asset_sql[9],
+        'site_location_shorthand' : asset_sql[10],
+        'site_friendly_name' : asset_sql[11]
+    }
+
+    return render_template('specific_asset.html', asset = asset)
