@@ -2,6 +2,7 @@ import os, hashlib, time
 from flask import Blueprint, jsonify, abort, render_template, request, redirect, url_for, flash, current_app, send_from_directory
 from .db import query_one, query_all, execute_returning_one, execute
 from uuid import UUID
+from datetime import datetime, timezone, timedelta
 from werkzeug.utils import secure_filename
 
 bp = Blueprint("app", __name__)
@@ -75,15 +76,28 @@ def dashboard():
             SELECT 
                 created_at, raw_issue_description, work_order_id
             FROM work_order
+            WHERE status IN ('OPEN', 'IN_PROGRESS') 
             ORDER BY created_at ASC
             LIMIT 1;
         """
     )
 
+    if oldest_issue_sql:
+        dt_utc = datetime.fromisoformat(oldest_issue_sql[0])
+        tz_minus_5 = timezone(timedelta(hours=-5))
+        dt_local = dt_utc.astimezone(tz_minus_5)
+        now_local = datetime.now(tz_minus_5)
+        delta = now_local - dt_local
+        days = delta.days
+        hours = delta.seconds // 3600
+        delta_time = f"{days}D {hours}H" if days else f"{hours}H"
+    else:
+        delta_time = "N/A"
+
     issue_info = {
         'num_open_issues' : num_open_issues_sql[0],
         'num_blocked_issues' : num_blocked_issues_sql[0],
-        'oldest_issue' : oldest_issue_sql[0]
+        'oldest_issue' : delta_time
     }
 
     return render_template("dashboard/index.html", issue_info = issue_info)
