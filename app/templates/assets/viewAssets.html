@@ -19,7 +19,7 @@
       </div>
 
       {% for asset in assets %}
-        <a class="trow--six" href="{{ url_for('app.view_asset', asset_uuid=asset.get('asset.get('asset_uuid'))}}">
+        <a class="trow--six" href="{{ url_for('app.view_asset', asset_uuid=asset.get('asset_uuid')) }}">
             <div>#{{ asset.get('asset_friendly_tag') }}</div>
             <div>{{ asset.get('site_friendly_name') }}</div>
             <div>{{ asset.get('asset_make') }}</div>
