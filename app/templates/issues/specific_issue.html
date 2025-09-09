@@ -126,7 +126,7 @@
             </div>
         </div>
 
-      <form method="post" action="{{ url_for('app.update_issue', issue_uuid=issue[7]) }}">
+      <form method="post" action="{{ url_for('app.update_issue', issue_uuid=issue.get('work_order_uuid')) }}">
           <div class="trow--four_three_position" id="update-form-row" style="display:none;">
               <div></div>
               <div>
