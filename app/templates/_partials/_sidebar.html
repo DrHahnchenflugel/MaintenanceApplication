@@ -5,9 +5,7 @@
         <a href="{{ url_for('app.issues_active') }}" class="{{ 'is-active' if request.endpoint == 'app.issues_active' else 'not-active' }}">Active Issues</a>
         <a href="#" class="not-active">Past Issues</a>
         <a href="#" class="not-active">Blocked Issues</a>
-        <a href="{{ url_for('app.assets') }}" class="{{ 'is-active' if request.endpoint == 'app.assets' else 'not-active' }}">Assets</a>
-        <a href="#" class="not-active">Inventory</a>
-        <a href="#" class="not-active">Statistics</a>
+        <a href="{{ url_for('app.assets') }}" class="{{ 'is-active' if request.endpoint == 'app.assets' else 'not-active' }}">Inventory</a>
         <a href="#" class="not-active">Settings</a>
     </nav>
 </aside>
