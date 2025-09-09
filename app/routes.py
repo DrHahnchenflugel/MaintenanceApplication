@@ -452,8 +452,8 @@ def view_asset(asset_uuid):
                 s.location_shorthand,
                 s.friendly_name
             FROM asset a
-            WHERE a.uuid = %s
-            JOIN site s ON a.site_id = s.site_id;
+            JOIN site s ON a.site_id = s.site_id
+            WHERE a.uuid = %s;
         """,
         (asset_uuid, )
     )
