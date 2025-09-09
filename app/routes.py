@@ -419,15 +419,15 @@ def assets():
     for a in assets_sql:
         assets.append(
             {
-                'asset_id' : a[0][0],
-                'asset_friendly_tag' : a[0][1],
-                'asset_make' : a[0][2],
-                'asset_model' : a[0][3],
-                'asset_variant' : a[0][4],
-                'asset_status' : a[0][5],
-                'asset_uuid' : a[0][6],
-                'site_location_shorthand' : a[0][7],
-                'site_friendly_name' : a[0][8]
+                'asset_id' : a[0],
+                'asset_friendly_tag' : a[1],
+                'asset_make' : a[2],
+                'asset_model' : a[3],
+                'asset_variant' : a[4],
+                'asset_status' : a[5],
+                'asset_uuid' : a[6],
+                'site_location_shorthand' : a[7],
+                'site_friendly_name' : a[8]
             }
         )
 
