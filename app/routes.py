@@ -278,7 +278,7 @@ def create_issue_for_asset(asset_uuid):
         return render_template(f"issues/new.html", asset=asset, asset_uuid=asset_uuid, form=request.form)
 
     workOrder = execute_returning_one("""
-        INSERT INTO work_order (asset_uuid, raw_issue_description, status)
+        INSERT INTO work_order (asset_id, raw_issue_description, status)
         VALUES (%s, %s, 'OPEN')
         RETURNING work_order_id;
         """, (asset_uuid, description))
