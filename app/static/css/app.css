@@ -141,6 +141,12 @@ a{
     flex-wrap: wrap;
 }
 
+.column{
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
 .card{
     background: var(--panel);
     border: 1px solid var(--line);
