@@ -278,10 +278,10 @@ def create_issue_for_asset(asset_uuid):
         return render_template(f"issues/new.html", asset=asset, asset_uuid=asset_uuid, form=request.form)
 
     workOrder = execute_returning_one("""
-        INSERT INTO work_order (asset_id, raw_issue_description, status)
+        INSERT INTO work_order (asset_uuid, raw_issue_description, status)
         VALUES (%s, %s, 'OPEN')
         RETURNING work_order_id;
-        """, (asset_id, description))
+        """, (asset_uuid, description))
     work_order_id = workOrder[0]
 
     execute("""
@@ -515,10 +515,11 @@ def view_asset(asset_uuid):
         'asset_variant' :  asset_sql[5],
         'asset_retired_at' : asset_sql[6],
         'asset_retired_reason' : asset_sql[7],
-        'asset_uuid' : asset_sql[8],
-        'site_site_id' : asset_sql[9],
-        'site_location_shorthand' : asset_sql[10],
-        'site_friendly_name' : asset_sql[11]
+        'asset_status' : asset_sql[8],
+        'asset_uuid' : asset_sql[9],
+        'site_site_id' : asset_sql[10],
+        'site_location_shorthand' : asset_sql[11],
+        'site_friendly_name' : asset_sql[12]
     }
 
     return render_template('assets/specific_asset.html', asset = asset)
