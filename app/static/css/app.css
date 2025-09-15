@@ -275,3 +275,25 @@ a{
   width: clamp(96px, 8vw, 10000px);  /* guardrails */
   height: auto;
 }
+
+.asset-layout {
+    display:grid;
+    gap:16px;
+
+    grid-template-columns: 1fr 1fr 1fr;
+
+    grid-template-rows: auto auto 1fr auto;
+
+    grid-template-areas:
+        "asset-asset   asset-meta    asset-status"
+        "asset-asset   asset-meta    asset-metrics"
+        "asset-history asset-history asset-metrics";
+    align-items:start;
+}
+
+.asset-asset { grid-area: asset-asset; }
+.asset-meta  { grid-area: asset-meta; }
+.asset-status { grid-area: asset-status; }
+.asset-metrics { grid-area: asset-metrics; }
+.asset-history  { grid-area: asset-history; min-height:260px}
+

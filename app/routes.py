@@ -89,7 +89,7 @@ def dashboard():
         delta = now_local - dt_local
         days = delta.days
         hours = delta.seconds // 3600
-        delta_time = f"{days}D {hours}H" if days else f"{hours}H"
+        delta_time = f"{days} Days {hours} Hrs" if days else f"{hours}H"
     else:
         delta_time = "N/A"
 

@@ -3,31 +3,44 @@
 {% block page_title %} Maintenance - Asset {{ asset.get('asset_friendly_tag') }} {% endblock %}
 
 {% block content %}
-    <div class="row">
-        <div class="card" style="flex:1">
-            <div>Asset Name</div>
-            <div class="kpi">{{ asset.get('asset_friendly_tag') }}</div>
-        </div>
+    <div class="asset-layout">
+        <section class="card asset-asset">
+            <h2 style="margin:0;"> THO-A-3 </h2>
+            <div class="muted"> 3y 1m old </div>
+        </section>
 
-        <div class="card" style="flex:1">
-            <div class="column">
-                <div>Location</div>
-                <div class="kpi">{{ asset.get('site_friendly_name') }}</div>
-                <br>
-                <div class="btn--outline">Transfer Locations</div>
-            </div>
-        </div>
+        <section class="card asset-meta">
+            <div><b>Make:</b>Lenovo</div>
+            <div><b>Model:</b>Desktop Idk</div>
+            <div><b>Variant:</b>3</div>
+        </section>
 
-        <div class="card" style="flex:1">
-            <div class="column">
-                <div>Make: </div>
-                <div class="kpi">{{ asset.get('asset_make') if asset.get('asset_make') else "-" }}</div>
-                <div>Model: </div>
-                <div class="kpi">{{ asset.get('asset_model') if asset.get('asset_model') else "-" }}</div>
-                <div>Variant: </div>
-                <div class="kpi">{{ asset.get('asset_variant') if asset.get('asset_variant') else "-" }}</div>
-                <div class="btn--outline">Edit Information</div>
+        <section class="card asset-status">
+            <div><b>Status:</b><span class="badge>"> Active </span></div>
+            <div class="muted"> 2w </div>
+        </section>
+
+        <section class="card asset-metrics">
+            <div><b>Last Maintenance:</b> 3w </div>
+            <div><b>Uptime:</b> 95% </div>
+        </section>
+
+        <section class="card column asset-history">
+            <h3 style="margin 0 0 8px;">Maintenance History</h3>
+            <div class="table">
+                <div class="thead--four">
+                    <div>Date</div>
+                    <div>Issue</div>
+                    <div>Length</div>
+                    <div>Result</div>
+                </div>
+                <div class="trow">
+                    <div>01/03/2024</div>
+                    <div>Missing Brain</div>
+                    <div>3w</div>
+                    <div>Brain Found</div>
+                </div>
             </div>
-        </div>
+        </section>
     </div>
 {% endblock %}
