@@ -189,7 +189,7 @@ a{
     font-size: 1.2rem;
     color:var(--brand);
     text:var(--text);
-    border:1px solid var(--line);
+    border:3px solid var(--brand);
     border-radius:10px;
     cursor:pointer;
 }
