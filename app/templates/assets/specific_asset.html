@@ -10,29 +10,29 @@
         </section>
 
         <section class="card asset-location" style="min-height:10vh">
-            <h2 style="margin:0;"> THORNHILL </h2>
-            <div class="muted"> 3y 1m </div>
-            <div><b>Before: </b>Richmond Hill</div>
-            <div class="muted"> 6y ago </div>
+            <h2 style="margin:0;"> {{ asset.get('location_friendly_name') }} </h2>
+            <div class="muted"> - </div>
+            <div><b>Before: </b>-</div>
+            <div class="muted"> - ago </div>
         </section>
 
         <section class="card asset-meta" style="min-height:15vh">
-            <div><b>Make: </b>Lenovo</div>
-            <div><b>Model: </b>Desktop Idk</div>
-            <div><b>Variant: </b>3</div>
+            <div><b>Make: </b>{{ asset.get('asset_make') }}</div>
+            <div><b>Model: </b>{{ asset.get('asset_model') }}</div>
+            <div><b>Variant: </b>{{ asset.get('asset_variant') }}</div>
         </section>
 
         <section class="card asset-status" style="min-height:5vh">
-            <div><b>Status:</b><span class="badge>"> Active </span></div>
-            <div class="muted"> 2w </div>
+            <div><b>Status:</b><span class="badge>"> {{ asset.get('asset_status') }} </span></div>
+            <div class="muted"> - </div>
         </section>
 
         <section class="card asset-metrics" style="min-height:5vh">
             <div><b>Last Maintenance:</b>
-                <div class="muted"> 3w </div>
+                <div class="muted"> - </div>
             </div>
             <div><b>Uptime:</b>
-                <div class="muted"> 95% </div>
+                <div class="muted"> - </div>
             </div>
         </section>
 
