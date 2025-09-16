@@ -1,6 +1,7 @@
 :root {
     --bg:#0f1115;
     --panel:#171a21;
+    --panel-lighter:#272b36;
     --line:#323745;
     --text:#e7ebf1;
     --muted:#aab1bd;
@@ -267,7 +268,6 @@ a{
 .thead--four,
 .thead--three {
   font-weight: bold;
-  background: var(--bg);
   position: sticky;
   top: 0;
   z-index: 1;
@@ -284,7 +284,7 @@ a{
 .trow--six:hover,
 .trow--four:hover,
 .trow--three:hover {
-  background: var(--bg);
+  background: var(--panel-lighter);
 }
 
 .badge {
