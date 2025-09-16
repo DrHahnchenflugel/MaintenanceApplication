@@ -1,6 +1,7 @@
 :root {
     --bg:#0f1115;
     --panel:#171a21;
+    --panel-ok:#42806c;
     --panel-lighter:#272b36;
     --line:#323745;
     --text:#e7ebf1;
@@ -172,9 +173,10 @@ a{
 
 .card--nobg{
     background: var(--bg);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 16px;
+}
+
+.card--ok{
+    background: var(--panel-ok);
 }
 
 .kpi{
