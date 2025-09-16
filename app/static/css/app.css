@@ -305,14 +305,16 @@ a{
 }
 
 .badge {
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content:center
+
   padding: 2px 8px;
   border-radius: 999px;
+
   background: var(--chip);
   font-size: 0.85rem;
   font-weight: bold;
-  text-align: center;
-  line-height: 0.85rem;
 }
 
 .badge--ok {
