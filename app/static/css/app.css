@@ -30,6 +30,11 @@ a{
     text-decoration:none;
 }
 
+.muted {
+  color: var(--muted);
+  margin-top: 0.5rem;
+}
+
 .layout{
     display:grid;
     grid-template-columns:240px 1fr;
