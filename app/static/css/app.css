@@ -295,7 +295,7 @@ a{
 
     grid-template-areas:
         "asset-asset    asset-location    asset-meta    asset-status"
-        "asset-asset    asset-location    asset-meta    asset-metrics"
+        "asset-update    asset-location    asset-meta    asset-metrics"
         "asset-history  asset-history     asset-history asset-metrics";
     align-items:start;
 }
