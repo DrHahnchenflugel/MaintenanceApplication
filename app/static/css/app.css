@@ -1,14 +1,19 @@
 :root {
     --bg:#0f1115;
+
     --panel:#171a21;
     --panel-ok:#42806c;
     --panel-warn:#c29623;
     --panel-bad:#884649;
     --panel-lighter:#272b36;
+
     --line:#323745;
     --text:#e7ebf1;
+
     --muted:#aab1bd;
+
     --brand:#FF6600;
+
     --ok:#6ee7b7;
     --warn:#fbbf24;
     --bad:#f87171;
@@ -305,6 +310,21 @@ a{
   border-radius: 999px;
   background: var(--chip);
   font-size: 0.85rem;
+}
+
+.badge--ok {
+  border: var(--line);
+  background: var(--ok);
+}
+
+.badge--warn {
+  border: var(--line);
+  background: var(--warn);
+}
+
+.badge--bad {
+  border: var(--line);
+  background: var(--bad);
 }
 
 .actions {
