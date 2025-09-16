@@ -204,7 +204,7 @@ a{
 
 
 .btn {
-    background: var(--brand);
+    background: var(--panel);
     color:var(--panel);
     padding: 10px 14px;
     border: none;
