@@ -305,7 +305,7 @@ a{
     grid-area: asset-location;
     align-self: stretch;
     }
-
+.asset-update { grid-area: asset-update; }
 .asset-meta  {
     grid-area: asset-meta;
     align-self: stretch;
