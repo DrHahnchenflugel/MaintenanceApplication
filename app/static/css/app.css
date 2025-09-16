@@ -5,7 +5,6 @@
     --text:#e7ebf1;
     --muted:#aab1bd;
     --brand:#FF6600;
-    --brand-darkened:#
     --ok:#6ee7b7;
     --warn:#fbbf24;
     --bad:#f87171;
@@ -190,7 +189,7 @@ a{
     font-size: 1.2rem;
     color:var(--brand);
     text:var(--text);
-    border:1px solid var(--text);
+    border:1px solid var(--line);
     border-radius:10px;
     cursor:pointer;
 }
