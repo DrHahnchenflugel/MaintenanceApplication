@@ -264,7 +264,7 @@ a{
 }
 
 .thead--six,
-.thead--four
+.thead--four,
 .thead--three {
   font-weight: bold;
   background: var(--bg);
@@ -274,8 +274,8 @@ a{
 }
 
 .trow--six,
-.trow--four
-.trow--four_three_position
+.trow--four,
+.trow--four_three_position,
 .trow--three {
   text-decoration: none;
   color: inherit;
