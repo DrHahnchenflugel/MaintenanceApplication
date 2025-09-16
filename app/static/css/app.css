@@ -184,17 +184,17 @@ a{
 
 .card--ok{
     background: var(--panel-ok);
-    border: var(--ok);
+    border: 2px solid var(--ok);
 }
 
 .card--warn{
     background: var(--panel-warn);
-    border: var(--warn);
+    border: 2px solid var(--warn);
 }
 
 .card--bad{
     background: var(--panel-bad);
-    border: var(--bad);
+    border: 2px solid var(--bad);
 }
 
 .kpi{
