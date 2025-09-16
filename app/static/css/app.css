@@ -265,7 +265,7 @@ a{
 .thead--six,
 .thead--four
 .thead--three {
-  font-weight: 600;
+  font-weight: bold;
   background: var(--surface-2);
   position: sticky;
   top: 0;
