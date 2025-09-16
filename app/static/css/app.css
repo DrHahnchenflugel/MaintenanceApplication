@@ -41,6 +41,10 @@ a{
     min-height:100vh;
 }
 
+.container {
+  display: flex;
+}
+
 .main{
     display:flex;
     flex-direction:column;
@@ -297,8 +301,15 @@ a{
 }
 
 .asset-asset { grid-area: asset-asset; }
-.asset-location { grid-area: asset-location; }
-.asset-meta  { grid-area: asset-meta; }
+.asset-location {
+    grid-area: asset-location;
+    align-self: stretch;
+    }
+
+.asset-meta  {
+    grid-area: asset-meta;
+    align-self: stretch;
+    }
 .asset-status { grid-area: asset-status; }
 .asset-metrics { grid-area: asset-metrics; }
 .asset-history  { grid-area: asset-history; min-height:260px}
