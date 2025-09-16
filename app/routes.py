@@ -4,6 +4,7 @@ from .db import query_one, query_all, execute_returning_one, execute
 from uuid import UUID
 from datetime import datetime, timezone, timedelta
 from werkzeug.utils import secure_filename
+from helpers import human_delta
 
 bp = Blueprint("app", __name__)
 
@@ -496,6 +497,7 @@ def view_asset(asset_uuid):
                 a.retired_reason,
                 a.status,
                 a.uuid,
+                a.created_at,
                 s.site_id,
                 s.location_shorthand,
                 s.friendly_name
@@ -505,6 +507,9 @@ def view_asset(asset_uuid):
         """,
         (asset_uuid, )
     )
+
+    dt_utc = asset_sql[10]
+    delta_time = human_delta(dt_utc=dt_utc)
 
     asset = {
         'asset_asset_id' : asset_sql[0],
@@ -517,9 +522,10 @@ def view_asset(asset_uuid):
         'asset_retired_reason' : asset_sql[7],
         'asset_status' : asset_sql[8],
         'asset_uuid' : asset_sql[9],
-        'site_site_id' : asset_sql[10],
-        'site_location_shorthand' : asset_sql[11],
-        'site_friendly_name' : asset_sql[12]
+        'asset_age' : delta_time,
+        'site_site_id' : asset_sql[11],
+        'site_location_shorthand' : asset_sql[12],
+        'site_friendly_name' : asset_sql[13]
     }
 
     return render_template('assets/specific_asset.html', asset = asset)
