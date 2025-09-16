@@ -16,7 +16,8 @@
             <div class="muted"> - ago </div>
         </section>
 
-        <section class="card asset-meta" style="min-height:15vh">
+        <section class="card asset-meta" style="min-height:15vh; display:flex;
+                                                    flex-direction:column; justify-content:space-evenly;">
             <div><b>Make: </b>{{ asset.get('asset_make') }}</div>
             <div><b>Model: </b>{{ asset.get('asset_model') }}</div>
             <div><b>Variant: </b>{{ asset.get('asset_variant') }}</div>
