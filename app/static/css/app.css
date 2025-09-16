@@ -2,6 +2,8 @@
     --bg:#0f1115;
     --panel:#171a21;
     --panel-ok:#42806c;
+    --panel-warn:#c7a13f;
+    --panel-bad:#884649;
     --panel-lighter:#272b36;
     --line:#323745;
     --text:#e7ebf1;
@@ -177,6 +179,14 @@ a{
 
 .card--ok{
     background: var(--panel-ok);
+}
+
+.card--warn{
+    background: var(--panel-warn);
+}
+
+.card--bad{
+    background: var(--panel-bad``);
 }
 
 .kpi{
