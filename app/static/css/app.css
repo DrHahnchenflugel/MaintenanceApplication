@@ -186,7 +186,7 @@ a{
 }
 
 .card--bad{
-    background: var(--panel-bad``);
+    background: var(--panel-bad);
 }
 
 .kpi{
