@@ -326,5 +326,5 @@ a{
     }
 .asset-status { grid-area: asset-status; }
 .asset-metrics { grid-area: asset-metrics; }
-.asset-history  { grid-area: asset-history; min-height:260px}
+.asset-history  { grid-area: asset-history; }
 
