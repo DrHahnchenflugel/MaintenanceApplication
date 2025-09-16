@@ -316,7 +316,8 @@ a{
   font-size: 0.85rem;
   font-weight: bold;
 
-  width: auto;
+  width: 8rem;
+  height: 2rem;
   flex: 0 0 auto;
 }
 
