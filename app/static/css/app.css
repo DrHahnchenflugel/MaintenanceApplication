@@ -218,7 +218,7 @@ a{
 }
 
 .table {
-  background: var(--bg);
+  background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 10px;
   overflow: hidden;
