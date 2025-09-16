@@ -4,7 +4,7 @@ from .db import query_one, query_all, execute_returning_one, execute
 from uuid import UUID
 from datetime import datetime, timezone, timedelta
 from werkzeug.utils import secure_filename
-from helpers import human_delta
+from .templates.helpers import human_delta
 
 bp = Blueprint("app", __name__)
 
