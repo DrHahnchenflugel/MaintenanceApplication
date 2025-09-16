@@ -280,18 +280,19 @@ a{
     display:grid;
     gap:16px;
 
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
 
-    grid-template-rows: auto auto 1fr auto;
+    grid-template-rows: auto auto 1fr;
 
     grid-template-areas:
-        "asset-asset   asset-meta    asset-status"
-        "asset-asset   asset-meta    asset-metrics"
-        "asset-history asset-history asset-metrics";
+        "asset-asset    asset-location    asset-meta    asset-status"
+        "asset-asset    asset-location    asset-meta    asset-metrics"
+        "asset-history  asset-history     asset-history asset-metrics";
     align-items:start;
 }
 
 .asset-asset { grid-area: asset-asset; }
+.asset-location { grid-area: asset-location; }
 .asset-meta  { grid-area: asset-meta; }
 .asset-status { grid-area: asset-status; }
 .asset-metrics { grid-area: asset-metrics; }
