@@ -9,11 +9,14 @@
             <div class="muted"> {{ asset.get('asset_age') }} old </div>
         </section>
 
-        <section class="card asset-location" style="min-height:10vh">
-            <h2 style="margin:0;"> {{ asset.get('site_friendly_name') }} </h2>
-            <div class="muted"> - </div>
-            <div><b>Before: </b>-</div>
-            <div class="muted"> - ago </div>
+        <section class="card asset-asset" style="min-height:10vh">
+            <div><h2 style="margin:0;">
+                <b>Name: </b>
+                <span class="view-only">{{ asset.get('asset_friendly_tag') }}</span>
+                <input class="edit-field" type="text" name="asset_friendly_tag"
+                       value="{{ asset.get('asset_friendly_tag') }}" style="display:none;" disabled>
+            </h2></div>
+            <div class="muted">{{ asset.get('asset_age') }} old</div>
         </section>
 
         <form id="assetForm"
@@ -100,11 +103,13 @@
     <script>
     document.addEventListener('DOMContentLoaded', () => {
         const startBtn  = document.getElementById('startEdit');
-        const actions   = document.getElementById('editActions');
-        const cancelBtn = document.getElementById('cancelEdit');
+        const cancelBtn = document.getElementById('cancelEdit')
+
+        const actions   = document.getElementById('editActions');;
         const form      = document.getElementById('assetForm');
-        const viewEls   = document.querySelectorAll('#assetMeta .view-only');
-        const inputs    = document.querySelectorAll('#assetMeta .edit-field');
+
+        const viewEls = document.querySelectorAll('#assetForm .view-only');
+        const inputs  = document.querySelectorAll('#assetForm .edit-field');
 
         const original = new Map(); inputs.forEach(f => original.set(f.name, f.value));
 

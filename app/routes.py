@@ -591,9 +591,9 @@ def view_asset(asset_uuid):
 
     return render_template('assets/specific_asset.html', asset = asset, issues = issues)
 
-
 @bp.post("/assets/<uuid:asset_uuid>/update")
 def update_asset(asset_uuid):
+    name    = (request.form.get("asset_friendly_tag") or "").strip()
     make    = (request.form.get("asset_make") or "").strip()
     model   = (request.form.get("asset_model") or "").strip()
     variant = (request.form.get("asset_variant") or "").strip()
@@ -604,12 +604,13 @@ def update_asset(asset_uuid):
 
     execute("""
         UPDATE asset
-           SET make   = %s,
+           SET friendly_tag = %s,
+               make   = %s,
                model  = %s,
                variant= %s,
                modified_at  = NOW()
          WHERE uuid = %s
-    """, (make, model, variant, asset_uuid))
+    """, (name, make, model, variant, asset_uuid))
 
     try:
         flash("Asset updated.", "success")
