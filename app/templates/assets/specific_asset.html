@@ -48,12 +48,12 @@
                     <div><b>Result</b></div>
                 </div>
 
-                {% for i in issues %}
+                {% for issue in issues %}
                     <a href="{{ url_for('app.view_issue', issue_uuid=issue.get('issue_uuid')) }}" class="trow--four">
-                        <div>{{ i.get('date') }}</div>
-                        <div>{{ i.get('issue') }}</div>
-                        <div>{{ i.get('length') }}</div>
-                        <div>{{ i.get('result') }}</div>
+                        <div>{{ issue.get('date') }}</div>
+                        <div>{{ issue.get('issue') }}</div>
+                        <div>{{ issue.get('length') }}</div>
+                        <div>{{ issue.get('result') }}</div>
                     </a>
                 {% endfor %}
 
