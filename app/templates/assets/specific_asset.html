@@ -23,13 +23,11 @@
             <div><h4><b>Variant: </b>{{ asset.get('asset_variant') }}</h4></div>
         </section>
 
-        <section class="card card--
-                                    {{ 'warn' if asset.get('asset_status') == 'RETIRED'
+        <section class="card card--{{ 'warn' if asset.get('asset_status') == 'RETIRED'
                                         else 'bad' if asset.get('asset_status') == 'LOST'
                                         else 'ok' }}
                                     asset-status" style="min-height:5vh">
-            <div><b>Status: </b><span class="badge badge--
-                                    {{ 'warn' if asset.get('asset_status') == 'RETIRED'
+            <div><b>Status: </b><span class="badge badge--{{ 'warn' if asset.get('asset_status') == 'RETIRED'
                                         else 'bad' if asset.get('asset_status') == 'LOST'
                                         else 'ok' }}
                                     asset_status" style="min-height:5vh">
