@@ -4,7 +4,7 @@ from .db import query_one, query_all, execute_returning_one, execute
 from uuid import UUID
 from datetime import datetime, timezone, timedelta
 from werkzeug.utils import secure_filename
-from .helpers import human_delta
+from .helpers import human_delta_to_now, human_delta_2_times
 
 bp = Blueprint("app", __name__)
 
@@ -509,7 +509,7 @@ def view_asset(asset_uuid):
     )
 
     dt_utc = asset_sql[10]
-    delta_time = human_delta(dt_utc=dt_utc)
+    delta_time = human_delta_to_now(dt_utc=dt_utc)
 
     asset = {
         'asset_asset_id' : asset_sql[0],
@@ -528,4 +528,64 @@ def view_asset(asset_uuid):
         'site_friendly_name' : asset_sql[13]
     }
 
-    return render_template('assets/specific_asset.html', asset = asset)
+    inactive_issues_sorted_sql = query_all(
+        """
+            SELECT 
+                work_order_id,
+                asset_id,
+                raw_issue_description,
+                created_at,
+                closed_at,
+                close_note,
+                status,
+                uuid
+            FROM 
+                work_order
+            WHERE
+                asset_id = %s AND status = 'CLOSED'
+            ORDER BY closed_at DESC;
+        """,
+        (asset.get('asset_asset_id'),)
+    )
+
+    active_issues_sorted_sql = query_all(
+        """
+            SELECT
+                work_order_id,
+                asset_id,
+                raw_issue_description,
+                created_at,
+                status,
+                uuid
+            FROM 
+                work_order
+            WHERE
+                asset_id = %s AND status <> 'CLOSED'
+            ORDER BY created_at DESC;
+        """
+    )
+
+    issues = []
+    for i in active_issues_sorted_sql:
+        issues.append(
+            {
+                'date':i[3],
+                'issue':i[2],
+                'length':human_delta_to_now(i[3]),
+                'result':i[4],
+                'issue_uuid':i[5]
+            }
+        )
+
+    for i in inactive_issues_sorted_sql:
+        issues.append(
+            {
+                'date':i[3],
+                'issue':i[2],
+                'length':human_delta_2_times(i[3],i[4]),
+                'result':i[5],
+                'issue_uuid':i[7]
+            }
+        )
+
+    return render_template('assets/specific_asset.html', asset = asset, issues = issues)

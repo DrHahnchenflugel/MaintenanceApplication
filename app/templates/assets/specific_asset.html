@@ -47,24 +47,16 @@
                     <div><b>Length</b></div>
                     <div><b>Result</b></div>
                 </div>
-                <div class="trow--four">
-                    <div>01/03/2024</div>
-                    <div>Missing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing Brain</div>
-                    <div>3w</div>
-                    <div>Brain Found</div>
-                </div>
-                <div class="trow--four">
-                    <div>01/03/2024</div>
-                    <div>Missing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing Brain</div>
-                    <div>3w</div>
-                    <div>Brain Found</div>
-                </div>
-                <div class="trow--four">
-                    <div>01/03/2024</div>
-                    <div>Missing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing BrainMissing Brain</div>
-                    <div>3w</div>
-                    <div>Brain Found</div>
-                </div>
+
+                {% for i in issues %}
+                    <a href="{{ url_for('app.view_issue', issue_uuid=issue.get('issue_uuid')) }}" class="trow--four">
+                        <div>{{ i.get('date') }}</div>
+                        <div>{{ i.get('issue') }}</div>
+                        <div>{{ i.get('length') }}</div>
+                        <div>{{ i.get('result') }}</div>
+                    </a>
+                {% endfor %}
+
             </div>
         </section>
     </div>
