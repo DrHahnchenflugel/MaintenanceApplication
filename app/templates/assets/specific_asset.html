@@ -71,13 +71,14 @@
 
 {% block footer_center_right %}
     <button type="button" class="btn btn--fixed--bottomright btn--lg" id="startEdit">Update</button>
+
+    <script>
+        document.getElementById("startEdit")?.addEventListener(
+            "click",
+            function() {
+                this.style.display = "none";
+            }
+        );
+    </script>
 {% endblock %}
 
-<script>
-    document.getElementById("startEdit")?.addEventListener(
-        "click",
-        function() {
-            this.style.display = "none";
-        }
-    );
-</script>
