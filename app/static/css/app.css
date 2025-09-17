@@ -393,7 +393,7 @@ a{
 
     grid-template-columns: 1fr 1fr 1fr 1fr;
 
-    grid-template-rows: auto auto 1fr;
+    grid-template-rows: minmax(0,120px) auto 1fr;
 
     grid-template-areas:
         "asset-asset    asset-location    asset-meta    asset-status"
