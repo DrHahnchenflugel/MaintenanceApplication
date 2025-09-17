@@ -402,7 +402,10 @@ a{
     align-items:start;
 }
 
-.asset-asset { grid-area: asset-asset; }
+.asset-asset {
+    grid-area: asset-asset;
+    align-self: stretch;
+    }
 .asset-location {
     grid-area: asset-location;
     align-self: stretch;
