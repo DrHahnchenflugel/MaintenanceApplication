@@ -604,9 +604,9 @@ def update_asset(asset_uuid):
 
     execute("""
         UPDATE asset
-           SET asset_make   = %s,
-               asset_model  = %s,
-               asset_variant= %s,
+           SET make   = %s,
+               model  = %s,
+               variant= %s,
                modified_at  = NOW()
          WHERE uuid = %s
     """, (make, model, variant, asset_uuid))
