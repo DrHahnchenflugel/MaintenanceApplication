@@ -397,7 +397,7 @@ a{
 
     grid-template-areas:
         "asset-asset    asset-location    asset-meta    asset-status"
-        "asset-metrics    asset-location    asset-meta  asset-status"
+        "asset-metrics  asset-location    asset-meta    asset-status"
         "asset-history  asset-history     asset-history asset-status";
     align-items:start;
 }
@@ -405,7 +405,6 @@ a{
 .asset-asset { grid-area: asset-asset; }
 .asset-location {
     grid-area: asset-location;
-    align-self: stretch;
     }
 .asset-meta  {
     grid-area: asset-meta;
