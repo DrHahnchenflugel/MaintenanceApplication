@@ -234,6 +234,17 @@ a{
     cursor:pointer;
 }
 
+.btn--bad{
+    color:var(--panel-bad);
+    border:1px solid var(--bad);
+}
+
+.btn--ok{
+    color:var(--panel-ok);
+    border:1px solid var(--ok);
+}
+
+
 .btn--outline{
     background:transparent;
     color:var(--brand);

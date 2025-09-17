@@ -72,13 +72,27 @@
 {% block footer_center_right %}
     <button type="button" class="btn btn--fixed--bottomright btn--lg" id="startEdit">Update</button>
 
+    <div id="editActions" style="display:none; position:fixed; bottom:20px; right:20px; z-index:1000; gap:8px;">
+        <button type="submit" form="assetForm" class="btn btn--ok btn--lg">Save</button>
+        <button type="button" class="btn btn--bad btn--lg secondary" id="cancelEdit">Cancel</button>
+    </div>
+
     <script>
-        document.getElementById("startEdit")?.addEventListener(
-            "click",
-            function() {
-                this.style.display = "none";
-            }
-        );
+      document.addEventListener('DOMContentLoaded', () => {
+        const startBtn = document.getElementById('startEdit');
+        const actions = document.getElementById('editActions');
+        const cancelBtn = document.getElementById('cancelEdit');
+
+        startBtn?.addEventListener('click', () => {
+          startBtn.style.display = 'none';
+          actions.style.display = 'flex';
+        });
+
+        cancelBtn?.addEventListener('click', () => {
+          actions.style.display = 'none';
+          startBtn.style.display = 'inline-flex';
+        });
+      });
     </script>
 {% endblock %}
 
