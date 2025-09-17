@@ -243,6 +243,13 @@ a{
     cursor:pointer;
 }
 
+.btn--fixed--bottomright {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 1000;
+}
+
 .table {
   background: var(--panel);
   border: 1px solid var(--line);
