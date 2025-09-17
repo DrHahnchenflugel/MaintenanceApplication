@@ -185,6 +185,11 @@ a{
 .card--ok{
     background: var(--panel-ok);
     border: 2px solid var(--ok);
+    text-shadow:
+        -1px -1px 0 black,
+         1px -1px 0 black,
+        -1px  1px 0 black,
+         1px  1px 0 black;
 }
 
 .card--warn{
