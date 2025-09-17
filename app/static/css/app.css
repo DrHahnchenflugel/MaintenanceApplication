@@ -235,13 +235,15 @@ a{
 }
 
 .btn--bad{
-    color:var(--panel-bad);
-    border:1px solid var(--bad);
+    background:var(--panel-bad);
+    text:white;
+    border:3px solid var(--bad);
 }
 
 .btn--ok{
-    color:var(--panel-ok);
-    border:1px solid var(--ok);
+    background:var(--panel-ok);
+    text:white;
+    border:3px solid var(--ok);
 }
 
 
