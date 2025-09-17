@@ -16,11 +16,33 @@
             <div class="muted"> - ago </div>
         </section>
 
-        <section class="card asset-meta" style="min-height:15vh; display:flex;
-                                                    flex-direction:column; justify-content:space-evenly;">
-            <div><h4><b>Make: </b>{{ asset.get('asset_make') }}</h4></div>
-            <div><h4><b>Model: </b>{{ asset.get('asset_model') }}</h4></div>
-            <div><h4><b>Variant: </b>{{ asset.get('asset_variant') }}</h4></div>
+        <section class="card asset-meta"
+                 style="min-height:15vh; display:flex; flex-direction:column; justify-content:space-evenly;"
+                 id="assetMeta">
+
+            <div>
+                <h4><b>Make: </b>
+                  <span class="view-only">{{ asset.get('asset_make') }}</span>
+                  <input class="edit-field" type="text" name="asset_make"
+                         value="{{ asset.get('asset_make') }}" style="display:none;" disabled>
+                </h4>
+            </div>
+
+            <div>
+                <h4><b>Model: </b>
+                  <span class="view-only">{{ asset.get('asset_model') }}</span>
+                  <input class="edit-field" type="text" name="asset_model"
+                         value="{{ asset.get('asset_model') }}" style="display:none;" disabled>
+                </h4>
+            </div>
+
+            <div>
+                <h4><b>Variant: </b>
+                  <span class="view-only">{{ asset.get('asset_variant') }}</span>
+                  <input class="edit-field" type="text" name="asset_variant"
+                         value="{{ asset.get('asset_variant') }}" style="display:none;" disabled>
+                </h4>
+            </div>
         </section>
 
         <section class="card card--{{ 'warn' if asset.get('asset_status') == 'IN_MAINTENANCE'
@@ -79,18 +101,36 @@
 
     <script>
       document.addEventListener('DOMContentLoaded', () => {
-        const startBtn = document.getElementById('startEdit');
-        const actions = document.getElementById('editActions');
+        const startBtn  = document.getElementById('startEdit');
+        const actions   = document.getElementById('editActions');
         const cancelBtn = document.getElementById('cancelEdit');
+
+        const viewEls = document.querySelectorAll('#assetMeta .view-only');
+        const inputs  = document.querySelectorAll('#assetMeta .edit-field');
+
+        const original = new Map();
+        inputs.forEach(f => original.set(f.name, f.value));
 
         startBtn?.addEventListener('click', () => {
           startBtn.style.display = 'none';
           actions.style.display = 'flex';
+
+          viewEls.forEach(el => el.style.display = 'none');
+          inputs.forEach(f => { f.style.display = 'inline-block'; f.disabled = false; });
+          inputs[0]?.focus();
         });
 
         cancelBtn?.addEventListener('click', () => {
           actions.style.display = 'none';
           startBtn.style.display = 'inline-flex';
+
+          // restore + lock
+          inputs.forEach(f => {
+            f.value = original.get(f.name);
+            f.style.display = 'none';
+            f.disabled = true;
+          });
+          viewEls.forEach(el => el.style.display = 'inline');
         });
       });
     </script>
