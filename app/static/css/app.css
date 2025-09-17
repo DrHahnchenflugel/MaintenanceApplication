@@ -40,6 +40,10 @@ a{
     text-decoration:none;
 }
 
+#assetForm {
+  display: contents;
+}
+
 .muted {
   color: var(--muted);
   margin-top: 0.5rem;
