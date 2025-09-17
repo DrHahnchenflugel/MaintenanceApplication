@@ -226,12 +226,15 @@ a{
 .btn--lg{
     padding: 18px 28px;
     font-size: 1.2rem;
-    color:var(--brand);
-    text:var(--text);
     font-weight: bold;
     border:3px solid var(--brand);
     border-radius:10px;
     cursor:pointer;
+}
+
+.btn--brand{
+    color:var(--brand);
+    text:var(--text);
 }
 
 .btn--bad{
