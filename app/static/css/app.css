@@ -239,14 +239,19 @@ a{
 
 .btn--bad{
     background:var(--panel-bad);
-    text:white;
+    color:white;
     border:3px solid var(--bad);
 }
 
 .btn--ok{
     background:var(--panel-ok);
-    text:white;
+    color:white;
     border:3px solid var(--ok);
+    text-shadow:
+        -1px -1px 0 black,
+         1px -1px 0 black,
+        -1px  1px 0 black,
+         1px  1px 0 black;
 }
 
 
