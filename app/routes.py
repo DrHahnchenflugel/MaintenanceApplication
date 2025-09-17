@@ -562,7 +562,8 @@ def view_asset(asset_uuid):
             WHERE
                 asset_id = %s AND status <> 'CLOSED'
             ORDER BY created_at DESC;
-        """
+        """,
+        (asset.get('asset_asset_id'),)
     )
 
     issues = []
