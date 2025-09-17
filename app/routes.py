@@ -590,3 +590,31 @@ def view_asset(asset_uuid):
         )
 
     return render_template('assets/specific_asset.html', asset = asset, issues = issues)
+
+
+@bp.post("/assets/<uuid:asset_uuid>/update")
+def update_asset(asset_uuid):
+    make    = (request.form.get("asset_make") or "").strip()
+    model   = (request.form.get("asset_model") or "").strip()
+    variant = (request.form.get("asset_variant") or "").strip()
+
+    row = query_one("SELECT asset_id FROM asset WHERE uuid = %s", (asset_uuid,))
+    if row is None:
+        abort(404)
+
+    execute("""
+        UPDATE asset
+           SET asset_make   = %s,
+               asset_model  = %s,
+               asset_variant= %s,
+               modified_at  = NOW()
+         WHERE uuid = %s
+    """, (make, model, variant, asset_uuid))
+
+    try:
+        flash("Asset updated.", "success")
+    except Exception:
+        print("no flash :(")
+        pass
+
+    return redirect(url_for("app.view_asset", asset_uuid=asset_uuid))
