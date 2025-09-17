@@ -583,7 +583,7 @@ def view_asset(asset_uuid):
             {
                 'date':i[3],
                 'issue':i[2],
-                'length':human_delta_2_times(i[3],i[4]),
+                'length':human_delta_2_times(i[3],i[4]) if i[4] else "NA",
                 'result':i[5],
                 'issue_uuid':i[7]
             }
