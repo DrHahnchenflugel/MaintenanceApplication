@@ -50,10 +50,9 @@ a{
 }
 
 .layout{
-    display:grid;
-    grid-template-columns:240px 1fr;
-    height:100dvh;
-    overflow: hidden;
+    min-height:100dvh;
+    height:auto;
+    overflow:hidden;
 }
 
 .container {
@@ -61,18 +60,15 @@ a{
 }
 
 .main{
-    display:flex;
-    flex-direction:column;
-    min-height:0;
-    /*overflow: hidden;*/
+    display:grid;
+    grid-template-rows:auto 1fr auto;
+    min-height:100dvh;
 }
 
 .content{
-    padding:20px;
-    display:flex;
-    flex-direction:column;
-    flex:1;
     overflow:auto;
+    -webkit-overflow-scrolling:touch;
+    padding:20px;
     min-height:0;
 }
 
@@ -105,11 +101,15 @@ a{
 }
 
 .footer{
-    margin-top:auto;
+    border-top:1px solid var(--line);
+    background:var(--panel);
+    padding:12px 20px;
     display:flex;
     justify-content:space-between;
     align-items:center;
-    flex-shrink:0;
+    position:sticky;
+    bottom:0;
+    z-index:5;
 }
 
 .sidebar {
@@ -118,7 +118,7 @@ a{
     padding:16px;
     position:sticky;
     top:0;
-    height:100vh;
+    height:100dvh;
 }
 
 .brand{
