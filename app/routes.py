@@ -109,7 +109,7 @@ def issues_active():
                             FROM work_order w 
                             JOIN asset a 
                             ON w.asset_id = a.asset_id 
-                            WHERE w.status IN ('OPEN', 'IN_PROGRESS') 
+                            WHERE w.status IN ('OPEN', 'IN_PROGRESS', 'BLOCKED') 
                             ORDER BY w.created_at DESC;""")
     issues = []
     for i in issues_sql:
