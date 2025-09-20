@@ -140,7 +140,7 @@ def issues_active():
             FROM work_order w
             JOIN asset a ON w.asset_id = a.asset_id
             JOIN site s ON a.site_id = s.site_id
-            WHERE {'AND'.join(where)}
+            WHERE {' AND '.join(where)}
             ORDER BY w.created_at DESC;
         """
     print("WHEREEE=========================================+",where)
