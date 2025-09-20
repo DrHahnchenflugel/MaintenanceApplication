@@ -7,14 +7,17 @@
   <form method="get" class="card" style="display:flex;align-items:center;gap:12px;">
     <label class="field" style="display:flex;align-items:center;gap:8px;margin:0;">
       <span class="muted">Filter</span>
-      <select name="f" onchange="this.form.submit()">
-        <option value="active"      {{ 'selected' if cur_filter=='active' else '' }}>Active (Open/In Progress/Blocked)</option>
-        <option value="open"        {{ 'selected' if cur_filter=='open' else '' }}>Open</option>
-        <option value="in_progress" {{ 'selected' if cur_filter=='in_progress' else '' }}>In&nbsp;Progress</option>
-        <option value="blocked"     {{ 'selected' if cur_filter=='blocked' else '' }}>Blocked</option>
-        <option value="closed"      {{ 'selected' if cur_filter=='closed' else '' }}>Closed</option>
-        <option value="all"         {{ 'selected' if cur_filter=='all' else '' }}>All</option>
-      </select>
+      <span class="card">
+          <span class="muted">Status: </span>
+          <select name="f" onchange="this.form.submit()">
+            <option value="active"      {{ 'selected' if cur_filter=='active' else '' }}>Active</option>
+            <option value="open"        {{ 'selected' if cur_filter=='open' else '' }}>Open</option>
+            <option value="in_progress" {{ 'selected' if cur_filter=='in_progress' else '' }}>In Progress</option>
+            <option value="blocked"     {{ 'selected' if cur_filter=='blocked' else '' }}>Blocked</option>
+            <option value="closed"      {{ 'selected' if cur_filter=='closed' else '' }}>Closed</option>
+            <option value="all"         {{ 'selected' if cur_filter=='all' else '' }}>All</option>
+          </select>
+      </span>
     </label>
     <noscript><button class="btn">Apply</button></noscript>
   </form>
