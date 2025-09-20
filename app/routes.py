@@ -117,7 +117,7 @@ def issues_active():
     }
     statuses = FILTERS.get(f, FILTERS["active"])
 
-    locations = query_one("""
+    locations = query_all("""
         SELECT
             location_shorthand
         FROM 
@@ -143,6 +143,7 @@ def issues_active():
             WHERE {' AND '.join(where)}
             ORDER BY w.created_at DESC;
         """
+
     rows = query_all(sql, tuple(params))
 
     issues = []
