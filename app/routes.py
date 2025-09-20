@@ -102,7 +102,7 @@ def dashboard():
 
     return render_template("dashboard/index.html", issue_info = issue_info)
 
-@bp.get("/issues/active")
+@bp.get("/issues/list")
 def issues_active():
     f = (request.args.get("f") or "active").lower()
     loc = (request.args.get("loc") or "all").upper()
@@ -161,7 +161,7 @@ def issues_active():
             'asset_status': r[10],
         })
 
-    return render_template("issues/active.html",
+    return render_template("issues/list.html",
                                 issues=issues,
                                 cur_filter=f,
                                 cur_loc=loc,
