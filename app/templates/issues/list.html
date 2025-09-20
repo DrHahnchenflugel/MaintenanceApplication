@@ -24,7 +24,7 @@
           <select name="loc" onchange="this.form.submit()">
               <option value="ALL" {{ 'selected' if cur_loc=='ALL' else '' }}>All</option>
               {% for loc in locations %}
-                    <option value="{{ loc }}" {{ 'selected' if cur_loc==loc else '' }} "{{ loc }}"</option>
+                    <option value="{{ loc }}" {{ 'selected' if cur_loc==loc else '' }}> {{ loc }}</option>
               {% endfor %}
           </select>
       </span>
