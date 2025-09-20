@@ -221,13 +221,12 @@ a{
 
 .btn {
     background: var(--panel);
-    color:var(--panel);
+    color:var(--text);
     padding: 10px 14px;
     border: none;
     border-radius: 10px;
     font-weight:700;
     cursor:pointer;
-    text-color:var(--text);
 }
 
 .btn.secondary {
