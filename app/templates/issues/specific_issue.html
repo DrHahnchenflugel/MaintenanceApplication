@@ -16,20 +16,20 @@
       </div>
 
       <div class="field" style="margin-top:12px;">
-        <label>Description</label>
-        <div class="pill muted" style="white-space:pre-wrap;">{{ issue.get('raw_issue_description') }}</div>
+        <label class="muted">Description</label>
+        <div class="pill" style="white-space:pre-wrap;">{{ issue.get('raw_issue_description') }}</div>
       </div>
 
       <div class="row" style="gap:12px; margin-top:12px;">
         <div class="field" style="flex:1;">
-          <label>Opened</label>
-          <div class="pill muted">{{ issue.get('work_order_created_at') }}</div>
+          <label class="muted">Opened</label>
+          <div class="pill">{{ issue.get('work_order_created_at') }}</div>
         </div>
 
         {% if issue.get('work_order_status') != 'OPEN' %}
             <div class="field" style="flex:1;">
-              <label>Closed</label>
-              <div class="pill muted">{{ issue.get('work_order_closed_at')
+              <label class="muted">Closed</label>
+              <div class="pill">{{ issue.get('work_order_closed_at')
                   if issue.get('work_order_closed_at') else "—" }}</div>
             </div>
         {% endif %}
@@ -37,8 +37,8 @@
 
         {% if issue.get('work_order_status') != 'OPEN' %}
           <div class="field" style="margin-top:12px;">
-            <label>Close note</label>
-            <div class="pill muted" style="white-space:pre-wrap;">{{ issue.get('work_order_close_note')
+            <label class="muted">Close note</label>
+            <div class="pill" style="white-space:pre-wrap;">{{ issue.get('work_order_close_note')
                 if issue.get('work_order_close_note') else "—" }}</div>
           </div>
         {% endif %}
@@ -56,29 +56,29 @@
           </div>
 
           <div class="field" style="margin-top:12px;">
-            <label>Tag</label>
-            <div class="pill muted">{{ issue.get('asset_friendly_tag') }}</div>
+            <label class="muted">Tag</label>
+            <div class="pill">{{ issue.get('asset_friendly_tag') }}</div>
           </div>
 
           <div class="field" style="margin-top:12px;">
-            <label>Make / Model / Variant</label>
-            <div class="pill muted">{{ issue.get('asset_make') }} {{ issue.get('asset_model') }} {{ issue.get('asset_variant') }}</div>
+            <label class="muted">Make / Model / Variant</label>
+            <div class="pill">{{ issue.get('asset_make') }} {{ issue.get('asset_model') }} {{ issue.get('asset_variant') }}</div>
           </div>
 
           <div class="field" style="margin-top:12px;">
-            <label>Site</label>
-            <div class="pill muted">{{ issue.get('site_location_shorthand') }}</div>
+            <label class="muted">Site</label>
+            <div class="pill">{{ issue.get('site_location_shorthand') }}</div>
           </div>
 
             {% if issue[16] %}
               <div class="row" style="gap:12px; margin-top:12px;">
                 <div class="field" style="flex:1;">
-                  <label>Retired at</label>
-                  <div class="pill muted">{{ issue.get('asset_retired_at') if issue.get('asset_retired_at') else "—" }}</div>
+                  <label class="muted">Retired at</label>
+                  <div class="pill">{{ issue.get('asset_retired_at') if issue.get('asset_retired_at') else "—" }}</div>
                 </div>
                 <div class="field" style="flex:1;">
-                  <label>Retired reason</label>
-                  <div class="pill muted">{{ issue.get('asset_retired_reason') if issue.get('asset_retired_reason') else "—" }}</div>
+                  <label class="muted">Retired reason</label>
+                  <div class="pill">{{ issue.get('asset_retired_reason') if issue.get('asset_retired_reason') else "—" }}</div>
                 </div>
               </div>
             {% endif %}
