@@ -238,6 +238,7 @@ a{
     padding: 18px 28px;
     height:10dvh;
     width:20dvh;
+    text-color:var(--text);
     font-size: 1.2rem;
     font-weight: bold;
     border:3px solid var(--brand);
