@@ -8,7 +8,7 @@
     <label class="field" style="display:flex;align-items:center;gap:8px;margin:0;">
       <span class="muted">Filter</span>
       <span class="card">
-          <span class="muted">Status: </span>
+          <span class="muted"><b>Status:  </b></span>
           <select name="f" onchange="this.form.submit()">
             <option value="active"      {{ 'selected' if cur_filter=='active' else '' }}>Active</option>
             <option value="open"        {{ 'selected' if cur_filter=='open' else '' }}>Open</option>
