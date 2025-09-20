@@ -243,6 +243,11 @@ a{
     border:3px solid var(--brand);
     border-radius:10px;
     cursor:pointer;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
 }
 
 .btn--brand{
