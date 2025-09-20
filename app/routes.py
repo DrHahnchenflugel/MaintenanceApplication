@@ -104,32 +104,48 @@ def dashboard():
 
 @bp.get("/issues/active")
 def issues_active():
-    issues_sql = query_all("""SELECT (w.uuid, w.asset_id, w.raw_issue_description, w.created_at, w.status, 
-                            a.friendly_tag, a.site_id, a.make, a.model, a.variant, a.status) 
-                            FROM work_order w 
-                            JOIN asset a 
-                            ON w.asset_id = a.asset_id 
-                            WHERE w.status IN ('OPEN', 'IN_PROGRESS', 'BLOCKED') 
-                            ORDER BY w.created_at DESC;""")
-    issues = []
-    for i in issues_sql:
-        issues.append(
-            {
-                'workOrder_uuid':i[0][0],
-                'workOrder_asset_id':i[0][1],
-                'workOrder_raw_issue_description':i[0][2],
-                'workOrder_created_at':i[0][3],
-                'workOrder_status':i[0][4],
-                'asset_friendly_tag':i[0][5],
-                'asset_site_id':i[0][6],
-                'asset_make':i[0][7],
-                'asset_model':i[0][8],
-                'asset_variant':i[0][9],
-                'asset_status':i[0][10],
-            }
-        )
+    f = (request.args.get("f") or "active").lower()
 
-    return render_template("issues/active.html", issues=issues)
+    FILTERS = {
+        "active": ["OPEN", "IN_PROGRESS", "BLOCKED"],
+        "open": ["OPEN"],
+        "in_progress": ["IN_PROGRESS"],
+        "blocked": ["BLOCKED"],
+        "closed": ["CLOSED"],
+        "all": ["OPEN", "IN_PROGRESS", "BLOCKED", "CLOSED"],
+    }
+    statuses = FILTERS.get(f, FILTERS["active"])
+
+    placeholders = ",".join(["%s"] * len(statuses))
+    sql = f"""
+            SELECT
+                w.uuid, w.asset_id, w.raw_issue_description, w.created_at, w.status,
+                a.friendly_tag, a.site_id, a.make, a.model, a.variant, a.status
+            FROM work_order w
+            JOIN asset a ON w.asset_id = a.asset_id
+            WHERE w.status IN ({placeholders})
+            ORDER BY w.created_at DESC;
+        """
+
+    rows = query_all(sql, tuple(statuses))
+
+    issues = []
+    for r in rows:
+        issues.append({
+            'workOrder_uuid': r[0],
+            'workOrder_asset_id': r[1],
+            'workOrder_raw_issue_description': r[2],
+            'workOrder_created_at': r[3],
+            'workOrder_status': r[4],
+            'asset_friendly_tag': r[5],
+            'asset_site_id': r[6],
+            'asset_make': r[7],
+            'asset_model': r[8],
+            'asset_variant': r[9],
+            'asset_status': r[10],
+        })
+
+    return render_template("issues/active.html", issues=issues, cur_filter=f)
 
 @bp.get("/issues/new")
 def new_issue():

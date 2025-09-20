@@ -2,11 +2,23 @@
 {% block title %} Maintenance - Active Issues {% endblock %}
 {% block page_title %} Active Issues {% endblock %}
 
-
 {% block content %}
-    <div class="card">
-        Filter [To be implemented]
-    </div>
+  <!-- Filter bar -->
+  <form method="get" class="card" style="display:flex;align-items:center;gap:12px;">
+    <label class="field" style="display:flex;align-items:center;gap:8px;margin:0;">
+      <span class="muted">Filter</span>
+      <select name="f" onchange="this.form.submit()">
+        <option value="active"      {{ 'selected' if cur_filter=='active' else '' }}>Active (Open/In Progress/Blocked)</option>
+        <option value="open"        {{ 'selected' if cur_filter=='open' else '' }}>Open</option>
+        <option value="in_progress" {{ 'selected' if cur_filter=='in_progress' else '' }}>In&nbsp;Progress</option>
+        <option value="blocked"     {{ 'selected' if cur_filter=='blocked' else '' }}>Blocked</option>
+        <option value="closed"      {{ 'selected' if cur_filter=='closed' else '' }}>Closed</option>
+        <option value="all"         {{ 'selected' if cur_filter=='all' else '' }}>All</option>
+      </select>
+    </label>
+    <noscript><button class="btn">Apply</button></noscript>
+  </form>
+
   {% if issues %}
     <div class="table">
       <div class="thead--four">
@@ -18,18 +30,19 @@
 
       {% for issue in issues %}
         <a class="trow--four" href="{{ url_for('app.view_issue', issue_uuid=issue.get('workOrder_uuid')) }}">
-            <div>#{{ issue.get('asset_friendly_tag') }}</div>
-            <div>{{ issue.get('workOrder_raw_issue_description') }}</div>
-            <div>{{ issue.get('workOrder_created_at') }}</div>
-            <div class="badge badge--outline-{{ 'warn' if issue.get('workOrder_status') == 'IN_PROGRESS'
+          <div>#{{ issue.get('asset_friendly_tag') }}</div>
+          <div>{{ issue.get('workOrder_raw_issue_description') }}</div>
+          <div>{{ issue.get('workOrder_created_at') }}</div>
+          <div class="badge badge--outline-{{ 'warn' if issue.get('workOrder_status') == 'IN_PROGRESS'
                                         else 'ok' if issue.get('workOrder_status') == 'OPEN'
                                         else 'bad' if issue.get('workOrder_status') == 'BLOCKED'
-                                        else 'blue'}}">
-                {{ issue.get('workOrder_status') }}</div>
+                                        else 'blue' }}">
+            {{ issue.get('workOrder_status') }}
+          </div>
         </a>
       {% endfor %}
     </div>
   {% else %}
-    <p>No active issues.</p>
+    <p>No issues for this filter.</p>
   {% endif %}
 {% endblock %}
