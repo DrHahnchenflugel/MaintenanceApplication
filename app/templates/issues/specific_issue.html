@@ -42,8 +42,8 @@
     </div>
 
     <!-- Right: Asset details -->
-      <a href="{{ url_for('app.view_asset', asset_uuid=issue.get('asset_uuid')) }}">
-        <div class="card" style="flex:1;">
+      <div class="card" style="flex:1;">
+        <a href="{{ url_for('app.view_asset', asset_uuid=issue.get('asset_uuid')) }}">
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <h3 style="margin:0;">Asset</h3>
             <span class="badge">{{ issue.get('asset_status') }}</span>
@@ -76,8 +76,8 @@
                 </div>
               </div>
             {% endif %}
-        </div>
-      </a>
+        </a>
+      </div>
   </div>
 
   <!-- Attachments -->
