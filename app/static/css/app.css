@@ -17,6 +17,7 @@
     --ok:#6ee7b7;
     --warn:#fb923c;
     --bad:#f87171;
+    --blue:#2596be;
 }
 
 *{
@@ -379,6 +380,7 @@ a{
 .badge--ok { border: var(--line); background: var(--ok); }
 .badge--warn { border: var(--line); background: var(--warn); }
 .badge--bad { border: var(--line); background: var(--bad); }
+.badge--blue {  border: var(--line); background: var(--blue); }
 
 .badge--outline      { background:var(--bg); }
 .badge--outline.ok   { border-color:var(--line); color:var(--ok); }
