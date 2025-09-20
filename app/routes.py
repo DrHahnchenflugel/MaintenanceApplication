@@ -103,7 +103,7 @@ def dashboard():
     return render_template("dashboard/index.html", issue_info = issue_info)
 
 @bp.get("/issues/list")
-def issues_active():
+def issues_list():
     f = (request.args.get("f") or "active").lower()
     loc = (request.args.get("loc") or "all").upper()
 
