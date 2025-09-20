@@ -9,7 +9,10 @@
     <div class="card" style="flex:2;">
       <div style="display:flex; justify-content:space-between; align-items:center;">
         <h2 style="margin:0;">Issue #{{ issue.get('work_order_id') }}</h2>
-        <span class="badge">{{ issue.get('work_order_status') }}</span>
+        <span class="badge badge-{{ 'warn' if issue.get('workOrder_status') == 'IN_PROGRESS'
+                                        else 'ok' if issue.get('workOrder_status') == 'OPEN'
+                                        else 'bad' if issue.get('workOrder_status') == 'BLOCKED'
+                                        else 'blue' }}">{{ issue.get('work_order_status') }}</span>
       </div>
 
       <div class="field" style="margin-top:12px;">
@@ -46,7 +49,10 @@
         <a href="{{ url_for('app.view_asset', asset_uuid=issue.get('asset_uuid')) }}">
           <div style="display:flex; justify-content:space-between; align-items:center;">
             <h3 style="margin:0;">Asset</h3>
-            <span class="badge">{{ issue.get('asset_status') }}</span>
+            <span class="badge  badge--outline-{{ 'ok' if issue.get('workOrder_status') == 'ACTIVE'
+                                        else 'blue' if issue.get('workOrder_status') == 'RETIRED'
+                                        else 'bad' if issue.get('workOrder_status') == 'LOST'
+                                        else 'warn' }}">{{ issue.get('asset_status') }}</span>
           </div>
 
           <div class="field" style="margin-top:12px;">
