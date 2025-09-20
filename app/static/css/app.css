@@ -383,9 +383,10 @@ a{
 .badge--blue {  border: var(--line); background: var(--blue); }
 
 .badge--outline      { background:var(--bg); }
-.badge--outline.ok   { border-color:var(--line); color:var(--ok); }
-.badge--outline.warn { border-color:var(--line); color:var(--warn); }
-.badge--outline.bad  { border-color:var(--line); color:var(--bad); }
+.badge--outline.ok   { border: 2px solid var(--ok); }
+.badge--outline.warn { border: 2px solid var(--warn); }
+.badge--outline.bad  { border: 2px solid var(--bad); }
+.badge--outline.blue { border: 2px solid var(--blue); }
 
 .actions {
   display: flex;
