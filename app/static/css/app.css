@@ -236,6 +236,8 @@ a{
 
 .btn--lg{
     padding: 18px 28px;
+    height:10dvh;
+    width:20dvh;
     font-size: 1.2rem;
     font-weight: bold;
     border:3px solid var(--brand);
