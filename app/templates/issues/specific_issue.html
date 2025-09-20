@@ -42,40 +42,42 @@
     </div>
 
     <!-- Right: Asset details -->
-    <div class="card" style="flex:1;">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h3 style="margin:0;">Asset</h3>
-        <span class="badge">{{ issue.get('asset_status') }}</span>
-      </div>
-
-      <div class="field" style="margin-top:12px;">
-        <label>Tag</label>
-        <div class="pill">{{ issue.get('asset_friendly_tag') }}</div>
-      </div>
-
-      <div class="field" style="margin-top:12px;">
-        <label>Make / Model / Variant</label>
-        <div class="pill">{{ issue.get('asset_make') }} {{ issue.get('asset_model') }} {{ issue.get('asset_variant') }}</div>
-      </div>
-
-      <div class="field" style="margin-top:12px;">
-        <label>Site</label>
-        <div class="pill">{{ issue.get('site_location_shorthand') }}</div>
-      </div>
-
-        {% if issue[16] %}
-          <div class="row" style="gap:12px; margin-top:12px;">
-            <div class="field" style="flex:1;">
-              <label>Retired at</label>
-              <div class="pill">{{ issue.get('asset_retired_at') if issue.get('asset_retired_at') else "—" }}</div>
-            </div>
-            <div class="field" style="flex:1;">
-              <label>Retired reason</label>
-              <div class="pill">{{ issue.get('asset_retired_reason') if issue.get('asset_retired_reason') else "—" }}</div>
-            </div>
+      <a href="{{ url_for('app.view_asset', asset_uuid=issue.get('asset_uuid')) }}">
+        <div class="card" style="flex:1;">
+          <div style="display:flex; justify-content:space-between; align-items:center;">
+            <h3 style="margin:0;">Asset</h3>
+            <span class="badge">{{ issue.get('asset_status') }}</span>
           </div>
-        {% endif %}
-    </div>
+
+          <div class="field" style="margin-top:12px;">
+            <label>Tag</label>
+            <div class="pill">{{ issue.get('asset_friendly_tag') }}</div>
+          </div>
+
+          <div class="field" style="margin-top:12px;">
+            <label>Make / Model / Variant</label>
+            <div class="pill">{{ issue.get('asset_make') }} {{ issue.get('asset_model') }} {{ issue.get('asset_variant') }}</div>
+          </div>
+
+          <div class="field" style="margin-top:12px;">
+            <label>Site</label>
+            <div class="pill">{{ issue.get('site_location_shorthand') }}</div>
+          </div>
+
+            {% if issue[16] %}
+              <div class="row" style="gap:12px; margin-top:12px;">
+                <div class="field" style="flex:1;">
+                  <label>Retired at</label>
+                  <div class="pill">{{ issue.get('asset_retired_at') if issue.get('asset_retired_at') else "—" }}</div>
+                </div>
+                <div class="field" style="flex:1;">
+                  <label>Retired reason</label>
+                  <div class="pill">{{ issue.get('asset_retired_reason') if issue.get('asset_retired_reason') else "—" }}</div>
+                </div>
+              </div>
+            {% endif %}
+        </div>
+      </a>
   </div>
 
   <!-- Attachments -->

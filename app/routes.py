@@ -407,6 +407,7 @@ def view_issue(issue_uuid):
         'asset_retired_at' : issue_sql[14],
         'asset_retired_reason' : issue_sql[15],
         'asset_status' : issue_sql[16],
+        'asset_uuid' : issue_sql[17],
         'attachment_id' : issue_sql[18],
         'attachment_storage_path' : issue_sql[20],
         'attachment_uploaded_at' : issue_sql[21],
