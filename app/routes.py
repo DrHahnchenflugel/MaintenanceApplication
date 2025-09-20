@@ -105,6 +105,7 @@ def dashboard():
 @bp.get("/issues/active")
 def issues_active():
     f = (request.args.get("f") or "active").lower()
+    loc = (request.args.get("loc") or "all").upper()
 
     FILTERS = {
         "active": ["OPEN", "IN_PROGRESS", "BLOCKED"],
@@ -116,6 +117,22 @@ def issues_active():
     }
     statuses = FILTERS.get(f, FILTERS["active"])
 
+    locations = query_one("""
+        SELECT
+            location_shorthand
+        FROM 
+            site
+    """)[0]
+
+    loc = loc if loc in locations else "ALL"
+
+    where = ["w.status = ALL(%s)"]
+    params = [statuses]
+
+    if loc != "ALL":
+        where.append("s.location_shorthand = %s")
+        params.append(loc)
+
     placeholders = ",".join(["%s"] * len(statuses))
     sql = f"""
             SELECT
@@ -123,11 +140,12 @@ def issues_active():
                 a.friendly_tag, a.site_id, a.make, a.model, a.variant, a.status
             FROM work_order w
             JOIN asset a ON w.asset_id = a.asset_id
-            WHERE w.status IN ({placeholders})
+            JOIN site s ON a.site_id = s.site_id
+            WHERE {'AND'.join(where)}
             ORDER BY w.created_at DESC;
         """
 
-    rows = query_all(sql, tuple(statuses))
+    rows = query_all(sql, tuple(params))
 
     issues = []
     for r in rows:
@@ -145,7 +163,10 @@ def issues_active():
             'asset_status': r[10],
         })
 
-    return render_template("issues/active.html", issues=issues, cur_filter=f)
+    return render_template("issues/active.html",
+                                issues=issues,
+                                cur_filter=f,
+                                cur_loc=loc)
 
 @bp.get("/issues/new")
 def new_issue():

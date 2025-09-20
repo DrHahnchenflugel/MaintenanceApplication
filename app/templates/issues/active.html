@@ -18,6 +18,17 @@
             <option value="all"         {{ 'selected' if cur_filter=='all' else '' }}>All</option>
           </select>
       </span>
+
+      <span class="card">
+          <span class="muted"><b>Location:  </b></span>
+          <select name="loc" onchange="this.form.submit()">
+              <option value="ALL" {{ 'selected' if cur_loc=='ALL' else '' }}>All</option>
+              <option value="THO" {{ 'selected' if cur_loc=='THO' else '' }}>THO</option>
+              <option value="MIS" {{ 'selected' if cur_loc=='MIS' else '' }}>MIS</option>
+              <option value="RCH" {{ 'selected' if cur_loc=='RCH' else '' }}>RCH</option>
+              <option value="YLC" {{ 'selected' if cur_loc=='YLC' else '' }}>YLC</option>
+          </select>
+      </span>
     </label>
     <noscript><button class="btn">Apply</button></noscript>
   </form>
@@ -33,7 +44,11 @@
 
       {% for issue in issues %}
         <a class="trow--four" href="{{ url_for('app.view_issue', issue_uuid=issue.get('workOrder_uuid')) }}">
-          <div>#{{ issue.get('asset_friendly_tag') }}</div>
+          <div>#{{ issue.get('asset_friendly_tag') }}
+              <span class="muted">
+                  ({{ issue.get('site_location_shorthand') }})
+              </span>
+          </div>
           <div>{{ issue.get('workOrder_raw_issue_description') }}</div>
           <div>{{ issue.get('workOrder_created_at') }}</div>
           <div class="badge badge--outline-{{ 'warn' if issue.get('workOrder_status') == 'IN_PROGRESS'
