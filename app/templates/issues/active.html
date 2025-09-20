@@ -23,10 +23,8 @@
           <span class="muted"><b>Location:  </b></span>
           <select name="loc" onchange="this.form.submit()">
               <option value="ALL" {{ 'selected' if cur_loc=='ALL' else '' }}>All</option>
-              <option value="THO" {{ 'selected' if cur_loc=='THO' else '' }}>THO</option>
-              <option value="MIS" {{ 'selected' if cur_loc=='MIS' else '' }}>MIS</option>
-              <option value="RCH" {{ 'selected' if cur_loc=='RCH' else '' }}>RCH</option>
-              <option value="YLC" {{ 'selected' if cur_loc=='YLC' else '' }}>YLC</option>
+              {% for loc in locations %}
+                    <option value="{{ loc }}" {{ 'selected' if cur_loc==loc else '' }} {{ loc }}</option>
           </select>
       </span>
     </label>

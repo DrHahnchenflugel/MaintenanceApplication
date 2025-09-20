@@ -143,9 +143,6 @@ def issues_active():
             WHERE {' AND '.join(where)}
             ORDER BY w.created_at DESC;
         """
-    print("WHEREEE=========================================+",where)
-    print("WHEREJOIN========================================",'AND'.join(where))
-    print("POARAMS=========================================+",params)
     rows = query_all(sql, tuple(params))
 
     issues = []
@@ -167,7 +164,8 @@ def issues_active():
     return render_template("issues/active.html",
                                 issues=issues,
                                 cur_filter=f,
-                                cur_loc=loc)
+                                cur_loc=loc,
+                                locations=locations)
 
 @bp.get("/issues/new")
 def new_issue():
