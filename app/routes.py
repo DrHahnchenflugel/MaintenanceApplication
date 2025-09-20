@@ -144,6 +144,7 @@ def issues_active():
             ORDER BY w.created_at DESC;
         """
     print("WHEREEE=========================================+",where)
+    print("WHEREJOIN========================================",'AND'.join(where))
     print("POARAMS=========================================+",params)
     rows = query_all(sql, tuple(params))
 
