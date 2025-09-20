@@ -383,10 +383,10 @@ a{
 .badge--blue {  border: var(--line); background: var(--blue); }
 
 .badge--outline      { background:var(--bg); }
-.badge--outline.ok   { border: 2px solid var(--ok); background:var(--bg); }
-.badge--outline.warn { border: 2px solid var(--warn); background:var(--bg); }
-.badge--outline.bad  { border: 2px solid var(--bad); background:var(--bg); }
-.badge--outline.blue { border: 2px solid var(--blue); background:var(--bg); }
+.badge--outline-ok   { border: 2px solid var(--ok); background:var(--bg); }
+.badge--outline-warn { border: 2px solid var(--warn); background:var(--bg); }
+.badge--outline-bad  { border: 2px solid var(--bad); background:var(--bg); }
+.badge--outline-blue { border: 2px solid var(--blue); background:var(--bg); }
 
 .actions {
   display: flex;
