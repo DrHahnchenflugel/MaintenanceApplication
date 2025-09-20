@@ -133,7 +133,6 @@ def issues_active():
         where.append("s.location_shorthand = %s")
         params.append(loc)
 
-    placeholders = ",".join(["%s"] * len(statuses))
     sql = f"""
             SELECT
                 w.uuid, w.asset_id, w.raw_issue_description, w.created_at, w.status,
@@ -144,7 +143,7 @@ def issues_active():
             WHERE {'AND'.join(where)}
             ORDER BY w.created_at DESC;
         """
-
+    print(params)
     rows = query_all(sql, tuple(params))
 
     issues = []
