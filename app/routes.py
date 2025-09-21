@@ -128,6 +128,8 @@ def issues_list():
 
     where = ["w.status = ALL(%s)"]
     params = [statuses]
+    print("=================")
+    print(where)
     print(params)
 
     if loc != "ALL":
