@@ -614,7 +614,7 @@ def view_asset(asset_uuid):
     for i in active_issues_sorted_sql:
         issues.append(
             {
-                'date':i[3],
+                'date':timezone_to_YYYYMMDD_HHMM(i[3]),
                 'issue':i[2],
                 'length':human_delta_to_now(i[3]),
                 'result':i[4],
@@ -625,7 +625,7 @@ def view_asset(asset_uuid):
     for i in inactive_issues_sorted_sql:
         issues.append(
             {
-                'date':i[3],
+                'date':timezone_to_YYYYMMDD_HHMM(i[3]),
                 'issue':i[2],
                 'length':human_delta_2_times(i[3],i[4]) if i[4] else "NA",
                 'result':i[5],
