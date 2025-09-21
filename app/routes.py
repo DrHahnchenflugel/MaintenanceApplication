@@ -244,7 +244,9 @@ def create_issue_for_asset(asset_uuid):
                                     a.status,
 
                                     s.location_shorthand, 
-                                    s.friendly_name 
+                                    s.friendly_name,
+
+                                    a.asset_id
 
                                     FROM asset a
                                     JOIN site s
@@ -265,10 +267,11 @@ def create_issue_for_asset(asset_uuid):
         'asset_variant': asset_sql[5],
         'asset_status': asset_sql[6],
         'site_location_shorthand': asset_sql[7],
-        'site_friendly_name': asset_sql[8]
+        'site_friendly_name': asset_sql[8],
+        'asset_asset_id':asset_sql[9]
     }
 
-    asset_id = asset.get('asset_uuid')
+    asset_id = asset.get('asset_asset_id')
     description = (request.form.get("description") or "").strip()
 
     errors = []
@@ -289,7 +292,9 @@ def create_issue_for_asset(asset_uuid):
                                         a.status,
 
                                         s.location_shorthand, 
-                                        s.friendly_name 
+                                        s.friendly_name, 
+
+                                        a.asset_id
 
                                         FROM asset a
                                         JOIN site s
@@ -310,7 +315,8 @@ def create_issue_for_asset(asset_uuid):
             'asset_variant': asset_sql[5],
             'asset_status': asset_sql[6],
             'site_location_shorthand': asset_sql[7],
-            'site_friendly_name': asset_sql[8]
+            'site_friendly_name': asset_sql[8],
+            'asset_asset_id': asset_sql[9]
         }
 
         return render_template(f"issues/new.html", asset=asset, asset_uuid=asset_uuid, form=request.form)
@@ -319,7 +325,7 @@ def create_issue_for_asset(asset_uuid):
         INSERT INTO work_order (asset_id, raw_issue_description, status)
         VALUES (%s, %s, 'OPEN')
         RETURNING work_order_id;
-        """, (asset_uuid, description))
+        """, (asset_id, description))
     work_order_id = workOrder[0]
 
     execute("""
