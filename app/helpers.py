@@ -86,5 +86,7 @@ def human_delta_2_times(dt_1: datetime, dt_2: datetime) -> str:
 def timezone_to_YYYYMMDD_HHMM(dt_utc: datetime, tz:timezone = TZ_MINUS_5) -> str:
     # Normalize to target timezone
     dt_local = dt_utc.astimezone(tz)
-
-    return f"{dt_local.year} {dt_local.month} {dt_local.day} {dt_local.hour}:{dt_local.minute}"
+    if dt_utc is not None:
+        return f"{dt_local.year} {dt_local.month} {dt_local.day} {dt_local.hour}:{dt_local.minute}"
+    else:
+        return None
