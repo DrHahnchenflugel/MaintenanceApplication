@@ -734,7 +734,7 @@ def create_asset():
     # Insert into DB
     execute(
         """
-        INSERT INTO asset (asset_friendly_tag, make, model, variant, location)
+        INSERT INTO asset (friendly_tag, make, model, variant, location)
         VALUES (%s, %s, %s, %s, %s)
         """,
         (asset_friendly_tag, make, model, variant, location),
