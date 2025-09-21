@@ -695,3 +695,26 @@ def update_asset(asset_uuid):
         pass
 
     return redirect(url_for("app.view_asset", asset_uuid=asset_uuid))
+
+@bp.route("/issues_trend")
+def issues_trend():
+    rows = query_all("""
+        WITH weeks AS (
+            SELECT generate_series(
+                date_trunc('week', now() - interval '3 months'),
+                date_trunc('week', now()),
+                interval '1 week'
+            )::date AS week_start
+        )
+        SELECT 
+            w.week_start,
+            COUNT(*) AS active_issues
+        FROM weeks w
+        JOIN work_order wo
+            ON wo.created_at <= w.week_start + interval '7 days'
+           AND (wo.closed_at IS NULL OR wo.closed_at > w.week_start)
+        GROUP BY w.week_start
+        ORDER BY w.week_start;
+    """)
+
+    return jsonify(rows)
