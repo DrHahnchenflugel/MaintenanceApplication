@@ -1,6 +1,6 @@
 {% extends "base.html" %}
-{% block title %} Maintenance - New Asset {{ asset.get('asset_friendly_tag') }} {% endblock %}
-{% block page_title %} Maintenance - New Asset {{ asset.get('asset_friendly_tag') }} {% endblock %}
+{% block title %} Maintenance - New Asset {% endblock %}
+{% block page_title %} Maintenance - New Asset {% endblock %}
 
 {% block content %}
 <form action="{{ url_for('app.create_asset') }}" method="post" class="asset-layout">
