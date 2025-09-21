@@ -726,7 +726,7 @@ def new_asset():
                 location_shorthand
             FROM 
                 site
-        """)[0]
+        """)
 
     asset_types = query_all("""
             SELECT 
@@ -736,8 +736,8 @@ def new_asset():
             JOIN pg_type ON pg_enum.enumtypid = pg_type.oid
             WHERE 
                 pg_type.typname = 'asset_type';
-    """)[0]
-    print(asset_types)
+    """)
+    print(asset_types, locations[0], locations)
     return render_template("assets/new_asset.html")
 
 @bp.post("/assets/new")
