@@ -431,7 +431,7 @@ def view_issue(issue_uuid):
                 'id':log[0],
                 'action_taken':log[2],
                 'result':log[3],
-                'created_at':log[4]
+                'created_at':timezone_to_YYYYMMDD_HHMM(log[4])
             }
         )
 
