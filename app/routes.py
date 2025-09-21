@@ -721,6 +721,23 @@ def issues_trend():
 
 @bp.get("/assets/new")
 def new_asset():
+    locations = query_all("""
+            SELECT
+                location_shorthand
+            FROM 
+                site
+        """)[0]
+
+    asset_types = query_all("""
+            SELECT 
+                enumlabel
+            FROM 
+                pg_enum
+            JOIN pg_type ON pg_enum.enumtypid = pg_type.oid
+            WHERE 
+                pg_type.typname = 'asset_type';
+    """)[0]
+    print(asset_types)
     return render_template("assets/new_asset.html")
 
 @bp.post("/assets/new")
@@ -742,9 +759,6 @@ def create_asset():
         """,
         (location,)
     )
-
-    print(site_id)
-    print(location)
 
     # Insert into DB
     execute(
