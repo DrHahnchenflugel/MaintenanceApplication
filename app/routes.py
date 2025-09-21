@@ -128,6 +128,7 @@ def issues_list():
 
     where = ["w.status = ALL(%s)"]
     params = [statuses]
+    print(params)
 
     if loc != "ALL":
         where.append("s.location_shorthand = %s")
