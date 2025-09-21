@@ -718,3 +718,27 @@ def issues_trend():
     """)
 
     return jsonify(rows)
+
+@bp.get("/assets/new")
+def new_asset():
+    return render_template("assets/new_asset.html")
+
+@bp.post("/assets/new")
+def create_asset():
+    asset_friendly_tag = request.form.get("asset_friendly_tag")
+    make = request.form.get("make")
+    model = request.form.get("model")
+    variant = request.form.get("variant")
+    location = request.form.get("location")
+
+    # Insert into DB
+    execute(
+        """
+        INSERT INTO asset (asset_friendly_tag, make, model, variant, location)
+        VALUES (%s, %s, %s, %s, %s)
+        """,
+        (asset_friendly_tag, make, model, variant, location),
+    )
+
+    flash("Asset created successfully!", "success")
+    return redirect(url_for("app.assets"))

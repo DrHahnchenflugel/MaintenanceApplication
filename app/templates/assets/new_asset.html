@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %} Maintenance - New Asset {{ asset.get('asset_friendly_tag') }} {% endblock %}
+{% block page_title %} Maintenance - New Asset {{ asset.get('asset_friendly_tag') }} {% endblock %}
+
+{% block content %}
+<form action="{{ url_for('app.create_asset') }}" method="post" class="asset-layout">
+
+    <!-- Asset Details -->
+    <section class="card" style="min-height:15vh">
+      <h2 style="margin-top:0;">Asset Information</h2>
+      <div class="form-row">
+        <label for="asset_friendly_tag"><b>Name / Tag</b></label>
+        <input type="text" id="asset_friendly_tag" name="asset_friendly_tag" required>
+      </div>
+      <div class="form-row">
+        <label for="make"><b>Make</b></label>
+        <input type="text" id="make" name="make">
+      </div>
+      <div class="form-row">
+        <label for="model"><b>Model</b></label>
+        <input type="text" id="model" name="model">
+      </div>
+      <div class="form-row">
+        <label for="variant"><b>Variant</b></label>
+        <input type="text" id="variant" name="variant">
+      </div>
+    </section>
+
+    <!-- Meta -->
+    <section class="card" style="min-height:15vh">
+      <h2 style="margin-top:0;">Meta</h2>
+      <div class="form-row">
+        <label for="location"><b>Location</b></label>
+        <input type="text" id="location" name="location">
+      </div>
+    </section>
+
+    <!-- Actions -->
+    <section class="card" style="min-height:10vh; display:flex; align-items:center; justify-content:space-between;">
+      <button type="submit" class="btn btn--lg">Save Asset</button>
+      <a href="{{ url_for('app.assets') }}" class="btn secondary">Cancel</a>
+    </section>
+
+  </form>
+{% endblock %}

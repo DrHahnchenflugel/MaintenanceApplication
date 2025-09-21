@@ -30,3 +30,7 @@
     <p>No active assets.</p>
   {% endif %}
 {% endblock %}
+
+{% block footer_center_right %}
+    <a class="btn btn--lg btn--fixed--bottomright" href="{{ url_for('app.new_asset') }}">New Issue +</a>
+{% endblock %}
