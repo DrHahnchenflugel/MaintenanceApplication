@@ -151,6 +151,8 @@
                       <option value="CLOSED">CLOSED</option>
                       <!-- TODO: add BLOCKED as an option -->
                   </select>
+
+                  <input type="text" name="result" id="result-input" placeholder="Result">
               </div>
           </div>
 
@@ -182,6 +184,16 @@
             submitRow.style.display = "grid"; // show submit
         });
     });
+
+  const statusSel = document.getElementById('status-select');
+  const resultInp = document.getElementById('result-input');
+  function tweak() {
+    const isClosed = statusSel.value === 'CLOSED';
+    resultInp.placeholder = isClosed ? "Close reason (required)" : "Result";
+    resultInp.required = isClosed;  // only force when closing
+  }
+  statusSel.addEventListener('change', tweak);
+  tweak();
 </script>
 
 {% endblock %}

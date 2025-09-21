@@ -468,6 +468,38 @@ def update_issue(issue_uuid):
             "UPDATE work_order SET status = 'BLOCKED' WHERE work_order_id = %s",
             (work_order_id,)
         )
+    else:
+        flash("Invalid status.", "error")
+        return redirect(url_for("app.view_issue", issue_uuid=issue_uuid))
+
+    if new_status == "CLOSED":
+        # Require a reason when closing; store it in close_note and stamp closed_at
+        if not result:
+            flash("Please provide a Result (this will be saved as the close note).", "error")
+            return redirect(url_for("app.view_issue", issue_uuid=issue_uuid))
+
+        execute(
+            """
+            UPDATE work_order
+               SET status = 'CLOSED',
+                   closed_at = NOW(),
+                   close_note = %s
+             WHERE work_order_id = %s
+            """,
+            (result, work_order_id)
+        )
+    else:
+        # Reopen / progress / block → clear closed fields
+        execute(
+            """
+            UPDATE work_order
+               SET status = %s,
+                   closed_at = NULL,
+                   close_note = NULL
+             WHERE work_order_id = %s
+            """,
+            (new_status, work_order_id)
+        )
 
     flash("Updated issue log.", "ok")
     return redirect(url_for("app.view_issue", issue_uuid=issue_uuid))
