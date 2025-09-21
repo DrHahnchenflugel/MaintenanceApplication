@@ -737,7 +737,6 @@ def new_asset():
             WHERE 
                 pg_type.typname = 'asset_type';
     """)
-    print(asset_types, locations[0], locations)
     return render_template("assets/new_asset.html")
 
 @bp.post("/assets/new")
