@@ -152,7 +152,7 @@ def issues_list():
             'workOrder_uuid': r[0],
             'workOrder_asset_id': r[1],
             'workOrder_raw_issue_description': r[2],
-            'workOrder_created_at': r[3],
+            'workOrder_created_at': timezone_to_ddmonthyyyy_hhmm(r[3]),
             'workOrder_status': r[4],
             'asset_friendly_tag': r[5],
             'asset_site_id': r[6],
