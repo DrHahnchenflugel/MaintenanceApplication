@@ -293,7 +293,11 @@ a{
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 10px;
-  overflow: hidden;
+}
+
+.table--issues{
+    max-height: 70vh;
+    overflow-y: auto;
 }
 
 .thead--three,
