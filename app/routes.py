@@ -126,7 +126,7 @@ def issues_list():
 
     loc = loc if loc in locations else "ALL"
 
-    where = ["w.status = ALL(%s)"]
+    where = ["w.status = ANY(%s)"]
     params = [statuses]
     print("=================")
     print(where)
