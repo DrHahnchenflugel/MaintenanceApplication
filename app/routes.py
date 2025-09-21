@@ -123,6 +123,7 @@ def issues_list():
         FROM 
             site
     """)[0]
+    # TODO: need to make locations indexing better, maybe fix query_all so no need for [0]?
 
     loc = loc if loc in locations else "ALL"
 
