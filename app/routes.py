@@ -4,7 +4,7 @@ from .db import query_one, query_all, execute_returning_one, execute
 from uuid import UUID
 from datetime import datetime, timezone, timedelta
 from werkzeug.utils import secure_filename
-from .helpers import human_delta_to_now, human_delta_2_times
+from .helpers import human_delta_to_now, human_delta_2_times, timezone_to_YYYYMMDD_HHMM
 
 bp = Blueprint("app", __name__)
 
@@ -128,9 +128,6 @@ def issues_list():
 
     where = ["w.status = ANY(%s)"]
     params = [statuses]
-    print("=================")
-    print(where)
-    print(params)
 
     if loc != "ALL":
         where.append("s.location_shorthand = %s")
@@ -404,8 +401,8 @@ def view_issue(issue_uuid):
         'work_order_id' : issue_sql[0],
         'asset_id' : issue_sql[1],
         'raw_issue_description' : issue_sql[2],
-        'work_order_created_at' : issue_sql[3],
-        'work_order_closed_at' : issue_sql[4],
+        'work_order_created_at' : timezone_to_YYYYMMDD_HHMM(issue_sql[3]),
+        'work_order_closed_at' : timezone_to_YYYYMMDD_HHMM(issue_sql[4]),
         'work_order_close_note' : issue_sql[5],
         'work_order_status' : issue_sql[6],
         'work_order_uuid' : issue_sql[7],
@@ -413,7 +410,7 @@ def view_issue(issue_uuid):
         'asset_make' : issue_sql[11],
         'asset_model' : issue_sql[12],
         'asset_variant' : issue_sql[13],
-        'asset_retired_at' : issue_sql[14],
+        'asset_retired_at' : timezone_to_YYYYMMDD_HHMM(issue_sql[14]),
         'asset_retired_reason' : issue_sql[15],
         'asset_status' : issue_sql[16],
         'asset_uuid' : issue_sql[17],
@@ -565,7 +562,7 @@ def view_asset(asset_uuid):
         'asset_make' : asset_sql[3],
         'asset_model' : asset_sql[4],
         'asset_variant' :  asset_sql[5],
-        'asset_retired_at' : asset_sql[6],
+        'asset_retired_at' : timezone_to_YYYYMMDD_HHMM(asset_sql[6]),
         'asset_retired_reason' : asset_sql[7],
         'asset_status' : asset_sql[8],
         'asset_uuid' : asset_sql[9],
