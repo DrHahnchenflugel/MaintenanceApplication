@@ -734,14 +734,17 @@ def create_asset():
     site_id = execute_returning_one(
         """
             SELECT
-                site_id
+                s.site_id
             FROM 
-                site
+                site s
             WHERE
-                friendly_name = %s
+                s.friendly_name = %s
         """,
         (location,)
     )
+
+    print(site_id)
+    print(location)
 
     # Insert into DB
     execute(
