@@ -54,7 +54,7 @@
                                         else 'ok' if issue.get('workOrder_status') == 'OPEN'
                                         else 'bad' if issue.get('workOrder_status') == 'BLOCKED'
                                         else 'blue' }}">
-            {{ issue.get('workOrder_status') }}
+            {{ issue.get('workOrder_status').replace('_', ' ') }}
           </div>
         </a>
       {% endfor %}
