@@ -337,7 +337,7 @@ def create_issue_for_asset(asset_uuid):
     _save_attachment_if_any(request, work_order_id)
 
     flash("Issue created.", "ok")
-    return redirect(url_for("app.issues_active", work_order_id=work_order_id))
+    return redirect(url_for("app.issues_list", work_order_id=work_order_id, f='active'))
 
 @bp.get("/issues/<issue_uuid>")
 def view_issue(issue_uuid):
