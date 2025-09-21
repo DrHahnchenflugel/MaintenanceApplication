@@ -296,6 +296,12 @@ a{
 }
 
 .table--issues{
+    max-height: 85vh;
+    overflow-y: auto;
+}
+
+.table--asset-issues{
+    max-height: 50vh;
     overflow-y: auto;
 }
 
