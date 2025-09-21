@@ -749,10 +749,10 @@ def create_asset():
     # Insert into DB
     execute(
         """
-        INSERT INTO asset (friendly_tag, make, model, variant, site_id)
-        VALUES (%s, %s, %s, %s, %s)
+        INSERT INTO asset (friendly_tag, make, model, variant, site_id, status)
+        VALUES (%s, %s, %s, %s, %s, %s)
         """,
-        (asset_friendly_tag, make, model, variant, site_id[0]),
+        (asset_friendly_tag, make, model, variant, site_id[0], 'ACTIVE'),
     )
 
     flash("Asset created successfully!", "success")
