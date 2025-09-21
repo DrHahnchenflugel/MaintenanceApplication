@@ -4,7 +4,7 @@ from .db import query_one, query_all, execute_returning_one, execute
 from uuid import UUID
 from datetime import datetime, timezone, timedelta
 from werkzeug.utils import secure_filename
-from .helpers import human_delta_to_now, human_delta_2_times, timezone_to_monthddyyyy_hhmm,timezone_to_ddmmyyyy_hhmm
+from .helpers import human_delta_to_now, human_delta_2_times, timezone_to_monthddyyyy_hhmm,timezone_to_ddmonthyyyy_hhmm
 
 bp = Blueprint("app", __name__)
 
@@ -431,7 +431,7 @@ def view_issue(issue_uuid):
                 'id':log[0],
                 'action_taken':log[2],
                 'result':log[3],
-                'created_at':timezone_to_ddmmyyyy_hhmm(log[4])
+                'created_at':timezone_to_ddmonthyyyy_hhmm(log[4])
             }
         )
 
