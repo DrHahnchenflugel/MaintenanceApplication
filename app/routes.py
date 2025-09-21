@@ -731,13 +731,25 @@ def create_asset():
     variant = request.form.get("variant")
     location = request.form.get("location")
 
+    site_id = execute_returning_one(
+        """
+            SELECT
+                site_id
+            FROM 
+                site
+            WHERE
+                friendly_name = %s
+        """,
+        (location,)
+    )
+
     # Insert into DB
     execute(
         """
-        INSERT INTO asset (friendly_tag, make, model, variant, location)
+        INSERT INTO asset (friendly_tag, make, model, variant, site_id)
         VALUES (%s, %s, %s, %s, %s)
         """,
-        (asset_friendly_tag, make, model, variant, location),
+        (asset_friendly_tag, make, model, variant, site_id[0]),
     )
 
     flash("Asset created successfully!", "success")
