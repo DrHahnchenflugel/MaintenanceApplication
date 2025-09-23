@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Resolve repo root even if called by sym link or from another dir
-REPO_ROOT="$(cd -- "$(dirname "${BASH_SOURCE[0]}")" /.. && pwd)"
+REPO_ROOT="$(cd -- "$(dirname "${BASH_SOURCE[0]}")"/.. && pwd)"
 cd "$REPO_ROOT"
 
 echo "[-] GIT PULL in $REPO_ROOT"
