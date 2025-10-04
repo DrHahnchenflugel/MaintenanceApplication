@@ -110,6 +110,7 @@ def dashboard():
 
     return render_template("dashboard/index.html", issue_info = issue_info)
 
+
 @bp.get("/issues/list")
 def issues_list():
     # Get arguments
