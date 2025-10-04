@@ -57,9 +57,12 @@ def dashboard():
         """
             SELECT
             COUNT(*)
-            FROM work_order
-            WHERE status = 'OPEN'
-                OR status = 'IN_PROGRESS';
+            FROM issue
+            WHERE status_id IN (
+                SELECT id
+                FROM issue_status
+                WHERE code IN ('OPEN', 'IN_PROGRESS')
+            );
         """
     )
 
@@ -67,46 +70,53 @@ def dashboard():
         """
             SELECT
             COUNT(*)
-            FROM work_order
-            WHERE status = 'BLOCKED';
+            FROM issue
+            WHERE status_id IN (
+                SELECT id
+                FROM issue_status
+                WHERE code IN ('BLOCKED')
+            );
         """
     )
 
     oldest_issue_sql = query_one(
         """
             SELECT 
-                created_at, raw_issue_description, work_order_id
-            FROM work_order
-            WHERE status IN ('OPEN', 'IN_PROGRESS') 
+                id, created_at
+            FROM issue
+            WHERE status_id IN (
+                SELECT id
+                FROM issue_status
+                WHERE code IN ('OPEN', 'IN_PROGRESS')
+            ) 
             ORDER BY created_at ASC
             LIMIT 1;
         """
     )
+
     if oldest_issue_sql:
-        dt_utc = oldest_issue_sql[0]
-        tz_minus_5 = timezone(timedelta(hours=-5))
-        dt_local = dt_utc.astimezone(tz_minus_5)
-        now_local = datetime.now(tz_minus_5)
-        delta = now_local - dt_local
-        days = delta.days
-        hours = delta.seconds // 3600
-        delta_time = f"{days} Days {hours} Hrs" if days else f"{hours}H"
+        delta_time = human_delta_to_now(oldest_issue_sql[1])
     else:
         delta_time = "N/A"
 
     issue_info = {
         'num_open_issues' : num_open_issues_sql[0],
         'num_blocked_issues' : num_blocked_issues_sql[0],
-        'oldest_issue' : delta_time
+        'oldest_issue' : {
+            'id': oldest_issue_sql[0],
+            'age':delta_time
+        },
     }
 
     return render_template("dashboard/index.html", issue_info = issue_info)
 
 @bp.get("/issues/list")
 def issues_list():
-    f = (request.args.get("f") or "active").lower()
+    # Get arguments
+    filter = (request.args.get("filter") or "active").lower()
     loc = (request.args.get("loc") or "all").upper()
 
+    # Filter issue by category
     FILTERS = {
         "active": ["OPEN", "IN_PROGRESS", "BLOCKED"],
         "open": ["OPEN"],
@@ -115,52 +125,60 @@ def issues_list():
         "closed": ["CLOSED"],
         "all": ["OPEN", "IN_PROGRESS", "BLOCKED", "CLOSED"],
     }
-    statuses = FILTERS.get(f, FILTERS["active"])
+    statuses = FILTERS.get(filter, FILTERS["active"])
 
-    locations = query_all("""
+    # Filter by location
+    locations = query_all(
+        """
         SELECT
-            location_shorthand
+            shorthand
         FROM 
-            site
-    """)[0]
-    # TODO: need to make locations indexing better, maybe fix query_all so no need for [0]?
-
+            site;
+        """
+    )
+    print(locations)
     loc = loc if loc in locations else "ALL"
 
+    # Set up SQL call
     where = ["w.status = ANY(%s)"]
     params = [statuses]
 
+    # locations
     if loc != "ALL":
         where.append("s.location_shorthand = %s")
         params.append(loc)
 
+    # build string
     sql = f"""
             SELECT
-                w.uuid, w.asset_id, w.raw_issue_description, w.created_at, w.status,
-                a.friendly_tag, a.site_id, a.make, a.model, a.variant, a.status
-            FROM work_order w
-            JOIN asset a ON w.asset_id = a.asset_id
-            JOIN site s ON a.site_id = s.site_id
+                i.id, i.title, i.description, i.created_at, i.status,
+                a.asset_tag, a.site_id, a.category, a.make, a.model, a.variant, a.status_id
+            FROM issue i
+            JOIN asset a ON i.asset_id = a.id
+            JOIN site s ON a.site_id = s.id
             WHERE {' AND '.join(where)}
             ORDER BY w.created_at DESC;
         """
 
+    # run query
     rows = query_all(sql, tuple(params))
 
+    # create list
     issues = []
     for r in rows:
         issues.append({
-            'workOrder_uuid': r[0],
-            'workOrder_asset_id': r[1],
-            'workOrder_raw_issue_description': r[2],
-            'workOrder_created_at': timezone_to_ddmonthyyyy_hhmm(r[3]),
-            'workOrder_status': r[4],
-            'asset_friendly_tag': r[5],
+            'issue_id': r[0],
+            'issue_title': r[1],
+            'issue_description': r[2],
+            'issue_created_at': timezone_to_ddmonthyyyy_hhmm(r[3]),
+            'issue_status': r[4],
+            'asset_tag': r[5],
             'asset_site_id': r[6],
-            'asset_make': r[7],
-            'asset_model': r[8],
-            'asset_variant': r[9],
-            'asset_status': r[10],
+            'asset_category': r[7],
+            'asset_make': r[8],
+            'asset_model': r[9],
+            'asset_variant': r[10],
+            'asset_status': r[11],
         })
 
     return render_template("issues/list.html",
@@ -171,50 +189,50 @@ def issues_list():
 
 @bp.get("/issues/new")
 def new_issue():
-    assets_sql = query_all("""SELECT (a.uuid, a.friendly_tag, a.site_id, a.make, a.model, a.variant, a.status,
-                        s.location_shorthand, s.friendly_name) 
-                        FROM asset a
-                        JOIN site s
-                        ON a.site_id = s.site_id
-                        ORDER BY friendly_tag ASC;
-                        """)
+    assets_sql = query_all(
+        """
+        SELECT (
+                a.id, a.asset_tag, a.site_id, a.category, a.make, a.model, a.variant, a.status,
+                s.shorthand, s.fullname
+                ) 
+        FROM asset a
+        JOIN site s
+        ON a.site_id = s.site_id
+        ORDER BY friendly_tag ASC;                    
+        """
+    )
     assets = []
     for asset in assets_sql:
         assets.append(
             {
-                'asset_uuid':asset[0][0],
-                'asset_friendly_tag':asset[0][1],
+                'asset_id':asset[0][0],
+                'asset_tag':asset[0][1],
                 'asset_site_id':asset[0][2],
-                'asset_make':asset[0][3],
-                'asset_model':asset[0][4],
-                'asset_variant':asset[0][5],
-                'asset_status':asset[0][6],
-                'site_location_shorthand':asset[0][7],
-                'site_friendly_name':asset[0][8]
+                'asset_category':asset[0][3],
+                'asset_make':asset[0][4],
+                'asset_model':asset[0][5],
+                'asset_variant':asset[0][6],
+                'asset_status':asset[0][7],
+                'site_location_shorthand':asset[0][8],
+                'site_friendly_name':asset[0][9]
             }
         )
     return render_template("issues/new_issue_asset_selector.html", assets=assets)
 
 @bp.get("/issues/new/<uuid:asset_uuid>")
 def new_issue_for_asset(asset_uuid):
-    asset_sql = query_one("""SELECT 
-                                a.uuid, 
-                                a.friendly_tag, 
-                                a.site_id, 
-                                a.make, 
-                                a.model, 
-                                a.variant, 
-                                a.status,
-                                
-                                s.location_shorthand, 
-                                s.friendly_name 
+    asset_sql = query_one(
+        """
+                SELECT 
+                    a.uuid, a.friendly_tag, a.site_id, a.make, a.model, a.variant, a.status,
+                    s.location_shorthand, s.friendly_name 
 
-                                FROM asset a
-                                JOIN site s
-                                ON a.site_id = s.site_id
-                                WHERE a.uuid = %s;
-                                """,
-                      (str(asset_uuid),))
+                FROM asset a
+                JOIN site s
+                ON a.site_id = s.site_id
+                WHERE a.uuid = %s;
+            """,
+    (str(asset_uuid),))
 
     if asset_sql is None:
         abort(404)
@@ -236,7 +254,7 @@ def new_issue_for_asset(asset_uuid):
 @bp.post("/issues/new/<uuid:asset_uuid>")
 def create_issue_for_asset(asset_uuid):
     asset_sql = query_one("""SELECT 
-                                    a.uuid, 
+                                    a.id, 
                                     a.friendly_tag, 
                                     a.site_id, 
                                     a.make, 
