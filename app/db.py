@@ -18,6 +18,7 @@ def query_one(sql:str, params:(str) = ()) -> str|None:
             cursor.execute(sql, params)
             single_row = cursor.fetchone()
             return single_row
+    return -1
 
 def query_all(sql:str, params:(str) = ()) -> str|None:
     with POOL.connection() as connection:
@@ -25,6 +26,7 @@ def query_all(sql:str, params:(str) = ()) -> str|None:
             cursor.execute(sql, params)
             rows = cursor.fetchall()
             return rows
+    return -1
 
 def execute(sql:str, params:str|(str) = ()) -> None:
     with POOL.connection() as connection:
@@ -38,6 +40,7 @@ def execute_returning_one(sql:str, params:(str) = ()) -> None:
             cursor.execute(sql, params)
             return cursor.fetchone()
             # autocommits, as psycopg_pool opens in autocommit
+    return -1
 
 def execute_returning_all(sql:str, params:(str) = ()) -> None:
     with POOL.connection() as connection:
@@ -45,3 +48,4 @@ def execute_returning_all(sql:str, params:(str) = ()) -> None:
             cursor.execute(sql, params)
             return cursor.fetchall()
             # autocommits, as psycopg_pool opens in autocommit
+    return -1

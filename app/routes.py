@@ -224,7 +224,7 @@ def new_issue_for_asset(asset_uuid):
     asset_sql = query_one(
         """
                 SELECT 
-                    a.uuid, a.friendly_tag, a.site_id, a.make, a.model, a.variant, a.status,
+                    a.id, a.asset_tag, a.category, a.make, a.model, a.variant, a.status,
                     s.location_shorthand, s.friendly_name 
 
                 FROM asset a
@@ -238,9 +238,9 @@ def new_issue_for_asset(asset_uuid):
         abort(404)
 
     asset = {
-        'asset_uuid':asset_sql[0],
-        'asset_friendly_tag':asset_sql[1],
-        'asset_site_id':asset_sql[2],
+        'asset_id':asset_sql[0],
+        'asset_tag':asset_sql[1],
+        'asset_category':asset_sql[2],
         'asset_make':asset_sql[3],
         'asset_model':asset_sql[4],
         'asset_variant':asset_sql[5],
@@ -253,44 +253,35 @@ def new_issue_for_asset(asset_uuid):
 
 @bp.post("/issues/new/<uuid:asset_uuid>")
 def create_issue_for_asset(asset_uuid):
-    asset_sql = query_one("""SELECT 
-                                    a.id, 
-                                    a.friendly_tag, 
-                                    a.site_id, 
-                                    a.make, 
-                                    a.model, 
-                                    a.variant, 
-                                    a.status,
+    asset_sql = query_one(
+        """
+            SELECT 
+                a.id, a.asset_tag, a.category, a.make, a.model, a.variant, a.status,
+                s.shorthand, s.fullname
 
-                                    s.location_shorthand, 
-                                    s.friendly_name,
-
-                                    a.asset_id
-
-                                    FROM asset a
-                                    JOIN site s
-                                    ON a.site_id = s.site_id
-                                    WHERE a.uuid = %s;
-                                    """,
-                          (str(asset_uuid),))
+            FROM asset a
+            JOIN site s
+            ON a.site_id = s.site_id
+            WHERE a.uuid = %s;
+            """,
+     (str(asset_uuid),))
 
     if asset_sql is None:
         abort(404)
 
     asset = {
-        'asset_uuid': asset_sql[0],
-        'asset_friendly_tag': asset_sql[1],
-        'asset_site_id': asset_sql[2],
+        'asset_id': asset_sql[0],
+        'asset_tag': asset_sql[1],
+        'asset_category': asset_sql[2],
         'asset_make': asset_sql[3],
         'asset_model': asset_sql[4],
         'asset_variant': asset_sql[5],
         'asset_status': asset_sql[6],
-        'site_location_shorthand': asset_sql[7],
-        'site_friendly_name': asset_sql[8],
-        'asset_asset_id':asset_sql[9]
+        'site_shorthand': asset_sql[7],
+        'site_fullname': asset_sql[8]
     }
 
-    asset_id = asset.get('asset_asset_id')
+    asset_id = asset.get('asset_id')
     description = (request.form.get("description") or "").strip()
 
     errors = []
@@ -301,50 +292,51 @@ def create_issue_for_asset(asset_uuid):
         for e in errors:
             flash(e, "error")
 
-        asset_sql = query_one("""SELECT 
-                                        a.uuid, 
-                                        a.friendly_tag, 
-                                        a.site_id, 
-                                        a.make, 
-                                        a.model, 
-                                        a.variant, 
-                                        a.status,
-
-                                        s.location_shorthand, 
-                                        s.friendly_name, 
-
-                                        a.asset_id
-
-                                        FROM asset a
-                                        JOIN site s
-                                        ON a.site_id = s.site_id
-                                        WHERE a.uuid = %s;
-                                        """,
-                              (str(asset_uuid),))
+        asset_sql = query_one(
+            """
+                    SELECT a.id,
+                           a.asset_tag,
+                           a.category,
+                           a.make,
+                           a.model,
+                           a.variant,
+                           a.status,
+                           s.shorthand,
+                           s.fullname
+        
+                    FROM asset a
+                             JOIN site s
+                                  ON a.site_id = s.site_id
+                    WHERE a.uuid = %s;
+                """,
+         (str(asset_uuid),))
 
         if asset_sql is None:
             abort(404)
 
         asset = {
-            'asset_uuid': asset_sql[0],
-            'asset_friendly_tag': asset_sql[1],
-            'asset_site_id': asset_sql[2],
+            'asset_id': asset_sql[0],
+            'asset_tag': asset_sql[1],
+            'asset_category': asset_sql[2],
             'asset_make': asset_sql[3],
             'asset_model': asset_sql[4],
             'asset_variant': asset_sql[5],
             'asset_status': asset_sql[6],
-            'site_location_shorthand': asset_sql[7],
-            'site_friendly_name': asset_sql[8],
-            'asset_asset_id': asset_sql[9]
+            'site_shorthand': asset_sql[7],
+            'site_fullname': asset_sql[8]
         }
 
         return render_template(f"issues/new.html", asset=asset, asset_uuid=asset_uuid, form=request.form)
 
-    workOrder = execute_returning_one("""
-        INSERT INTO work_order (asset_id, raw_issue_description, status)
-        VALUES (%s, %s, 'OPEN')
-        RETURNING work_order_id;
-        """, (asset_id, description))
+    workOrder = execute_returning_one(
+                                """
+                                        INSERT INTO 
+                                            work_order (asset_id, raw_issue_description, status)
+                                        VALUES 
+                                            (%s, %s, 'OPEN')
+                                        RETURNING 
+                                            work_order_id;
+                                    """, (asset_id, description))
     work_order_id = workOrder[0]
 
     execute("""
