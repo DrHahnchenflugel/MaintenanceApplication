@@ -6,7 +6,12 @@ def initialise_application():
     # Load environment vars from /app/.env
     from dotenv import load_dotenv
     load_dotenv()
-    app = Flask(__name__)
+    app = Flask(
+        __name__,
+        template_folder = "templates",
+        static_folder = "static",
+        static_url_path = "/static"
+    )
     app.secret_key = os.environ["FLASK_SECRET"]
     app.register_blueprint(bp)
 
