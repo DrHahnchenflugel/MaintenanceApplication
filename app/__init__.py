@@ -10,10 +10,10 @@ def initialise_application():
         __name__,
         template_folder = "templates",
         static_folder = "static",
-        static_url_path = "/static"
+        static_url_path = "/maintenance/static"
     )
     app.secret_key = os.environ["FLASK_SECRET"]
-    app.register_blueprint(bp)
+    app.register_blueprint(bp, url_prefix="/maintenance")
 
     app.config.update(
         {
