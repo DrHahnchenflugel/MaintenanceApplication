@@ -50,8 +50,8 @@ def db_ping():
 
     return jsonify(ok=True, postgres=version, site_count=site_count)
 
-@bp.get("/")
-@bp.get("/dashboard")
+@bp.get("/", strict_slashes=False)
+@bp.get("/dashboard/", strict_slashes=False)
 def dashboard():
     num_open_issues_sql = query_one(
         """
