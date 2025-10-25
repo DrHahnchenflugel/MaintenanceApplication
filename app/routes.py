@@ -111,7 +111,7 @@ def dashboard():
     return render_template("dashboard/index.html", issue_info = issue_info)
 
 
-@bp.get("/issues/list")
+@bp.get("/issues/list", strict_slashes=False)
 def issues_list():
     # Get arguments
     filter = (request.args.get("filter") or "active").lower()
