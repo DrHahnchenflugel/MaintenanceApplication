@@ -1,6 +1,7 @@
 import os
 from flask import Flask
 from .routes import register_blueprints
+from .health import health_bp
 
 def initialise_application():
     # Load environment vars from /app/.env
@@ -13,6 +14,7 @@ def initialise_application():
         static_url_path = "/maintenance/static"
     )
     register_blueprints(app)
+    app.register_blueprint(health_bp)
     app.secret_key = os.environ["FLASK_SECRET"]
 
     app.config.update(
