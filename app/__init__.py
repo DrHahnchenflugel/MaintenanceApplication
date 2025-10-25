@@ -14,7 +14,6 @@ def initialise_application():
     )
     register_blueprints(app)
     app.secret_key = os.environ["FLASK_SECRET"]
-    app.register_blueprint(app)
 
     app.config.update(
         {
