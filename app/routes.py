@@ -114,22 +114,23 @@ def dashboard():
 @bp.get("/issues/list", strict_slashes=False)
 def issues_list():
     # Get arguments
-    filter = (request.args.get("filter") or "active").lower()
-    loc = (request.args.get("loc") or "all").upper()
+    filter = (request.args.get("issue_cat") or "ACTIVE").upper()        # ISSUE_FILTER{} keys are UPPER
+    loc = (request.args.get("loc") or "all").upper()                    # site.shorthand is UPPER
+    category = (request.args.get("asset_cat") or "all").upper()         # category.label is UPPER
 
-    # Filter issue by category
-    FILTERS = {
-        "active": ["OPEN", "IN_PROGRESS", "BLOCKED"],
-        "open": ["OPEN"],
-        "in_progress": ["IN_PROGRESS"],
-        "blocked": ["BLOCKED"],
-        "closed": ["CLOSED"],
-        "all": ["OPEN", "IN_PROGRESS", "BLOCKED", "CLOSED"],
+    # Filter by issue category
+    ISSUE_FILTERS = {
+        "ACTIVE": ["OPEN", "IN_PROGRESS", "BLOCKED"],
+        "OPEN": ["OPEN"],
+        "IN_PROGRESS": ["IN_PROGRESS"],
+        "BLOCKED": ["BLOCKED"],
+        "CLOSED": ["CLOSED"],
+        "ALL": ["OPEN", "IN_PROGRESS", "BLOCKED", "CLOSED"],
     }
-    statuses = FILTERS.get(filter, FILTERS["active"])
+    statuses = ISSUE_FILTERS.get(filter, ISSUE_FILTERS["ACTIVE"])
 
     # Filter by location
-    locations = query_all(
+    LOCATION_FILTERS = query_all(
         """
         SELECT
             shorthand
@@ -137,28 +138,50 @@ def issues_list():
             site;
         """
     )
-    print(locations)
-    loc = loc if loc in locations else "ALL"
+    loc = loc if loc in LOCATION_FILTERS else "ALL"
+
+    # Filter by category
+    CATEGORY_FILTERS = query_all(
+        """
+        SELECT
+            label
+        FROM 
+            category;
+        """
+    )
+    cat = category if category in CATEGORY_FILTERS else "ALL"
 
     # Set up SQL call
-    where = ["w.status = ANY(%s)"]
+    # Refer to string directly below the if statements for sql
+    where = ["i.status = ANY(%s)"]
     params = [statuses]
 
     # locations
     if loc != "ALL":
-        where.append("s.location_shorthand = %s")
+        where.append("s.shorthand = %s")
         params.append(loc)
+
+    # category
+    if cat != "ALL":
+        where.append("a.category = %s")
+        params.append(cat)
 
     # build string
     sql = f"""
             SELECT
-                i.id, i.title, i.description, i.created_at, i.status,
-                a.asset_tag, a.site_id, a.category, a.make, a.model, a.variant, a.status_id
+                i.id, i.title, i.description, i.created_at, i.status_id,
+                a.asset_tag, a.site_id, a.category_id, a.status_id,
+                v.name, v.label 
+                mk.name, mk.label
+                md.name, md.label
             FROM issue i
             JOIN asset a ON i.asset_id = a.id
             JOIN site s ON a.site_id = s.id
+            JOIN variant v ON a.variant_id = v.id
+            JOIN model md ON v.model_id = md.id
+            JOIN make mk ON md.make_id = mk.id
             WHERE {' AND '.join(where)}
-            ORDER BY w.created_at DESC;
+            ORDER BY i.created_at DESC;
         """
 
     # run query
