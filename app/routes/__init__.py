@@ -1,4 +1,4 @@
-from .web import bp as web_bp
+from .web import web_bp as web_bp
 from .api.v2 import bp as api_v2_bp
 
 def register_blueprints(app):
