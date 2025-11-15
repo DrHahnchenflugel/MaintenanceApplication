@@ -23,37 +23,7 @@
         <div class="card" style="flex:2; min-height:160px">
             <div>Open Issues (trend) </div>
             <div style="height:120px; border:1px dashed var(--line); border-radius:8px; margin-top:8px;">
-                <canvas id="issuesTrendChart"></canvas>
-                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-                <script>
-                fetch("{{ url_for('app.issues_trend') }}")
-                  .then(res => res.json())
-                  .then(data => {
-                    const labels = data.map(r => r.week_start);
-                    const values = data.map(r => r.active_issues);
-
-                    new Chart(document.getElementById("issuesTrendChart"), {
-                      type: "line",
-                      data: {
-                        labels: labels,
-                        datasets: [{
-                          label: "Active Issues",
-                          data: values,
-                          borderColor: "#FF6600",
-                          backgroundColor: "rgba(255, 102, 0, 0.2)",
-                          fill: true,
-                          tension: 0.3
-                        }]
-                      },
-                      options: {
-                        scales: {
-                          x: { title: { display: true, text: "Week" }},
-                          y: { title: { display: true, text: "Active Issues" }, beginAtZero: true }
-                        }
-                      }
-                    });
-                  });
-                </script>
+                PASS
             </div>
         </div>
     </div>
