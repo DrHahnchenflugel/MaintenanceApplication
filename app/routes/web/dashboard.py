@@ -1,7 +1,7 @@
 from flask import render_template
 
-from templates.db import query_one
-from templates.helpers import human_delta_to_now
+from db import query_one
+from helpers import human_delta_to_now
 from . import web_bp
 
 
