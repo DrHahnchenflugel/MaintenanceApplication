@@ -4,4 +4,5 @@
 - add make as a prerequisite (which is apparently not always there on ubuntu server?)
 - add chmod +x as a step on setting the makefiles up
 - update .env.example to not always point to localhost, the db is likely not on a localhost
-- 
+- in the db, make name vs label make more user-friendly (which is userfriendly name which is internal name) 
+- also name=code (asset status)
