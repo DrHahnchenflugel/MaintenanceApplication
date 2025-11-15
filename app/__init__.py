@@ -14,7 +14,7 @@ def initialise_application():
         static_url_path = "/maintenance/static"
     )
     register_blueprints(app)
-    app.register_blueprint(health_bp)
+    app.register_blueprint(health_bp, url_prefix="/maintenance")
     app.secret_key = os.environ["FLASK_SECRET"]
 
     app.config.update(
