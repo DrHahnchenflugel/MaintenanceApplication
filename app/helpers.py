@@ -87,7 +87,7 @@ def timezone_to_monthddyyyy_hhmm(dt_utc: datetime, tz:timezone = TZ_MINUS_5) -> 
     if dt_utc is not None:
         # Normalize to target timezone
         dt_local = dt_utc.astimezone(tz)
-        return f"{dt_local.strftime("%B")} {dt_local.day}, {dt_local.year} ({dt_local.hour}:{dt_local.minute})"
+        return f"{dt_local.strftime('%B')} {dt_local.day}, {dt_local.year} ({dt_local.hour}:{dt_local.minute})"
     else:
         return None
 
