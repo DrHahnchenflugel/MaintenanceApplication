@@ -10,7 +10,7 @@
         <a href="{{ url_for('app.issues_list', f='active') }}" class="{{ 'is-active' if request.endpoint == 'app.issues_active' else 'not-active' }}">Active Issues</a>
         <a href="{{ url_for('app.issues_list', f='closed') }}" class="not-active">Past Issues</a>
         <a href="{{ url_for('app.issues_list', f='blocked') }}" class="not-active">Blocked Issues</a>
-        <a href="{{ url_for('app.assets') }}" class="{{ 'is-active' if request.endpoint == 'app.assets' else 'not-active' }}">Inventory</a>
+        <a href="{{ url_for('app.assets_list') }}" class="{{ 'is-active' if request.endpoint == 'app.assets' else 'not-active' }}">Inventory</a>
         <a href="#" class="not-active">Settings</a>
     </nav>
 </aside>
