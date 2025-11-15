@@ -1,5 +1,3 @@
-# app/routes/web/dashboard.py
-
 from flask import render_template
 
 from templates.db import query_one

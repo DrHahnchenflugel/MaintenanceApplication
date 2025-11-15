@@ -4,7 +4,6 @@ from .routes import register_blueprints
 from .health import health_bp
 
 def initialise_application():
-    # Load environment vars from /app/.env
     from dotenv import load_dotenv
     load_dotenv()
     app = Flask(
