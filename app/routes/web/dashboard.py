@@ -5,8 +5,8 @@ from app.helpers import human_delta_to_now
 from . import web_bp
 
 
-@bp.get("/", strict_slashes=False)
-@bp.get("/dashboard", strict_slashes=False)
+@web_bp.get("/", strict_slashes=False)
+@web_bp.get("/dashboard", strict_slashes=False)
 def dashboard():
     # Total open / in-progress issues
     num_open_issues_sql = query_one(
