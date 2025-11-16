@@ -47,3 +47,89 @@ def get_asset_service(asset_id, include=None):
     #     asset["variant"] = variant
 
     return asset
+
+def list_assets_service(
+    filters,
+    sort,
+    page,
+    page_size,
+    include=None
+    ):
+    """
+    List assets with filters/sorting/pagination and optional expansions.
+
+    Args:
+        filters: dict of simple filter values, e.g.
+                 {
+                   "site_id": 1,
+                   "category_id": None,
+                   "status_id": 2,
+                   "make_id": None,
+                   "model_id": None,
+                   "variant_id": None,
+                   "asset_tag": None,
+                 }
+                 All keys are optional; missing/None = no filter.
+
+        sort: list of (field_name, direction) pairs, e.g.
+              [("asset_tag", "asc"), ("created_at", "desc")]
+              Route layer is responsible for parsing "?sort=..." into this.
+
+        page: 1-based page number (int)
+        page_size: number of items per page (int)
+        include: iterable of include strings, e.g. ["site", "category"]
+
+    Returns:
+        dict:
+        {
+          "items": [ {asset...}, ... ],
+          "page": page,
+          "page_size": page_size,
+          "total": total_count
+        }
+    """
+
+    if include is None:
+        include = []
+
+    include_set = set(include)
+
+    # Translate page/page_size into limit/offset for L3
+    if page < 1:
+        page = 1
+    if page_size < 1:
+        page_size = 1
+
+    limit = page_size
+    offset = (page - 1) * page_size
+
+    # Call L3 with unpacked filters
+    rows, total = assets_repo.list_asset_rows(
+        site_id=filters.get("site_id"),
+        category_id=filters.get("category_id"),
+        status_id=filters.get("status_id"),
+        make_id=filters.get("make_id"),
+        model_id=filters.get("model_id"),
+        variant_id=filters.get("variant_id"),
+        asset_tag=filters.get("asset_tag"),
+        sort=sort,
+        limit=limit,
+        offset=offset,
+    )
+
+    # For now, we just return the rows as-is.
+    # Later we can add include expansions similar to get_asset_service.
+    items = [dict(row) for row in rows]
+
+    # --- Includes (optional future step) ---
+    # If you want "include=site,category" for lists too, this is where you'd:
+    #  - collect all site_ids/category_ids from items
+    #  - call lookups_repo.get_sites_by_ids(site_ids)
+    #  - attach site/category dicts onto each item
+
+    return {
+        "items": items,
+        "page": page,
+        "page_size": page_size,
+        "total": total,
+    }
