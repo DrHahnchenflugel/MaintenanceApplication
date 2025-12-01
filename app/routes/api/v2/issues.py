@@ -1,8 +1,6 @@
-from flask import request, jsonify
-from . import api_v2_bp as v2_bp
+from flask import jsonify, request
+from . import bp
 
-@v2_bp.route("/issues", methods=[GET])
-def listIssues():
-    return jsonify({
-        "id":"issues"
-    })
+@bp.route("/issues", methods=["GET"])
+def list_issues():
+    return jsonify({"id": "issues"}), 200

@@ -1,23 +1,23 @@
 from flask import Blueprint, jsonify
-from .v2 import bp as api_v2_bp
 
-api_v2_bp = Blueprint("api", __name__)
+# Root API blueprint, just for the `/maintenance/api/` index
+bp = Blueprint("api_root", __name__, url_prefix="/maintenance/api")
 
-@api_v2_bp.route("/", methods=["GET"])
-def v2_root():
+@bp.route("/", methods=["GET"])
+def api_root():
     return jsonify({
-        "name":"Exceed Maintenance API",
-        "versions":{
-            "v2":"/api/v2"
+        "name": "Exceed Maintenance API",
+        "versions": {
+            "v2": "/maintenance/api/v2"
         },
-        "resources":{
-            "assets":"/assets",
-            "issues":"/issues",
-            "sites":"/sites",
-            "asset_categories":"/categories",
-            "asset_statuses":"/asset-statuses",
-            "issue_statuses":"/issue-statuses",
-            "action_types":"/action-types",
-            "health":"/health"
+        "resources": {
+            "assets": "/maintenance/api/v2/assets",
+            "issues": "/maintenance/api/v2/issues",
+            "sites": "/maintenance/api/v2/sites",
+            "asset_categories": "/maintenance/api/v2/categories",
+            "asset_statuses": "/maintenance/api/v2/asset-statuses",
+            "issue_statuses": "/maintenance/api/v2/issue-statuses",
+            "action_types": "/maintenance/api/v2/action-types",
+            "health": "/maintenance/api/v2/health",
         }
     })
