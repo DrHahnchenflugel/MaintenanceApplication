@@ -1,4 +1,4 @@
-from app.db import assets as assets_repo
+import app.db.assets as assets_repo
 
 def get_asset_service(asset_id, include=None):
     """
