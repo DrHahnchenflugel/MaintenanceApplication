@@ -177,3 +177,13 @@ def patch_issue(issue_id):
         abort(404, description="Issue not found")
 
     return jsonify(result)
+
+@bp.route("/issue-statuses", methods=["GET"])
+def get_issue_statuses():
+    result = issue_service.list_issue_statuses()
+    return jsonify({"items": result})
+
+@bp.route("/action-types", methods=["GET"])
+def get_action_types():
+    result = issue_service.list_action_types()
+    return jsonify({"items": result})

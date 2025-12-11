@@ -551,3 +551,41 @@ def list_issue_status_history(issue_id):
         rows = conn.execute(sql, {"issue_id": issue_id}).mappings().all()
 
     return [dict(r) for r in rows]
+
+def list_issue_status_rows():
+    """
+    List all issue_status rows ordered for display.
+    """
+    sql = text("""
+        SELECT
+            id,
+            code,
+            label,
+            display_order
+        FROM issue_status
+        ORDER BY display_order ASC, code ASC
+    """)
+
+    with get_connection() as conn:
+        rows = conn.execute(sql).mappings().all()
+
+    return [dict(r) for r in rows]
+
+def list_action_type_rows():
+    """
+    List all action_type rows ordered for display.
+    """
+    sql = text("""
+        SELECT
+            id,
+            code,
+            label,
+            display_order
+        FROM action_type
+        ORDER BY display_order ASC, code ASC
+    """)
+
+    with get_connection() as conn:
+        rows = conn.execute(sql).mappings().all()
+
+    return [dict(r) for r in rows]

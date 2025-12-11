@@ -283,3 +283,27 @@ def update_issue(issue_id: str, data: dict):
 
     # Return full issue view (with actions/history)
     return get_issue(issue_id)
+
+def list_issue_statuses():
+    rows = issue_db.list_issue_status_rows()
+    return [
+        {
+            "id": r["id"],
+            "code": r["code"],
+            "label": r["label"],
+            "display_order": r["display_order"],
+        }
+        for r in rows
+    ]
+
+def list_action_types():
+    rows = issue_db.list_action_type_rows()
+    return [
+        {
+            "id": r["id"],
+            "code": r["code"],
+            "label": r["label"],
+            "display_order": r["display_order"],
+        }
+        for r in rows
+    ]
