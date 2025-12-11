@@ -83,13 +83,13 @@ def create_issue():
 
     asset_id = parse_uuid_field(data, "asset_id", required=True)
     reported_by = data.get("reported_by")
-    created_by = parse_uuid_field(data, "created_by", required=True)
+    created_by = data.get("created_by")
     status_id = parse_uuid_field(data, "status_id", required=False)
 
     title = data.get("title")
     description = data.get("description")
 
-    if not asset_id or not created_by or not title or not description:
+    if not asset_id or not title or not description:
         abort(400, description="Missing required fields: asset_id, created_by, title, description")
 
     payload = {
