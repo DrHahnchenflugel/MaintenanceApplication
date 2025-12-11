@@ -1,39 +1,73 @@
 {% extends "base.html" %}
-{% block title %} Maintenance - Dashboard {% endblock %}
-{% block page_title %} Dashboard {% endblock %}
 
 {% block content %}
-    <div class="row">
-        <div class="card" style="flex:1">
-            <div>Open Issues</div>
-            <div class="kpi">{{ issue_info.get('num_open_issues') }}</div>
+<div class="dashboard">
+
+    <div id="dashboard-error" class="alert alert-danger" style="display:none;">
+        Failed to load issue stats.
+    </div>
+
+    <div class="dashboard-cards">
+        <div class="card">
+            <h2>Open / In-progress issues</h2>
+            <p id="num-open-issues">–</p>
         </div>
 
-
-        <div class="card" style="flex:1">
-            <div>Oldest Open Issue</div>
-            <div class="kpi">{{ issue_info.get('oldest_issue') }}</div>
+        <div class="card">
+            <h2>Blocked issues</h2>
+            <p id="num-blocked-issues">–</p>
         </div>
 
-        <div class="card" style="flex:1">
-            <div>Blocked Issues</div>
-            <div class="kpi">{{ issue_info.get('num_blocked_issues') }}</div>
-        </div>
-
-        <div class="card" style="flex:2; min-height:160px">
-            <div>Open Issues (trend) </div>
-            <div style="height:120px; border:1px dashed var(--line); border-radius:8px; margin-top:8px;">
-                PASS
-            </div>
+        <div class="card">
+            <h2>Oldest open issue</h2>
+            <p id="oldest-issue-text">–</p>
         </div>
     </div>
 
-    <div class="card" style="margin-top:16px;">
-        <h3 style="margin:0 0 8px 0;"> Assets (summary)</h3>
-        <div>-</div>
-    </div>
-{% endblock %}
+</div>
 
-{% block footer_center_right %}
-    <a class="btn btn--lg btn--fixed--bottomright" href="{{ url_for('app.issues_list') }}">New Issue + [not working TODO]</a>
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // This value is passed from the Flask route
+    var apiUrl = "{{ api_issue_summary_url }}";
+
+    // Basic fetch, no clever syntax
+    fetch(apiUrl)
+        .then(function (response) {
+            if (!response.ok) {
+                throw new Error("HTTP status " + response.status);
+            }
+            return response.json();
+        })
+        .then(function (data) {
+            var openElem = document.getElementById("num-open-issues");
+            var blockedElem = document.getElementById("num-blocked-issues");
+            var oldestElem = document.getElementById("oldest-issue-text");
+
+            if (openElem) {
+                openElem.textContent = data.num_open_issues;
+            }
+            if (blockedElem) {
+                blockedElem.textContent = data.num_blocked_issues;
+            }
+
+            if (oldestElem) {
+                if (data.oldest_issue && data.oldest_issue.id) {
+                    var text = "#" + data.oldest_issue.id + " (" + data.oldest_issue.age + ")";
+                    oldestElem.textContent = text;
+                } else {
+                    oldestElem.textContent = "No open issues";
+                }
+            }
+        })
+        .catch(function (error) {
+            console.error("Error loading issue summary:", error);
+
+            var errorBox = document.getElementById("dashboard-error");
+            if (errorBox) {
+                errorBox.style.display = "block";
+            }
+        });
+});
+</script>
 {% endblock %}
