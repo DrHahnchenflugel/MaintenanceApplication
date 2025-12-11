@@ -1,36 +1,210 @@
 {% extends "base.html" %}
-{% block title %} Maintenance - Inventory {% endblock %}
-{% block page_title %} Inventory {% endblock %}
 
+{% block title %}Assets · Maintenance{% endblock %}
 
-{% block content %}
-  {% if assets %}
-    <div class="table">
-      <div class="thead--six">
-        <div>Name</div>
-        <div>Site</div>
-        <div>Make</div>
-        <div>Model</div>
-        <div>Variant</div>
-        <div>Status</div>
-      </div>
-
-      {% for asset in assets %}
-        <a class="trow--six" href="{{ url_for('app.view_asset', asset_uuid=asset.get('asset_uuid')) }}">
-            <div>{{ asset.get('asset_friendly_tag') }}</div>
-            <div>{{ asset.get('site_friendly_name') }}</div>
-            <div>{{ asset.get('asset_make') }}</div>
-            <div>{{ asset.get('asset_model') }}</div>
-            <div>{{ asset.get('asset_variant') }}</div>
-            <div>{{ asset.get('asset_status') }}</div>
-        </a>
-      {% endfor %}
+{% block content_header %}
+    <div class="page-header">
+        <h1>Assets</h1>
     </div>
-  {% else %}
-    <p>No active assets.</p>
-  {% endif %}
 {% endblock %}
 
-{% block footer_center_right %}
-    <a class="btn btn--lg btn--fixed--bottomright" href="{{ url_for('app.new_asset') }}">New Asset +</a>
+{% block content %}
+<div class="assets-page">
+
+    <div id="assets-error" class="alert alert-danger" style="display:none;">
+        Failed to load assets. Please try again.
+    </div>
+
+    <section class="assets-controls">
+        <form id="assets-filters-form">
+            <label>
+                Retired:
+                <select id="filter-retired">
+                    <option value="active">Active only</option>
+                    <option value="all">All</option>
+                    <option value="retired">Retired only</option>
+                </select>
+            </label>
+
+            <label>
+                Asset tag:
+                <input type="text" id="filter-asset-tag" placeholder="Exact tag (optional)">
+            </label>
+
+            <button type="submit">Apply</button>
+        </form>
+    </section>
+
+    <section class="assets-summary">
+        <p id="assets-summary-text">Loading assets…</p>
+    </section>
+
+    <section class="assets-table-wrapper">
+        <table class="table assets-table">
+            <thead>
+                <tr>
+                    <th>Asset tag</th>
+                    <th>Serial</th>
+                    <th>Site</th>
+                    <th>Status</th>
+                    <th>Acquired</th>
+                    <th>Retired</th>
+                </tr>
+            </thead>
+            <tbody id="assets-table-body">
+                <!-- Filled by JavaScript -->
+            </tbody>
+        </table>
+    </section>
+
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    // API URL passed from Flask route
+    var apiUrl = "{{ api_assets_url }}";
+
+    // DOM elements
+    var errorBox = document.getElementById("assets-error");
+    var summaryText = document.getElementById("assets-summary-text");
+    var tableBody = document.getElementById("assets-table-body");
+    var retiredSelect = document.getElementById("filter-retired");
+    var assetTagInput = document.getElementById("filter-asset-tag");
+    var filtersForm = document.getElementById("assets-filters-form");
+
+    function clearTable() {
+        while (tableBody.firstChild) {
+            tableBody.removeChild(tableBody.firstChild);
+        }
+    }
+
+    function renderRows(items) {
+        clearTable();
+
+        if (!items || items.length === 0) {
+            var row = document.createElement("tr");
+            var cell = document.createElement("td");
+            cell.colSpan = 6;
+            cell.textContent = "No assets found.";
+            row.appendChild(cell);
+            tableBody.appendChild(row);
+            return;
+        }
+
+        for (var i = 0; i < items.length; i++) {
+            var asset = items[i];
+
+            var row = document.createElement("tr");
+
+            var cellTag = document.createElement("td");
+            cellTag.textContent = asset.asset_tag || "";
+            row.appendChild(cellTag);
+
+            var cellSerial = document.createElement("td");
+            cellSerial.textContent = asset.serial_number || "";
+            row.appendChild(cellSerial);
+
+            var cellSite = document.createElement("td");
+            // For now show raw UUID; later you can replace with site.name when includes are implemented
+            cellSite.textContent = asset.site_id || "";
+            row.appendChild(cellSite);
+
+            var cellStatus = document.createElement("td");
+            cellStatus.textContent = asset.status_id || "";
+            row.appendChild(cellStatus);
+
+            var cellAcquired = document.createElement("td");
+            cellAcquired.textContent = asset.acquired_at || "";
+            row.appendChild(cellAcquired);
+
+            var cellRetired = document.createElement("td");
+            cellRetired.textContent = asset.retired_at || "";
+            row.appendChild(cellRetired);
+
+            tableBody.appendChild(row);
+        }
+    }
+
+    function setError(message) {
+        if (summaryText) {
+            summaryText.textContent = "Failed to load assets.";
+        }
+        if (errorBox) {
+            errorBox.textContent = message || "Failed to load assets.";
+            errorBox.style.display = "block";
+        }
+    }
+
+    function clearError() {
+        if (errorBox) {
+            errorBox.style.display = "none";
+        }
+    }
+
+    function loadAssets() {
+        clearError();
+
+        var retiredMode = retiredSelect.value;
+        var assetTag = assetTagInput.value;
+
+        var params = [];
+        params.push("sort=asset_tag");
+        params.push("retired=" + encodeURIComponent(retiredMode));
+        // first page for now, could add paging later
+        params.push("page=1");
+        params.push("page_size=50");
+
+        if (assetTag) {
+            params.push("asset_tag=" + encodeURIComponent(assetTag));
+        }
+
+        var url = apiUrl + "?" + params.join("&");
+
+        if (summaryText) {
+            summaryText.textContent = "Loading assets…";
+        }
+
+        fetch(url)
+            .then(function (response) {
+                if (!response.ok) {
+                    throw new Error("HTTP status " + response.status);
+                }
+                return response.json();
+            })
+            .then(function (data) {
+                if (!data || !("items" in data)) {
+                    throw new Error("Unexpected response format");
+                }
+
+                var items = data.items;
+                var total = data.total;
+                var page = data.page;
+                var pageSize = data.page_size;
+
+                renderRows(items);
+
+                if (summaryText) {
+                    var count = items ? items.length : 0;
+                    summaryText.textContent =
+                        "Showing " + count + " of " + total + " assets (page " + page + ", page size " + pageSize + ").";
+                }
+            })
+            .catch(function (error) {
+                console.error("Error loading assets:", error);
+                setError(error.message);
+            });
+    }
+
+    // Initial load
+    loadAssets();
+
+    // Re-load when filters are submitted
+    if (filtersForm) {
+        filtersForm.addEventListener("submit", function (event) {
+            event.preventDefault();
+            loadAssets();
+        });
+    }
+});
+</script>
 {% endblock %}
