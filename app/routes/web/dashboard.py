@@ -1,5 +1,5 @@
 from flask import render_template, url_for
-from . import web_bp
+from . import bp as web_bp
 
 
 @web_bp.get("/", strict_slashes=False)
