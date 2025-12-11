@@ -235,6 +235,9 @@ def add_issue_action(issue_id: str, data: dict):
 
     # 2) optional status change
     if new_status_id and new_status_id != str(current_status_id):
+        print(new_status_id, str(current_status_id))
+        print(new_status_id == str(current_status_id))
+        print(type(new_status_id), type(str(current_status_id)))
         issue_db.create_issue_status_history_row(
             issue_id=issue_id,
             from_status_id=current_status_id,
