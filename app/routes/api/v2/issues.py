@@ -1,33 +1,33 @@
-# app/routes/api/v2/issues.py
-
-from flask import jsonify
+from flask import request, jsonify, abort
 from . import bp
-from app.services.issues import (
-    count_issues_by_status_codes,
-    get_oldest_issue_by_status_codes,
-)
-from app.helpers import human_delta_to_now
+from app.services import issues as issue_service
+from uuid import UUID
 
+def parse_uuid_arg(name: str):
+    v = request.args.get(name)
+    if not v:
+        return None
+    try:
+        UUID(v)
+    except ValueError:
+        abort(400, f"Invalid {name}, must be UUID")
+    return v
 
-@bp.route("/issues/summary", methods=["GET"])
-def issues_summary():
-    open_like_statuses = ("OPEN", "IN_PROGRESS")
-    blocked_statuses = ("BLOCKED",)
+@bp.route("/issues", methods=["GET"])
+def list_issues():
+    page = request.args.get("page", default=1, type=int)
+    page_size = request.args.get("page_size", default=50, type=int)
 
-    num_open_issues = count_issues_by_status_codes(open_like_statuses)
-    num_blocked_issues = count_issues_by_status_codes(blocked_statuses)
-    oldest_issue = get_oldest_issue_by_status_codes(open_like_statuses)
+    filters = {
+        "site_id": parse_uuid_arg("site_id"),
+        "asset_id": parse_uuid_arg("asset_id"),
+        "status_id": parse_uuid_arg("status_id"),
+        "reported_by": parse_uuid_arg("reported_by"),
+        "created_from": request.args.get("created_from"),
+        "created_to": request.args.get("created_to"),
+        "closed": request.args.get("closed"),
+        "search": request.args.get("search"),
+    }
 
-    oldest_issue_payload = None
-    if oldest_issue is not None:
-        issue_id, created_at = oldest_issue
-        oldest_issue_payload = {
-            "id": issue_id,
-            "age": human_delta_to_now(created_at),
-        }
-
-    return jsonify({
-        "num_open_issues": num_open_issues,
-        "num_blocked_issues": num_blocked_issues,
-        "oldest_issue": oldest_issue_payload,
-    }), 200
+    result = issue_service.list_issues(page, page_size, filters)
+    return jsonify(result)
