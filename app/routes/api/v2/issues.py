@@ -108,3 +108,38 @@ def create_issue():
         abort(400, description=str(e))
 
     return jsonify(result), 201
+
+@bp.route("/issues/<issue_id>/actions", methods=["POST"])
+def create_issue_action(issue_id):
+    validate_uuid_path(issue_id, "issue_id")
+
+    data = request.get_json(silent=True) or {}
+
+    # optional string
+    created_by = data.get("created_by")  # may be None, service will default "-"
+
+    # optional status change
+    new_status_id = parse_uuid_field(data, "new_status_id", required=False)
+
+    action_type_code = data.get("action_type_code")
+    body = data.get("body")
+
+    if not action_type_code or not body:
+        abort(400, description="Missing required fields: action_type_code, body")
+
+    payload = {
+        "action_type_code": action_type_code,
+        "body": body,
+        "created_by": created_by,
+        "new_status_id": new_status_id,
+    }
+
+    try:
+        result = issue_service.add_issue_action(issue_id, payload)
+    except ValueError as e:
+        abort(400, description=str(e))
+
+    if result is None:
+        abort(404, description="Issue not found")
+
+    return jsonify(result), 201

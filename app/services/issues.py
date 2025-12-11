@@ -85,7 +85,7 @@ def get_issue(issue_id: str):
             "created_at": a["created_at"],
             "created_by": {
                 "id": a["created_by"],
-                "name": str(a["created_by"]),  # placeholder until user table
+                "name": str(a["created_by"] or "-"),  # TODO: not sure if i like this
             },
         })
 
@@ -117,33 +117,31 @@ def create_issue(data: dict):
     """
     Create a new issue, initial action, and status history.
 
-    Expected keys in data:
-      - asset_id       (UUID string, required)
-      - title          (str, required)
-      - description    (str, required)
-      - reported_by    (UUID string, required)
-      - created_by     (UUID string, required)
-      - status_id      (UUID string, optional; default = 'OPEN' status)
+    data:
+      - asset_id    (UUID string, required)
+      - title       (str, required)
+      - description (str, required)
+      - reported_by (str, optional)
+      - created_by  (str, optional, default "-")
+      - status_id   (UUID string, optional; default status 'OPEN')
     """
 
     asset_id = data.get("asset_id")
     title = data.get("title")
     description = data.get("description")
     reported_by = data.get("reported_by")
-    created_by = data.get("created_by")
+    created_by = data.get("created_by") or "-"  # default here
     status_id = data.get("status_id")
 
-    # Basic sanity; real validation should live in route or a schema layer
-    if not asset_id or not title or not description or not created_by:
+    if not asset_id or not title or not description:
         raise ValueError("Missing required fields for issue creation")
 
-    # Default status: code 'OPEN' if status_id not provided
     if not status_id:
         status_id = issue_db.get_issue_status_id_by_code("OPEN")
         if not status_id:
             raise RuntimeError("No issue_status row with code 'OPEN' found")
 
-    # 1) Create the issue itself
+    # 1) issue row
     issue_row = issue_db.create_issue_row(
         asset_id=asset_id,
         status_id=status_id,
@@ -151,30 +149,81 @@ def create_issue(data: dict):
         description=description,
         reported_by=reported_by,
     )
-
     issue_id = issue_row["id"]
 
-    # 2) Initial status history: from NULL -> status_id
+    # 2) status history (NULL -> OPEN)
     issue_db.create_issue_status_history_row(
         issue_id=issue_id,
-        from_status_id=status_id,
+        from_status_id=None,
         to_status_id=status_id,
-        changed_by=created_by,
+        changed_by=created_by,  # string
     )
 
-    # 3) Initial action: type 'created'
+    # 3) initial action (CREATED)
     created_type_id = issue_db.get_action_type_id_by_code("CREATED")
     if not created_type_id:
         raise RuntimeError("No action_type row with code 'CREATED' found")
 
+    initial_body = data.get("initial_action_body") or "Issue created"
+
     issue_db.create_issue_action_row(
         issue_id=issue_id,
         action_type_id=created_type_id,
-        body=data.get("initial_action_body") or "Issue created",
+        body=initial_body,
+        created_by=created_by,  # string
+    )
+
+    return {"id": issue_id}
+
+def add_issue_action(issue_id: str, data: dict):
+    """
+    Add an action to an issue, optionally changing status.
+
+    data:
+      - action_type_code (str, required; one of CREATED, NOTE, INSPECT, REPAIR, CLOSED)
+      - body             (str, required)
+      - created_by       (str, optional, default "-")
+      - new_status_id    (UUID string, optional)
+    """
+
+    action_type_code = data.get("action_type_code")
+    body = data.get("body")
+    created_by = data.get("created_by") or "-"
+    new_status_id = data.get("new_status_id")
+
+    if not action_type_code or not body:
+        raise ValueError("Missing required fields for issue action")
+
+    # confirm issue exists + get current status
+    current_status_id = issue_db.get_issue_status_id(issue_id)
+    if current_status_id is None:
+        return None  # route will turn into 404
+
+    # look up action_type.id by code
+    action_type_id = issue_db.get_action_type_id_by_code(action_type_code)
+    if not action_type_id:
+        raise ValueError(f"Unknown action_type_code: {action_type_code}")
+
+    # 1) insert action
+    issue_db.create_issue_action_row(
+        issue_id=issue_id,
+        action_type_id=action_type_id,
+        body=body,
         created_by=created_by,
     )
 
-    # You can either return full issue or just ID
-    return {
-        "id": issue_id,
-    }
+    # 2) optional status change
+    if new_status_id:
+        issue_db.create_issue_status_history_row(
+            issue_id=issue_id,
+            from_status_id=current_status_id,
+            to_status_id=new_status_id,
+            changed_by=created_by,
+        )
+
+        issue_db.update_issue_row(
+            issue_id,
+            {"status_id": new_status_id},
+        )
+
+    return {"issue_id": issue_id}
