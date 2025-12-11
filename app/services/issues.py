@@ -89,6 +89,26 @@ def get_issue(issue_id: str):
             },
         })
 
+    # Status history
+    hist_rows = issue_db.list_issue_status_history(issue_id)
+    status_history = []
+    for h in hist_rows:
+        status_history.append({
+            "id": h["id"],
+            "from_status": None if h["from_status_id"] is None else {
+                "id": h["from_status_id"],
+                "code": h["from_status_code"],
+                "label": h["from_status_label"],
+            },
+            "to_status": {
+                "id": h["to_status_id"],
+                "code": h["to_status_code"],
+                "label": h["to_status_label"],
+            },
+            "changed_at": h["changed_at"],
+            "changed_by": h["changed_by"] or "-",
+        })
+
     return {
         "id": r["id"],
         "title": r["title"],
@@ -111,6 +131,7 @@ def get_issue(issue_id: str):
         "last_action_type": r["last_action_type_code"],
         "last_action_type_label": r["last_action_type_label"],
         "actions": actions,
+        "status_history": status_history,
     }
 
 def create_issue(data: dict):

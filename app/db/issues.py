@@ -514,3 +514,40 @@ def update_issue_row(issue_id, fields: dict):
         return None
 
     return dict(row)
+
+def list_issue_status_history(issue_id):
+    """
+    Return all status history entries for a given issue, oldest first.
+
+    Each row:
+      - id
+      - from_status_id, from_status_code, from_status_label (may be None)
+      - to_status_id,   to_status_code,   to_status_label
+      - changed_at
+      - changed_by
+    """
+
+    sql = text("""
+        SELECT
+            ish.id,
+            ish.from_status_id,
+            fs.code  AS from_status_code,
+            fs.label AS from_status_label,
+            ish.to_status_id,
+            ts.code  AS to_status_code,
+            ts.label AS to_status_label,
+            ish.changed_at,
+            ish.changed_by
+        FROM issue_status_history ish
+        LEFT JOIN issue_status fs
+          ON ish.from_status_id = fs.id
+        JOIN issue_status ts
+          ON ish.to_status_id = ts.id
+        WHERE ish.issue_id = :issue_id
+        ORDER BY ish.changed_at ASC
+    """)
+
+    with get_connection() as conn:
+        rows = conn.execute(sql, {"issue_id": issue_id}).mappings().all()
+
+    return [dict(r) for r in rows]
