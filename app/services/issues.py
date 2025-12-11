@@ -235,9 +235,6 @@ def add_issue_action(issue_id: str, data: dict):
 
     # 2) optional status change
     if new_status_id and new_status_id != str(current_status_id):
-        print(new_status_id, str(current_status_id))
-        print(new_status_id == str(current_status_id))
-        print(type(new_status_id), type(str(current_status_id)))
         issue_db.create_issue_status_history_row(
             issue_id=issue_id,
             from_status_id=current_status_id,
@@ -251,3 +248,38 @@ def add_issue_action(issue_id: str, data: dict):
         )
 
     return {"issue_id": issue_id}
+
+def update_issue(issue_id: str, data: dict):
+    """
+    Partially update an issue. Does NOT change status.
+    Allowed fields:
+      - title
+      - description
+      - reported_by
+      - asset_id
+    """
+
+    fields = {}
+
+    if "title" in data and data["title"] is not None:
+        fields["title"] = data["title"]
+
+    if "description" in data and data["description"] is not None:
+        fields["description"] = data["description"]
+
+    if "reported_by" in data:
+        fields["reported_by"] = data["reported_by"]
+
+    if "asset_id" in data and data["asset_id"] is not None:
+        fields["asset_id"] = data["asset_id"]
+
+    if not fields:
+        # nothing to do; just return current issue
+        return get_issue(issue_id)
+
+    updated = issue_db.update_issue_row(issue_id, fields)
+    if updated is None:
+        return None
+
+    # Return full issue view (with actions/history)
+    return get_issue(issue_id)

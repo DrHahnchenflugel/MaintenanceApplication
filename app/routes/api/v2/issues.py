@@ -143,3 +143,37 @@ def create_issue_action(issue_id):
         abort(404, description="Issue not found")
 
     return jsonify(result), 201
+
+@bp.route("/issues/<issue_id>", methods=["PATCH"])
+def patch_issue(issue_id):
+    validate_uuid_path(issue_id, "issue_id")
+
+    data = request.get_json(silent=True) or {}
+
+    # Optional fields
+    title = data.get("title")
+    description = data.get("description")
+    reported_by = data.get("reported_by")
+
+    asset_id = None
+    if "asset_id" in data:
+        # If caller sends null, we treat as no change; if non-null, validate UUID
+        if data["asset_id"] is not None:
+            asset_id = parse_uuid_field(data, "asset_id", required=True)
+
+    payload = {
+        "title": title,
+        "description": description,
+        "reported_by": reported_by,
+        "asset_id": asset_id,
+    }
+
+    try:
+        result = issue_service.update_issue(issue_id, payload)
+    except ValueError as e:
+        abort(400, description=str(e))
+
+    if result is None:
+        abort(404, description="Issue not found")
+
+    return jsonify(result)
