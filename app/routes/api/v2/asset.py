@@ -17,7 +17,7 @@ def parse_uuid_arg(name: str):
 def list_assets():
     page = request.args.get("page", default=1, type=int)
     page_size = request.args.get("page_size", default=50, type=int)
-    retired_param = request.args.get("retired", default="all", type=str).lower()
+    retired_param = request.args.get("retired", default="active", type=str).lower()
 
     filters = {
         "site_id": parse_uuid_arg("site_id"),
