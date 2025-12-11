@@ -55,7 +55,8 @@ def list_issues(page: int, page_size: int, filters: dict):
             "updated_at": r["updated_at"],
             "closed_at": r["closed_at"],
             "last_action_at": r["last_action_at"],
-            "last_action_type": r["last_action_type"],
+            "last_action_type": r["last_action_type_code"],
+            "last_action_type_label": r["last_action_type_label"],
         })
 
     return {

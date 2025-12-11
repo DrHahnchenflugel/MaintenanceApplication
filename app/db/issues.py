@@ -37,7 +37,8 @@ def list_issue_rows(
             issue_status.label AS status_label,
 
             last_action.last_action_at,
-            last_action.last_action_type
+            last_action.last_action_type_code,
+            last_action.last_action_type_label
         FROM issue
         JOIN issue_status
           ON issue.status_id = issue_status.id
@@ -45,11 +46,12 @@ def list_issue_rows(
           ON issue.asset_id = asset.id
         LEFT JOIN LATERAL (
             SELECT
-                ia.created_at AS last_action_at,
-                iat.code      AS last_action_type
+                ia.created_at     AS last_action_at,
+                at.code           AS last_action_type_code,
+                at.label          AS last_action_type_label
             FROM issue_action ia
-            JOIN issue_action_type iat
-              ON ia.action_type_id = iat.id
+            JOIN action_type at
+              ON ia.action_type_id = at.id
             WHERE ia.issue_id = issue.id
             ORDER BY ia.created_at DESC
             LIMIT 1
