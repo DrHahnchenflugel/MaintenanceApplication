@@ -1,5 +1,5 @@
 from flask import Blueprint
-web_bp = Blueprint("app", __name__)
+bp = Blueprint("app", __name__)
 
 # Import route modules, so they attach to bp
 from . import dashboard     # noqa: F401
