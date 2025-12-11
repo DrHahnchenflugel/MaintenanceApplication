@@ -165,3 +165,66 @@ def list_issue_rows(
 
     rows = [dict(row) for row in result]
     return rows, total
+
+def get_issue_row(issue_id):
+    """
+    Fetch a single issue row by id, with joined status/asset info and last action.
+
+    Returns:
+        dict with keys:
+          - id, asset_id, status_id, title, description, reported_by,
+            created_at, updated_at, closed_at
+          - asset_tag, site_id
+          - status_code, status_label
+          - last_action_at, last_action_type_code, last_action_type_label
+        or None if not found.
+    """
+
+    sql = text("""
+        SELECT
+            issue.id,
+            issue.asset_id,
+            issue.status_id,
+            issue.title,
+            issue.description,
+            issue.reported_by,
+            issue.created_at,
+            issue.updated_at,
+            issue.closed_at,
+
+            asset.asset_tag,
+            asset.site_id,
+
+            issue_status.code  AS status_code,
+            issue_status.label AS status_label,
+
+            last_action.last_action_at,
+            last_action.last_action_type_code,
+            last_action.last_action_type_label
+        FROM issue
+        JOIN issue_status
+          ON issue.status_id = issue_status.id
+        JOIN asset
+          ON issue.asset_id = asset.id
+        LEFT JOIN LATERAL (
+            SELECT
+                ia.created_at AS last_action_at,
+                at.code       AS last_action_type_code,
+                at.label      AS last_action_type_label
+            FROM issue_action ia
+            JOIN action_type at
+              ON ia.action_type_id = at.id
+            WHERE ia.issue_id = issue.id
+            ORDER BY ia.created_at DESC
+            LIMIT 1
+        ) AS last_action ON TRUE
+        WHERE issue.id = :id
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(sql, {"id": issue_id}).mappings().first()
+
+    if row is None:
+        return None
+
+    return dict(row)

@@ -65,3 +65,38 @@ def list_issues(page: int, page_size: int, filters: dict):
         "total": total,
         "items": items,
     }
+
+def get_issue(issue_id: str):
+    """
+    Return a single issue as a JSON-ready dict, or None if not found.
+    """
+    r = issue_db.get_issue_row(issue_id)
+    if r is None:
+        return None
+
+    return {
+        "id": r["id"],
+        "title": r["title"],
+        "description": r["description"],
+        "status": {
+            "id": r["status_id"],
+            "code": r["status_code"],
+            "label": r["status_label"],
+        },
+        "asset": {
+            "id": r["asset_id"],
+            "asset_tag": r["asset_tag"],
+            "site_id": r["site_id"],
+        },
+        "reported_by": {
+            "id": r["reported_by"],
+            "name": str(r["reported_by"]),  # placeholder until you have users
+        },
+        "created_at": r["created_at"],
+        "updated_at": r["updated_at"],
+        "closed_at": r["closed_at"],
+        "last_action_at": r["last_action_at"],
+        "last_action_type": r["last_action_type_code"],
+        # optional if you want it:
+        # "last_action_type_label": r["last_action_type_label"],
+    }

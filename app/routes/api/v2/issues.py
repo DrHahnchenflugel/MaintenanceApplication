@@ -31,3 +31,17 @@ def list_issues():
 
     result = issue_service.list_issues(page, page_size, filters)
     return jsonify(result)
+
+@bp.route("/issues/<issue_id>", methods=["GET"])
+def get_issue(issue_id):
+    # Validate UUID format
+    try:
+        UUID(issue_id)
+    except ValueError:
+        abort(400, description="Invalid issue_id, must be UUID")
+
+    issue = issue_service.get_issue(issue_id)
+    if issue is None:
+        abort(404, description="Issue not found")
+
+    return jsonify(issue)
