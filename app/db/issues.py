@@ -458,3 +458,59 @@ def get_issue_status_id(issue_id):
         return None
 
     return row["status_id"]
+
+def update_issue_row(issue_id, fields: dict):
+    """
+    Partially update an issue row.
+
+    Args:
+        issue_id: UUID (or string) primary key value.
+        fields: dict of {column_name: value} with DB column names,
+                e.g. {"status_id": ..., "title": ..., "description": ...}
+
+    Returns:
+        dict of the updated row, or None if issue_id not found.
+    """
+
+    if not fields:
+        # Nothing to update – just return current row
+        return get_issue_row(issue_id)
+
+    set_clauses = []
+    params = {"id": issue_id}
+
+    idx = 0
+    for col, value in fields.items():
+        param_name = f"v_{idx}"
+        set_clauses.append(f"{col} = :{param_name}")
+        params[param_name] = value
+        idx += 1
+
+    # Always bump updated_at
+    set_clauses.append("updated_at = NOW()")
+
+    set_sql = ", ".join(set_clauses)
+
+    sql = text(f"""
+        UPDATE issue
+        SET {set_sql}
+        WHERE id = :id
+        RETURNING
+            id,
+            asset_id,
+            status_id,
+            title,
+            description,
+            reported_by,
+            created_at,
+            updated_at,
+            closed_at
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(sql, params).mappings().first()
+
+    if row is None:
+        return None
+
+    return dict(row)
