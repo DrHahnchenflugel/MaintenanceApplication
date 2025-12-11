@@ -309,7 +309,7 @@ def list_action_types():
     ]
 
 def create_issue_status(data: dict):
-    code = (data.get("code") or "").strip()
+    code = (data.get("code") or "").strip().upper()
     label = (data.get("label") or "").strip()
     display_order = data.get("display_order")
 
@@ -328,7 +328,7 @@ def create_issue_status(data: dict):
     }
 
 def create_action_type(data: dict):
-    code = (data.get("code") or "").strip()
+    code = (data.get("code") or "").strip().upper()
     label = (data.get("label") or "").strip()
     display_order = data.get("display_order")
 
