@@ -69,3 +69,18 @@ def list_assets():
     )
 
     return jsonify(result), 200
+
+@bp.route("/assets", methods=["POST"])
+def create_asset():
+    data = request.get_json(silent=True)
+    if data is None:
+        return jsonify({"error": "invalid_json", "message": "Request body must be JSON"}), 400
+
+    try:
+        asset = asset_service.create_asset_service(data)
+    except ValueError as e:
+        # Validation error from service layer
+        return jsonify({"error": "invalid_input", "message": str(e)}), 400
+
+    # TODO: add return location header
+    return jsonify(asset), 201

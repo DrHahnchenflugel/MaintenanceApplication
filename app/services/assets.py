@@ -1,4 +1,17 @@
 from app.db import assets as assets_repo
+from uuid import UUID
+
+def _parse_uuid_field(payload, field_name: str, required: bool = True):
+    value = payload.get(field_name)
+    if value is None:
+        if required:
+            raise ValueError(f"Missing required field: {field_name}")
+        return None
+    try:
+        return UUID(value)
+    except ValueError:
+        raise ValueError(f"Invalid {field_name}, must be a UUID string")
+
 
 def get_asset_service(asset_id, include=None):
     """
@@ -133,3 +146,46 @@ def list_assets_service(
         "page_size": page_size,
         "total": total,
     }
+
+def create_asset_service(payload: dict) -> dict:
+    """
+    Create a new asset.
+
+    Expected payload keys (JSON):
+      - asset_tag (str, required)
+      - site_id (UUID string, required)
+      - category_id (UUID string, required)
+      - status_id (UUID string, required)
+      - variant_id (UUID string, required)
+      - serial_number (str, optional)
+      - acquired_at (ISO datetime string, optional; passed through to DB)
+
+    Returns:
+      dict representing the created asset row.
+    """
+
+    # Required simple fields
+    asset_tag = payload.get("asset_tag")
+    if not asset_tag or not isinstance(asset_tag, str):
+        raise ValueError("asset_tag is required and must be a string")
+
+    # UUID fields
+    site_id = _parse_uuid_field(payload, "site_id", required=True)
+    category_id = _parse_uuid_field(payload, "category_id", required=True)
+    status_id = _parse_uuid_field(payload, "status_id", required=True)
+    variant_id = _parse_uuid_field(payload, "variant_id", required=True)
+
+    # Optional fields
+    acquired_at = payload.get("acquired_at")      # let Postgres cast if given
+
+    # Call L3 to actually insert
+    row = assets_repo.create_asset_row(
+        variant_id=variant_id,
+        category_id=category_id,
+        site_id=site_id,
+        status_id=status_id,
+        asset_tag=asset_tag,
+        acquired_at=acquired_at,
+    )
+
+    return row
