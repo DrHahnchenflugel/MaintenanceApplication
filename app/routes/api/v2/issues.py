@@ -151,9 +151,9 @@ def patch_issue(issue_id):
     data = request.get_json(silent=True) or {}
 
     # Optional fields
-    title = data.get("title")
-    description = data.get("description")
-    reported_by = data.get("reported_by")
+    title = data.get("title") or None
+    description = data.get("description") or None
+    reported_by = data.get("reported_by") or None
 
     asset_id = None
     if "asset_id" in data:

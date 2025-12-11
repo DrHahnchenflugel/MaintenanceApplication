@@ -267,7 +267,7 @@ def update_issue(issue_id: str, data: dict):
     if "description" in data and data["description"] is not None:
         fields["description"] = data["description"]
 
-    if "reported_by" in data:
+    if "reported_by" in data and data["reported_by"] is not None:
         fields["reported_by"] = data["reported_by"]
 
     if "asset_id" in data and data["asset_id"] is not None:
