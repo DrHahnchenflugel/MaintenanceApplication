@@ -1,4 +1,4 @@
-from . import web_bp
+from . import bp as web_bp
 
 @web_bp.get("/files", strict_slashes=False, endpoint="files")
 def files():
