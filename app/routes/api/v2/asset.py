@@ -17,6 +17,7 @@ def parse_uuid_arg(name: str):
 def list_assets():
     page = request.args.get("page", default=1, type=int)
     page_size = request.args.get("page_size", default=50, type=int)
+    retired_param = request.args.get("retired", default="all", type=str).lower()
 
     filters = {
         "site_id": parse_uuid_arg("site_id"),
@@ -29,7 +30,6 @@ def list_assets():
     }
 
     # retired mode: active (default), retired, all
-    retired_param = (request.args.get("retired") or "").lower()
     if retired_param not in ("", "active", "retired", "all"):
         return jsonify({
             "error": "invalid_retired_param",
