@@ -433,3 +433,28 @@ def create_issue_status_history_row(
 
     with get_connection() as conn:
         conn.execute(sql, params)
+
+def get_issue_status_id(issue_id):
+    """
+    Return the current status_id for a given issue, or None if the issue
+    does not exist.
+
+    Args:
+        issue_id: UUID (or UUID string) of the issue.
+
+    Returns:
+        status_id (UUID) or None.
+    """
+    sql = text("""
+        SELECT status_id
+        FROM issue
+        WHERE id = :id
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(sql, {"id": issue_id}).mappings().first()
+
+    if row is None:
+        return None
+
+    return row["status_id"]
