@@ -105,7 +105,6 @@ def list_assets_service(
 
     # Call L3 with unpacked filters
     rows, total = assets_repo.list_asset_rows(
-        asset_id=id,
         site_id=filters.get("site_id"),
         category_id=filters.get("category_id"),
         status_id=filters.get("status_id"),
