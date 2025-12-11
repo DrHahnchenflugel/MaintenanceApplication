@@ -589,3 +589,89 @@ def list_action_type_rows():
         rows = conn.execute(sql).mappings().all()
 
     return [dict(r) for r in rows]
+
+def create_issue_status_row(code: str, label: str, display_order: int):
+    """
+    Insert a new issue_status row and return it as a dict.
+    """
+
+    sql = text("""
+        INSERT INTO issue_status (
+            code,
+            label,
+            display_order
+        )
+        VALUES (
+            :code,
+            :label,
+            :display_order
+        )
+        RETURNING
+            id,
+            code,
+            label,
+            display_order
+    """)
+
+    params = {
+        "code": code,
+        "label": label,
+        "display_order": display_order,
+    }
+
+    with get_connection() as conn:
+        try:
+            row = conn.execute(sql, params).mappings().first()
+        except IntegrityError as e:
+            # Check if it's the unique constraint on code
+            if "issue_status_code_key" in str(e.orig):
+                raise ValueError("Duplicate code for issue_status")
+            raise
+
+    if row is None:
+        raise RuntimeError("Failed to insert issue_status")
+
+    return dict(row)
+
+def create_action_type_row(code: str, label: str, display_order: int | None = None):
+    """
+    Insert a new action_type row and return it as a dict.
+    """
+
+    sql = text("""
+        INSERT INTO action_type (
+            code,
+            label,
+            display_order
+        )
+        VALUES (
+            :code,
+            :label,
+            :display_order
+        )
+        RETURNING
+            id,
+            code,
+            label,
+            display_order
+    """)
+
+    params = {
+        "code": code,
+        "label": label,
+        "display_order": display_order,
+    }
+
+    with get_connection() as conn:
+        try:
+            row = conn.execute(sql, params).mappings().first()
+        except IntegrityError as e:
+            # Check if it's the unique constraint on code
+            if "issue_status_code_key" in str(e.orig):
+                raise ValueError("Duplicate code for action_type")
+            raise
+
+    if row is None:
+        raise RuntimeError("Failed to insert action_type")
+
+    return dict(row)

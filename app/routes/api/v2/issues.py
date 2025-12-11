@@ -187,3 +187,28 @@ def get_issue_statuses():
 def get_action_types():
     result = issue_service.list_action_types()
     return jsonify({"items": result})
+
+@bp.route("/issue-statuses", methods=["POST"])
+def create_issue_status():
+    data = request.get_json(silent=True) or {}
+
+    try:
+        result = issue_service.create_issue_status(data)
+    except ValueError as e:
+        msg = str(e)
+        if "Duplicate code" in msg:
+            return jsonify({"error": msg}), 409
+        abort(400, description=msg)
+
+    return jsonify(result), 201
+
+@bp.route("/action-types", methods=["POST"])
+def create_action_type():
+    data = request.get_json(silent=True) or {}
+
+    try:
+        result = issue_service.create_action_type(data)
+    except ValueError as e:
+        abort(400, description=str(e))
+
+    return jsonify(result), 201

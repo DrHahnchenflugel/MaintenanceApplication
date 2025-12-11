@@ -307,3 +307,41 @@ def list_action_types():
         }
         for r in rows
     ]
+
+def create_issue_status(data: dict):
+    code = (data.get("code") or "").strip()
+    label = (data.get("label") or "").strip()
+    display_order = data.get("display_order")
+
+    if not code or not label:
+        raise ValueError("code and label are required for issue_status")
+
+    if display_order is None:
+        raise ValueError("display_order is required and must be an integer")
+
+    row = issue_db.create_issue_status_row(code, label, display_order)
+    return {
+        "id": row["id"],
+        "code": row["code"],
+        "label": row["label"],
+        "display_order": row["display_order"],
+    }
+
+def create_action_type(data: dict):
+    code = (data.get("code") or "").strip()
+    label = (data.get("label") or "").strip()
+    display_order = data.get("display_order")
+
+    if not code or not label:
+        raise ValueError("code and label are required for action_type")
+
+    if display_order is None:
+        raise ValueError("display_order is required and must be an integer")
+
+    row = issue_db.create_action_type_row(code, label, display_order)
+    return {
+        "id": row["id"],
+        "code": row["code"],
+        "label": row["label"],
+        "display_order": row["display_order"],
+    }
