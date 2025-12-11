@@ -40,6 +40,10 @@ def get_asset_service(asset_id, include=None):
     # Right now row is just the asset table columns.
     asset = dict(row)
 
+    # normalize names
+    asset["asset_id"] = asset.pop("id")
+    asset["serial_number"] = asset.pop("serial_num")
+
     # --- Includes (commented out until db.lookups ready) ---
 
     # if "site" in include_set and asset.get("site_id") is not None:
@@ -134,7 +138,13 @@ def list_assets_service(
 
     # For now, we just return the rows as-is.
     # Later we can add include expansions similar to get_asset_service.
-    items = [dict(row) for row in rows]
+    items = []
+    for row in rows:
+        asset = dict(row)
+        asset["asset_id"] = asset.pop("id")
+        asset["serial_number"] = asset.pop("serial_num")
+        items.append(asset)
+
 
     # --- Includes (optional future step) ---
     # If you want "include=site,category" for lists too, this is where you'd:
