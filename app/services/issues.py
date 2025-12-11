@@ -119,3 +119,69 @@ def get_issue(issue_id: str):
         "last_action_type_label": r["last_action_type_label"],
         "actions": actions,
     }
+
+def create_issue(data: dict):
+    """
+    Create a new issue, initial action, and status history.
+
+    Expected keys in data:
+      - asset_id       (UUID string, required)
+      - title          (str, required)
+      - description    (str, required)
+      - reported_by    (UUID string, required)
+      - created_by     (UUID string, required)
+      - status_id      (UUID string, optional; default = 'OPEN' status)
+    """
+
+    asset_id = data.get("asset_id")
+    title = data.get("title")
+    description = data.get("description")
+    reported_by = data.get("reported_by")
+    created_by = data.get("created_by")
+    status_id = data.get("status_id")
+
+    # Basic sanity; real validation should live in route or a schema layer
+    if not asset_id or not title or not description or not reported_by or not created_by:
+        raise ValueError("Missing required fields for issue creation")
+
+    # Default status: code 'OPEN' if status_id not provided
+    if not status_id:
+        status_id = issue_db.get_issue_status_id_by_code("OPEN")
+        if not status_id:
+            raise RuntimeError("No issue_status row with code 'OPEN' found")
+
+    # 1) Create the issue itself
+    issue_row = issue_db.create_issue_row(
+        asset_id=asset_id,
+        status_id=status_id,
+        title=title,
+        description=description,
+        reported_by=reported_by,
+    )
+
+    issue_id = issue_row["id"]
+
+    # 2) Initial status history: from NULL -> status_id
+    issue_db.create_issue_status_history_row(
+        issue_id=issue_id,
+        from_status_id=None,
+        to_status_id=status_id,
+        changed_by=created_by,
+    )
+
+    # 3) Initial action: type 'created'
+    created_type_id = issue_db.get_action_type_id_by_code("CREATED")
+    if not created_type_id:
+        raise RuntimeError("No action_type row with code 'CREATED' found")
+
+    issue_db.create_issue_action_row(
+        issue_id=issue_id,
+        action_type_id=created_type_id,
+        body=data.get("initial_action_body") or "Issue created",
+        created_by=created_by,
+    )
+
+    # You can either return full issue or just ID
+    return {
+        "id": issue_id,
+    }

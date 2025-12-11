@@ -1,6 +1,36 @@
 from sqlalchemy import text
 from app.db.connection import get_connection
 
+def get_action_type_id_by_code(code: str):
+    """
+    Return the id from action_type for a given code, or None if not found.
+    """
+    sql = text("""
+        SELECT id
+        FROM action_type
+        WHERE code = :code
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(sql, {"code": code}).mappings().first()
+
+    if row is None:
+        return None
+
+    return row["id"]
+
+def get_issue_status_id_by_code(code: str):
+    sql = text("""
+        SELECT id
+        FROM issue_status
+        WHERE code = :code
+    """)
+    with get_connection() as conn:
+        row = conn.execute(sql, {"code": code}).mappings().first()
+    if row is None:
+        return None
+    return row["id"]
+
 def list_issue_rows(
     site_id=None,
     asset_id=None,
@@ -263,3 +293,143 @@ def list_issue_actions(issue_id):
         rows = conn.execute(sql, {"issue_id": issue_id}).mappings().all()
 
     return [dict(r) for r in rows]
+
+def create_issue_row(
+    asset_id,
+    status_id,
+    title,
+    description,
+    reported_by,
+):
+    """
+    Insert a new issue row and return the full row as a dict.
+    """
+
+    sql = text("""
+        INSERT INTO issue (
+            asset_id,
+            status_id,
+            title,
+            description,
+            reported_by
+        )
+        VALUES (
+            :asset_id,
+            :status_id,
+            :title,
+            :description,
+            :reported_by
+        )
+        RETURNING
+            id,
+            asset_id,
+            status_id,
+            title,
+            description,
+            reported_by,
+            created_at,
+            updated_at,
+            closed_at
+    """)
+
+    params = {
+        "asset_id": asset_id,
+        "status_id": status_id,
+        "title": title,
+        "description": description,
+        "reported_by": reported_by,
+    }
+
+    with get_connection() as conn:
+        row = conn.execute(sql, params).mappings().first()
+
+    if row is None:
+        raise RuntimeError("Failed to insert issue")
+
+    return dict(row)
+
+def create_issue_action_row(
+    issue_id,
+    action_type_id,
+    body,
+    created_by,
+):
+    """
+    Insert a new issue_action row.
+    """
+
+    sql = text("""
+        INSERT INTO issue_action (
+            issue_id,
+            action_type_id,
+            body,
+            created_at,
+            created_by
+        )
+        VALUES (
+            :issue_id,
+            :action_type_id,
+            :body,
+            NOW(),
+            :created_by
+        )
+        RETURNING
+            id,
+            issue_id,
+            action_type_id,
+            body,
+            created_at,
+            created_by
+    """)
+
+    params = {
+        "issue_id": issue_id,
+        "action_type_id": action_type_id,
+        "body": body,
+        "created_by": created_by,
+    }
+
+    with get_connection() as conn:
+        row = conn.execute(sql, params).mappings().first()
+
+    if row is None:
+        raise RuntimeError("Failed to insert issue_action")
+
+    return dict(row)
+
+def create_issue_status_history_row(
+    issue_id,
+    from_status_id,
+    to_status_id,
+    changed_by,
+):
+    """
+    Insert into issue_status_history. from_status_id can be None for initial.
+    """
+
+    sql = text("""
+        INSERT INTO issue_status_history (
+            issue_id,
+            from_status_id,
+            to_status_id,
+            changed_at,
+            changed_by
+        )
+        VALUES (
+            :issue_id,
+            :from_status_id,
+            :to_status_id,
+            NOW(),
+            :changed_by
+        )
+    """)
+
+    params = {
+        "issue_id": issue_id,
+        "from_status_id": from_status_id,
+        "to_status_id": to_status_id,
+        "changed_by": changed_by,
+    }
+
+    with get_connection() as conn:
+        conn.execute(sql, params)
