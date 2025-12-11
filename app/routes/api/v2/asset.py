@@ -145,3 +145,18 @@ def retire_asset(asset_id: UUID):
         return jsonify({"error": "asset_not_found"}), 404
 
     return "", 204
+
+@bp.route("/assets/by-tag/<asset_tag>", methods=["GET"])
+def get_asset_by_tag(asset_tag: str):
+    result = asset_service.list_assets_service(
+        filters={"asset_tag": asset_tag},
+        sort=[],
+        page=1,
+        page_size=1,
+        include=[],
+        retired_mode="all",
+    )
+    items = result["items"]
+    if not items:
+        return jsonify({"error": "asset_not_found"}), 404
+    return jsonify(items[0]), 200
