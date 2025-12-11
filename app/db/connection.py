@@ -34,8 +34,8 @@ def get_connection() -> Connection:
     Context manager that yields a DB connection and
     ensures it is properly closed / returned to the pool.
     """
-    conn = _engine.connect()
+    conn = _engine.begin()
     try:
         yield conn
     finally:
-        conn.close()
+        pass
