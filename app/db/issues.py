@@ -228,3 +228,38 @@ def get_issue_row(issue_id):
         return None
 
     return dict(row)
+
+def list_issue_actions(issue_id):
+    """
+    Return all actions for a given issue, oldest first.
+
+    Each row:
+      - id
+      - action_type_id
+      - action_type_code
+      - action_type_label
+      - body
+      - created_at
+      - created_by
+    """
+
+    sql = text("""
+        SELECT
+            ia.id,
+            ia.action_type_id,
+            at.code  AS action_type_code,
+            at.label AS action_type_label,
+            ia.body,
+            ia.created_at,
+            ia.created_by
+        FROM issue_action ia
+        JOIN action_type at
+          ON ia.action_type_id = at.id
+        WHERE ia.issue_id = :issue_id
+        ORDER BY ia.created_at ASC
+    """)
+
+    with get_connection() as conn:
+        rows = conn.execute(sql, {"issue_id": issue_id}).mappings().all()
+
+    return [dict(r) for r in rows]

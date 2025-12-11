@@ -68,11 +68,30 @@ def list_issues(page: int, page_size: int, filters: dict):
 
 def get_issue(issue_id: str):
     """
-    Return a single issue as a JSON-ready dict, or None if not found.
+    Return a single issue with its actions, or None if not found.
     """
     r = issue_db.get_issue_row(issue_id)
     if r is None:
         return None
+
+    # Fetch actions timeline
+    action_rows = issue_db.list_issue_actions(issue_id)
+    actions = []
+    for a in action_rows:
+        actions.append({
+            "id": a["id"],
+            "type": {
+                "id": a["action_type_id"],
+                "code": a["action_type_code"],
+                "label": a["action_type_label"],
+            },
+            "body": a["body"],
+            "created_at": a["created_at"],
+            "created_by": {
+                "id": a["created_by"],
+                "name": str(a["created_by"]),  # placeholder until user table
+            },
+        })
 
     return {
         "id": r["id"],
@@ -90,13 +109,13 @@ def get_issue(issue_id: str):
         },
         "reported_by": {
             "id": r["reported_by"],
-            "name": str(r["reported_by"]),  # placeholder until you have users
+            "name": str(r["reported_by"]),
         },
         "created_at": r["created_at"],
         "updated_at": r["updated_at"],
         "closed_at": r["closed_at"],
         "last_action_at": r["last_action_at"],
         "last_action_type": r["last_action_type_code"],
-        # optional if you want it:
-        # "last_action_type_label": r["last_action_type_label"],
+        "last_action_type_label": r["last_action_type_label"],
+        "actions": actions,
     }
