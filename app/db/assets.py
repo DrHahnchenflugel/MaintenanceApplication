@@ -66,7 +66,8 @@ def list_asset_rows(
     asset_tag=None,
     sort=None,
     limit=None,
-    offset=None
+    offset=None,
+    retired_mode: str = "active",
     ):
     """
     List assets with optional filters, sorting, and pagination.
@@ -84,6 +85,7 @@ def list_asset_rows(
               [("asset_tag", "asc"), ("created_at", "desc")]
         limit: max number of rows to return (for pagination)
         offset: number of rows to skip (for pagination)
+        retired_mode: view asset based on active statuses, e.g., ["active" (only), "retired" (only), all]
 
     Returns:
         (rows, total_count)
@@ -93,6 +95,7 @@ def list_asset_rows(
 
         total_count: integer number of rows that match the filters,
                      ignoring limit/offset.
+
     """
 
     # Base SELECT – join variant/model so make_id/model_id filters work.
@@ -117,6 +120,17 @@ def list_asset_rows(
 
     where_clauses = []
     params = {}
+
+    # Retired filter: "active" (default), "retired", "all"
+    if retired_mode == "active":
+        where_clauses.append("asset.retired_at IS NULL")
+    elif retired_mode == "retired":
+        where_clauses.append("asset.retired_at IS NOT NULL")
+    elif retired_mode == "all":
+        pass  # no clause
+    else:
+        # safety net; should not happen if service validates
+        where_clauses.append("asset.retired_at IS NULL")
 
     # Direct asset filters
     if site_id is not None:
@@ -339,6 +353,49 @@ def update_asset_row(asset_id, fields: dict):
             created_at,
             updated_at
     """)
+
+    with get_connection() as conn:
+        row = conn.execute(sql, params).mappings().first()
+
+    if row is None:
+        return None
+
+    return dict(row)
+
+def retire_asset_row(asset_id, retire_reason=None):
+    """
+    Soft-delete an asset by setting retired_at and retire_reason.
+
+    Returns:
+      dict of the updated row, or None if asset_id not found.
+    """
+
+    sql = text("""
+        UPDATE asset
+        SET
+            retired_at = NOW(),
+            retire_reason = :retire_reason,
+            updated_at = NOW()
+        WHERE id = :id
+        RETURNING
+            id,
+            variant_id,
+            category_id,
+            site_id,
+            status_id,
+            serial_num,
+            asset_tag,
+            acquired_at,
+            retired_at,
+            retire_reason,
+            created_at,
+            updated_at
+    """)
+
+    params = {
+        "id": asset_id,
+        "retire_reason": retire_reason,
+    }
 
     with get_connection() as conn:
         row = conn.execute(sql, params).mappings().first()

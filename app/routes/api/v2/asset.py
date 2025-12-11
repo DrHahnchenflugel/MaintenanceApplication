@@ -28,6 +28,21 @@ def list_assets():
         "asset_tag": request.args.get("asset_tag"),  # string
     }
 
+    # retired mode: active (default), retired, all
+    retired_param = (request.args.get("retired") or "").lower()
+    if retired_param not in ("", "active", "retired", "all"):
+        return jsonify({
+            "error": "invalid_retired_param",
+            "message": "retired must be one of: active, retired, all"
+        }), 400
+
+    if retired_param in ("", "active"):
+        retired_mode = "active"
+    elif retired_param == "retired":
+        retired_mode = "retired"
+    else:  # "all"
+        retired_mode = "all"
+
     # Parse sort string like "asset_tag,-created_at"
     sort_param = request.args.get("sort", "")
     sort = []
@@ -52,6 +67,7 @@ def list_assets():
         page=page,
         page_size=page_size,
         include=include,
+        retired_mode=retired_mode,
     )
 
     return jsonify(result), 200
@@ -99,3 +115,33 @@ def update_asset(asset_id: UUID):
         return jsonify({"error": "asset_not_found"}), 404
 
     return jsonify(asset), 200
+
+@bp.route("/assets/<uuid:asset_id>", methods=["DELETE"])
+def retire_asset(asset_id: UUID):
+    """
+    Retire an asset. retire_reason is REQUIRED.
+    """
+    data = request.get_json(silent=True)
+    if not isinstance(data, dict):
+        return jsonify({
+            "error": "invalid_json",
+            "message": "Request body must be a JSON object"
+        }), 400
+
+    retire_reason = data.get("retire_reason")
+
+    # enforce mandatory reason
+    if not retire_reason or not isinstance(retire_reason, str) or retire_reason.strip() == "":
+        return jsonify({
+            "error": "missing_retire_reason",
+            "message": "retire_reason is required and must be a non-empty string"
+        }), 400
+
+    success = asset_service.retire_asset_service(
+        asset_id, retire_reason=retire_reason
+    )
+
+    if not success:
+        return jsonify({"error": "asset_not_found"}), 404
+
+    return "", 204

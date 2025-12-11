@@ -65,7 +65,8 @@ def list_assets_service(
     sort,
     page,
     page_size,
-    include=None
+    include=None,
+    retired_mode: str = "active",
     ):
     """
     List assets with filters/sorting/pagination and optional expansions.
@@ -90,6 +91,7 @@ def list_assets_service(
         page: 1-based page number (int)
         page_size: number of items per page (int)
         include: iterable of include strings, e.g. ["site", "category"]
+        retired_mode: view asset based on active statuses, e.g., ["active" (only), "retired" (only), all]
 
     Returns:
         dict:
@@ -127,6 +129,7 @@ def list_assets_service(
         sort=sort,
         limit=limit,
         offset=offset,
+        retired_mode=retired_mode,
     )
 
     # For now, we just return the rows as-is.
@@ -252,3 +255,14 @@ def patch_asset_service(asset_id: UUID, payload: dict) -> dict | None:
     row = assets_repo.update_asset_row(asset_id=asset_id, fields=update_fields)
     # row is dict or None
     return row
+
+def retire_asset_service(asset_id: UUID, retire_reason: str | None = None) -> bool:
+    """
+    Mark an asset as retired.
+
+    Returns:
+      True  if an asset was updated
+      False if no such asset_id exists
+    """
+    row = assets_repo.retire_asset_row(asset_id=asset_id, retire_reason=retire_reason)
+    return row is not None
