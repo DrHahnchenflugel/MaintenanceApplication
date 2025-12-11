@@ -157,7 +157,7 @@ def create_issue(data: dict):
     # 2) Initial status history: from NULL -> status_id
     issue_db.create_issue_status_history_row(
         issue_id=issue_id,
-        from_status_id=None,
+        from_status_id=status_id,
         to_status_id=status_id,
         changed_by=created_by,
     )
