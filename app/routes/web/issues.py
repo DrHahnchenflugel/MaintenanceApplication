@@ -12,6 +12,3 @@ def issues_index():
         "issues/viewIssues.html",
         api_issues_url=api_issues_url,
     )
-
-
-pass
