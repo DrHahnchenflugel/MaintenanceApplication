@@ -13,20 +13,6 @@ def parse_uuid_arg(name: str):
         abort(400, description=f"Invalid {name}, must be UUID")
     return value
 
-
-@bp.route("/assets/<uuid:asset_id>", methods=["GET"])
-def get_asset(asset_id:UUID):
-    include_param = request.args.get("include", "")
-    include = [x.strip() for x in include_param.split(",") if x.strip()]
-
-    asset = asset_service.get_asset_service(asset_id, include=include)
-
-    if asset is None:
-        return jsonify({"error": "asset_not_found"}), 404
-
-    return jsonify(asset), 200
-
-
 @bp.route("/assets", methods=["GET"])
 def list_assets():
     page = request.args.get("page", default=1, type=int)
@@ -84,3 +70,32 @@ def create_asset():
 
     # TODO: add return location header
     return jsonify(asset), 201
+
+@bp.route("/assets/<uuid:asset_id>", methods=["GET"])
+def get_asset(asset_id:UUID):
+    include_param = request.args.get("include", "")
+    include = [x.strip() for x in include_param.split(",") if x.strip()]
+
+    asset = asset_service.get_asset_service(asset_id, include=include)
+
+    if asset is None:
+        return jsonify({"error": "asset_not_found"}), 404
+
+    return jsonify(asset), 200
+
+@bp.route("/assets/<uuid:asset_id>", methods=["PATCH"])
+def update_asset(asset_id: UUID):
+    data = request.get_json(silent=True)
+    if data is None:
+        return jsonify({"error": "invalid_json", "message": "Request body must be JSON"}), 400
+
+    try:
+        asset = asset_service.patch_asset_service(asset_id, data)
+    except ValueError as e:
+        return jsonify({"error": "invalid_input", "message": str(e)}), 400
+
+    if asset is None:
+        # asset_id not found
+        return jsonify({"error": "asset_not_found"}), 404
+
+    return jsonify(asset), 200

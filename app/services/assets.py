@@ -12,7 +12,6 @@ def _parse_uuid_field(payload, field_name: str, required: bool = True):
     except ValueError:
         raise ValueError(f"Invalid {field_name}, must be a UUID string")
 
-
 def get_asset_service(asset_id, include=None):
     """
     Get a single asset by id, with optional expansions.
@@ -188,4 +187,68 @@ def create_asset_service(payload: dict) -> dict:
         acquired_at=acquired_at,
     )
 
+    return row
+
+def patch_asset_service(asset_id: UUID, payload: dict) -> dict | None:
+    """
+    Partially update an asset.
+
+    Allowed fields in payload:
+      - asset_tag (str)
+      - serial_number (str)
+      - site_id (UUID string)
+      - category_id (UUID string)
+      - status_id (UUID string)
+      - variant_id (UUID string)
+      - acquired_at (ISO datetime string)
+      - retired_at (ISO datetime string)
+      - retire_reason (str)
+    """
+
+    update_fields: dict[str, object] = {}
+
+    # Simple string fields
+    if "asset_tag" in payload:
+        value = payload["asset_tag"]
+        if value is not None and not isinstance(value, str):
+            raise ValueError("asset_tag must be a string or null")
+        update_fields["asset_tag"] = value
+
+    if "serial_number" in payload:
+        value = payload["serial_number"]
+        if value is not None and not isinstance(value, str):
+            raise ValueError("serial_number must be a string or null")
+        update_fields["serial_num"] = value  # DB column name
+
+    if "retire_reason" in payload:
+        value = payload["retire_reason"]
+        if value is not None and not isinstance(value, str):
+            raise ValueError("retire_reason must be a string or null")
+        update_fields["retire_reason"] = value
+
+    # UUID fields (optional; only parsed if present)
+    if "site_id" in payload:
+        update_fields["site_id"] = _parse_uuid_field(payload, "site_id", required=False)
+
+    if "category_id" in payload:
+        update_fields["category_id"] = _parse_uuid_field(payload, "category_id", required=False)
+
+    if "status_id" in payload:
+        update_fields["status_id"] = _parse_uuid_field(payload, "status_id", required=False)
+
+    if "variant_id" in payload:
+        update_fields["variant_id"] = _parse_uuid_field(payload, "variant_id", required=False)
+
+    # Datetime-ish fields – let Postgres cast from string
+    if "acquired_at" in payload:
+        update_fields["acquired_at"] = payload["acquired_at"]
+
+    if "retired_at" in payload:
+        update_fields["retired_at"] = payload["retired_at"]
+
+    if not update_fields:
+        raise ValueError("No valid fields to update")
+
+    row = assets_repo.update_asset_row(asset_id=asset_id, fields=update_fields)
+    # row is dict or None
     return row

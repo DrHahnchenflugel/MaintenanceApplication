@@ -288,3 +288,62 @@ def create_asset_row(
         raise RuntimeError("Failed to insert asset")
 
     return dict(row)
+
+def update_asset_row(asset_id, fields: dict):
+    """
+    Partially update an asset row.
+
+    Args:
+        asset_id: UUID (or string) primary key value.
+        fields: dict of {column_name: value} with DB column names,
+                e.g. {"site_id": ..., "status_id": ..., "asset_tag": ...}
+
+    Returns:
+        dict of the updated row, or None if asset_id not found.
+    """
+
+    if not fields:
+        # Nothing to do, just return current row
+        return get_asset_row(asset_id)
+
+    set_clauses = []
+    params = {"id": asset_id}
+
+    idx = 0
+    for col, value in fields.items():
+        param_name = f"v_{idx}"
+        set_clauses.append(f"{col} = :{param_name}")
+        params[param_name] = value
+        idx += 1
+
+    # Always bump updated_at
+    set_clauses.append("updated_at = NOW()")
+
+    set_sql = ", ".join(set_clauses)
+
+    sql = text(f"""
+        UPDATE asset
+        SET {set_sql}
+        WHERE id = :id
+        RETURNING
+            id,
+            variant_id,
+            category_id,
+            site_id,
+            status_id,
+            serial_num,
+            asset_tag,
+            acquired_at,
+            retired_at,
+            retire_reason,
+            created_at,
+            updated_at
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(sql, params).mappings().first()
+
+    if row is None:
+        return None
+
+    return dict(row)
