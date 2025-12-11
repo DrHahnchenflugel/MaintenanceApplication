@@ -47,16 +47,12 @@ def list_issues(page: int, page_size: int, filters: dict):
                 "asset_tag": r["asset_tag"],
                 "site_id": r["site_id"],
             },
-            "reported_by": {
-                "id": r["reported_by"],
-                "name": str(r["reported_by"]),  # placeholder
-            },
+            "reported_by": r["reported_by"],  # string or None
             "created_at": r["created_at"],
             "updated_at": r["updated_at"],
             "closed_at": r["closed_at"],
             "last_action_at": r["last_action_at"],
             "last_action_type": r["last_action_type_code"],
-            "last_action_type_label": r["last_action_type_label"],
         })
 
     return {
@@ -107,10 +103,7 @@ def get_issue(issue_id: str):
             "asset_tag": r["asset_tag"],
             "site_id": r["site_id"],
         },
-        "reported_by": {
-            "id": r["reported_by"],
-            "name": str(r["reported_by"]),
-        },
+        "reported_by": r["reported_by"],
         "created_at": r["created_at"],
         "updated_at": r["updated_at"],
         "closed_at": r["closed_at"],
@@ -141,7 +134,7 @@ def create_issue(data: dict):
     status_id = data.get("status_id")
 
     # Basic sanity; real validation should live in route or a schema layer
-    if not asset_id or not title or not description or not reported_by or not created_by:
+    if not asset_id or not title or not description or not created_by:
         raise ValueError("Missing required fields for issue creation")
 
     # Default status: code 'OPEN' if status_id not provided

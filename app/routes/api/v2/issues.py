@@ -52,7 +52,8 @@ def list_issues():
         "site_id": parse_uuid_arg("site_id"),
         "asset_id": parse_uuid_arg("asset_id"),
         "status_id": parse_uuid_arg("status_id"),
-        "reported_by": parse_uuid_arg("reported_by"),
+        # reported_by is now a plain optional string
+        "reported_by": request.args.get("reported_by"),
         "created_from": request.args.get("created_from"),
         "created_to": request.args.get("created_to"),
         "closed": request.args.get("closed"),
@@ -81,15 +82,15 @@ def create_issue():
     data = request.get_json(silent=True) or {}
 
     asset_id = parse_uuid_field(data, "asset_id", required=True)
-    reported_by = parse_uuid_field(data, "reported_by", required=True)
+    reported_by = data.get("reported_by")
     created_by = parse_uuid_field(data, "created_by", required=True)
     status_id = parse_uuid_field(data, "status_id", required=False)
 
     title = data.get("title")
     description = data.get("description")
 
-    if not title or not description:
-        abort(400, description="Missing required fields: title, description")
+    if not asset_id or not created_by or not title or not description:
+        abort(400, description="Missing required fields: asset_id, created_by, title, description")
 
     payload = {
         "asset_id": asset_id,
