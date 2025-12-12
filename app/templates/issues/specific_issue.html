@@ -48,7 +48,6 @@
             {% set time, date = issue.created_at | format_dt %}
             <div class="pill">
                 <div class="muted">{{ date }}</div>
-                {{ time }}
             </div>
           </div>
         </div>
@@ -59,7 +58,6 @@
             {% set time, date = issue.last_action_at | format_dt %}
             <div class="pill">
                 <div class="muted">{{ date }}</div>
-                {{ time }}
             </div>
           </div>
 
@@ -68,7 +66,6 @@
               {% set time, date = issue.closed_at | format_dt %}
             <div class="pill">
                 <div class="muted">{{ date }}</div>
-                {{ time }}
             </div>
           </div>
         </div>
