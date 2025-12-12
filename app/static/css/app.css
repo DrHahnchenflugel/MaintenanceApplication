@@ -423,10 +423,11 @@ a {
     display: grid;
     gap: 16px;
 
-    grid-template-columns: 2fr 2fr 1.5fr;
+    /* Make columns: left = big, middle = big, right = slim */
+    grid-template-columns: 2fr 2fr 1.4fr;
 
-    /* Top row ~45% of viewport, bottom row ~40% (rest is header/footer) */
-    grid-template-rows: minmax(0, 45vh) minmax(0, 40vh);
+    /* Top row short, bottom row tall */
+    grid-template-rows: 28vh 50vh;
 
     grid-template-areas:
         "issue-main  issue-image  right-col"
@@ -436,6 +437,7 @@ a {
     min-height: 0;
 }
 
+
 .issue-main   { grid-area: issue-main; }
 .issue-image  { grid-area: issue-image; }
 .actions-card {
@@ -444,6 +446,13 @@ a {
     overflow: hidden;
     /* min-height: 32vh; */
 }
+
+.issue-main,
+.issue-image {
+    min-height: 0;
+    height: 100%;
+}
+
 .right-col    { grid-area: right-col; }
 
 /* Issue main card scrolls internally */
@@ -562,7 +571,7 @@ a {
 }
 
 .image-placeholder--large {
-    height: 22vh;
+    height: 16vh;
 }
 
 .image-placeholder--small {
