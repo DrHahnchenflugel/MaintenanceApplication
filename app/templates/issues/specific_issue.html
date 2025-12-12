@@ -1,5 +1,8 @@
-{% block content %}
+{% extends "base.html" %}
+{% block title %}Maintenance – Issue{% endblock %}
+{% block page_title %}Issue{% endblock %}
 
+{% block content %}
   {% if form_error %}
     <div class="card" style="border-left:4px solid #c0392b;margin-bottom:12px;">
       <strong>Error:</strong> {{ form_error }}
@@ -7,7 +10,6 @@
   {% endif %}
 
   <div class="issue-layout">
-
     {# Top-left: Issue card #}
     <div class="card issue-main">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
