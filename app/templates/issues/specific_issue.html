@@ -11,7 +11,7 @@
 
   <div class="issue-layout">
     {# ─────────────────────────────
-       Top-left: Issue details card
+       Top-left: Issue details
        ───────────────────────────── #}
     <div class="card issue-main">
       <div class="issue-main-header"
@@ -74,107 +74,106 @@
     </div>
 
     {# ─────────────────────────────
-       Top-right: Asset card
+       Right column: asset + status + update
        ───────────────────────────── #}
-    <div class="card asset-main">
-      <h3 style="margin:0;">Asset</h3>
-      <div class="asset-main-body">
-        <div class="asset-fields">
-          <div class="field">
-            <label style="font-weight:bold;">Tag</label>
-            <div class="pill">{{ issue.asset.asset_tag }}</div>
-          </div>
-
-          <div class="field">
-            <label style="font-weight:bold;">Site ID</label>
-            <div class="pill">{{ issue.asset.site_id or "—" }}</div>
-          </div>
-        </div>
-
-        <div class="asset-image">
-          <div class="image-placeholder image-placeholder--small">
-            GENERIC IMAGE FOR THIS MAKE / MODEL / VARIANT
-          </div>
-        </div>
-      </div>
-    </div>
-
-    {# ─────────────────────────────
-       Middle-right: Status changes
-       ───────────────────────────── #}
-    <div class="card status-card">
-      <h3 style="margin-top:0;">Status Changes</h3>
-
-      <div class="table table--scrollable">
-        <div class="thead--four">
-          <div>When</div>
-          <div>From</div>
-          <div>To</div>
-          <div>By</div>
-        </div>
-
-        {% if issue.status_history %}
-          {% for h in issue.status_history %}
-            <div class="trow--four">
-              <div>{{ h.changed_at }}</div>
-              <div>{{ h.from_status.label if h.from_status else "—" }}</div>
-              <div>{{ h.to_status.label }}</div>
-              <div>{{ h.changed_by or "—" }}</div>
+    <div class="right-col">
+      {# Asset card at top #}
+      <div class="card asset-main">
+        <h3 style="margin:0;">Asset</h3>
+        <div class="asset-main-body">
+          <div class="asset-fields">
+            <div class="field">
+              <label style="font-weight:bold;">Tag</label>
+              <div class="pill">{{ issue.asset.asset_tag }}</div>
             </div>
-          {% endfor %}
-        {% else %}
-          <div class="trow--four">
-            <div>-</div><div>-</div><div>-</div><div>-</div>
+
+            <div class="field">
+              <label style="font-weight:bold;">Site ID</label>
+              <div class="pill">{{ issue.asset.site_id or "—" }}</div>
+            </div>
           </div>
-        {% endif %}
+
+          <div class="asset-image">
+            <div class="image-placeholder image-placeholder--small">
+              GENERIC IMAGE FOR THIS MAKE / MODEL / VARIANT
+            </div>
+          </div>
+        </div>
       </div>
-    </div>
 
-    {# ─────────────────────────────
-       Bottom-right: Add update form
-       ───────────────────────────── #}
-    <div class="card update-form">
-      <h3 style="margin-top:0;">Add update</h3>
+      {# Status card in the middle (flex:1, scrolls) #}
+      <div class="card status-card">
+        <h3 style="margin-top:0;">Status Changes</h3>
 
-      <form method="post" action="{{ url_for('app.add_issue_action', issue_id=issue.id) }}"
-            class="row" style="gap:12px;flex-wrap:wrap;">
+        <div class="table table--scrollable">
+          <div class="thead--four">
+            <div>When</div>
+            <div>From</div>
+            <div>To</div>
+            <div>By</div>
+          </div>
 
-        <div class="field" style="flex:1;min-width:180px;">
-          <label style="font-weight:bold;">Action type</label>
-          <select name="action_type_code" required>
-            {% for at in action_types %}
-              <option value="{{ at.code }}">{{ at.label }}</option>
+          {% if issue.status_history %}
+            {% for h in issue.status_history %}
+              <div class="trow--four">
+                <div>{{ h.changed_at }}</div>
+                <div>{{ h.from_status.label if h.from_status else "—" }}</div>
+                <div>{{ h.to_status.label }}</div>
+                <div>{{ h.changed_by or "—" }}</div>
+              </div>
             {% endfor %}
-          </select>
+          {% else %}
+            <div class="trow--four">
+              <div>-</div><div>-</div><div>-</div><div>-</div>
+            </div>
+          {% endif %}
         </div>
+      </div>
 
-        <div class="field" style="flex:1;min-width:180px;">
-          <label style="font-weight:bold;">New status (optional)</label>
-          <select name="new_status_id">
-            <option value="">(no status change)</option>
-            {% for st in status_options %}
-              <option value="{{ st.id }}">{{ st.label }}</option>
-            {% endfor %}
-          </select>
-        </div>
+      {# Add update form at bottom of right column #}
+      <div class="card update-form">
+        <h3 style="margin-top:0;">Add update</h3>
 
-        <div class="field" style="flex:1;min-width:180px;">
-          <label style="font-weight:bold;">Created by</label>
-          <input type="text" name="created_by" placeholder="Your name or initials">
-        </div>
+        <form method="post" action="{{ url_for('app.add_issue_action', issue_id=issue.id) }}"
+              class="row" style="gap:12px;flex-wrap:wrap;">
 
-        <div class="field" style="flex-basis:100%;margin-top:12px;">
-          <label style="font-weight:bold;">Details</label>
-          <textarea name="body" rows="3" required
-                    placeholder="What did you do / what happened?"
-                    style="width:100%;"></textarea>
-        </div>
+          <div class="field" style="flex:1;min-width:180px;">
+            <label style="font-weight:bold;">Action type</label>
+            <select name="action_type_code" required>
+              {% for at in action_types %}
+                <option value="{{ at.code }}">{{ at.label }}</option>
+              {% endfor %}
+            </select>
+          </div>
 
-        <div style="flex-basis:100%;margin-top:8px;">
-          <button type="submit" class="btn btn--ok">Save update</button>
-          <a class="btn" href="{{ url_for('app.issues_list') }}">Back to list</a>
-        </div>
-      </form>
+          <div class="field" style="flex:1;min-width:180px;">
+            <label style="font-weight:bold;">New status (optional)</label>
+            <select name="new_status_id">
+              <option value="">(no status change)</option>
+              {% for st in status_options %}
+                <option value="{{ st.id }}">{{ st.label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="field" style="flex:1;min-width:180px;">
+            <label style="font-weight:bold;">Created by</label>
+            <input type="text" name="created_by" placeholder="Your name or initials">
+          </div>
+
+          <div class="field" style="flex-basis:100%;margin-top:12px;">
+            <label style="font-weight:bold;">Details</label>
+            <textarea name="body" rows="3" required
+                      placeholder="What did you do / what happened?"
+                      style="width:100%;"></textarea>
+          </div>
+
+          <div style="flex-basis:100%;margin-top:8px;">
+            <button type="submit" class="btn btn--ok">Save update</button>
+            <a class="btn" href="{{ url_for('app.issues_list') }}">Back to list</a>
+          </div>
+        </form>
+      </div>
     </div>
 
     {# ─────────────────────────────

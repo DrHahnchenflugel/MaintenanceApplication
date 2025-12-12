@@ -406,22 +406,20 @@ a {
    5. ISSUE DETAIL PAGE LAYOUT
    ========================================================= */
 
-/* 3×3 grid:
-   row1: issue-main | issue-image | asset-main
-   row2: actions    | actions     | status-card
-   row3: actions    | actions     | update-form
+/* 2×3 grid:
+   row1: issue-main | issue-image | right-col
+   row2: actions    | actions     | right-col
 */
 .issue-layout {
     display: grid;
     gap: 16px;
 
     grid-template-columns: 2fr 2fr 1.5fr;
-    grid-template-rows: 30vh 30vh auto;
+    grid-template-rows: 35vh auto;
 
     grid-template-areas:
-        "issue-main  issue-image  asset-main"
-        "actions     actions      status-card"
-        "actions     actions      update-form";
+        "issue-main  issue-image  right-col"
+        "actions     actions      right-col";
 
     align-items: stretch;
     min-height: 0;
@@ -429,12 +427,10 @@ a {
 
 .issue-main   { grid-area: issue-main; }
 .issue-image  { grid-area: issue-image; }
-.asset-main   { grid-area: asset-main; }
-.status-card  { grid-area: status-card; }
-.update-form  { grid-area: update-form; }
 .actions-card { grid-area: actions; }
+.right-col    { grid-area: right-col; }
 
-/* issue main card scroll */
+/* Issue main card scrolls internally */
 .issue-main {
     display: flex;
     flex-direction: column;
@@ -460,23 +456,49 @@ a {
     min-height: 0;
 }
 
-/* actions & status are flex columns with scrollable tables */
-.actions-card,
-.status-card {
+/* Actions: table fills card and scrolls */
+.actions-card {
     display: flex;
     flex-direction: column;
     overflow: hidden;
     min-height: 0;
 }
 
-/* update-form: just a card in the grid; no internal scroll needed */
-
-/* Photos */
-.issue-image {
-    /* nothing special; inherits .card */
+/* Right column: asset (top), status (middle, scroll), update (bottom) */
+.right-col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 0;
+    overflow: hidden;
 }
 
-/* Asset card layout */
+.asset-main {
+    /* natural height, no flex needed */
+}
+
+.status-card {
+    flex: 1 1 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.update-form {
+    /* sits at the bottom of the column */
+}
+
+/* Tables inside flex cards take available height and scroll */
+.table--scrollable {
+    flex: 1 1 0;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+    scrollbar-gutter: stable;
+}
+
+/* Asset card layout inside right-col */
 .asset-main-body {
     display: grid;
     grid-template-columns: 1.2fr 1fr;
@@ -506,13 +528,10 @@ a {
         grid-template-areas:
             "issue-main"
             "issue-image"
-            "asset-main"
-            "status-card"
-            "update-form"
+            "right-col"
             "actions";
     }
 }
-
 
 /* =========================================================
    6. IMAGE PLACEHOLDERS
