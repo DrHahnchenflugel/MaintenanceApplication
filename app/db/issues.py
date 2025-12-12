@@ -286,7 +286,7 @@ def list_issue_actions(issue_id):
         JOIN action_type at
           ON ia.action_type_id = at.id
         WHERE ia.issue_id = :issue_id
-        ORDER BY ia.created_at ASC
+        ORDER BY ia.created_at DESC
     """)
 
     with get_connection() as conn:
@@ -544,7 +544,7 @@ def list_issue_status_history(issue_id):
         JOIN issue_status ts
           ON ish.to_status_id = ts.id
         WHERE ish.issue_id = :issue_id
-        ORDER BY ish.changed_at ASC
+        ORDER BY ish.changed_at DESC
     """)
 
     with get_connection() as conn:
