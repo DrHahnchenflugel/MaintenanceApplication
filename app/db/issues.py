@@ -675,3 +675,23 @@ def create_action_type_row(code: str, label: str, display_order: int | None = No
         raise RuntimeError("Failed to insert action_type")
 
     return dict(row)
+
+def get_issue_attachment_by_issue_id(issue_id: str):
+    sql = text("""
+        SELECT
+            id,
+            issue_id,
+            filepath,
+            content_type
+        FROM issue_attachment
+        WHERE issue_id = :issue_id
+        LIMIT 1
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(sql, {"issue_id": issue_id}).mappings().first()
+
+    if row is None:
+        return None
+
+    return dict(row)

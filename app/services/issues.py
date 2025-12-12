@@ -345,3 +345,10 @@ def create_action_type(data: dict):
         "label": row["label"],
         "display_order": row["display_order"],
     }
+
+def get_issue_attachment(issue_id: str):
+    """
+    Return attachment metadata for an issue, or None.
+    Expected keys: filepath, content_type
+    """
+    return issues_db.get_issue_attachment_by_issue_id(issue_id)

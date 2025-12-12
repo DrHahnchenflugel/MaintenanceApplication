@@ -78,7 +78,14 @@
     <div class="card issue-image">
       <h3 style="margin-top:0;">Photos</h3>
       <div class="image-placeholder image-placeholder--large">
-        IMAGE GOES HERE
+        NO IMAGE
+          {% if issue.get("id") %}
+          <img
+              src="/maintenance/api/v2/issues/{{ issue['id'] }}/attachment"
+              alt="Issue photo"
+              style="max-width: 100%; border-radius: 8px;"
+          >
+          {% endif %}
       </div>
     </div>
 

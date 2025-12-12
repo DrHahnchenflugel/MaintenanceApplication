@@ -1,4 +1,5 @@
-from flask import request, jsonify, abort
+import os
+from flask import request, jsonify, abort, send_file, current_app
 from . import bp
 from app.services import issues as issue_service
 from uuid import UUID
@@ -43,6 +44,13 @@ def validate_uuid_path(value: str, field_name: str = "id"):
         abort(400, description=f"Invalid {field_name}, must be UUID")
     return value
 
+def parse_uuid_path(value: str, name: str):
+    try:
+        UUID(value)
+        return(value)
+    except ValueError:
+        abort(400, description=f"Invalid {name}, must be UUID")
+
 @bp.route("/issues", methods=["GET"])
 def list_issues():
     page = request.args.get("page", default=1, type=int)
@@ -76,6 +84,32 @@ def get_issue(issue_id):
         abort(404, description="Issue not found")
 
     return jsonify(issue)
+
+@bp.route("/issues/<issue_id>/attachment", methods=["GET"])
+def get_issue_attachment(issue_id):
+    issue_id = parse_uuid_path(issue_id, "issue_id")
+
+    row = issues_service.get_issue_attachment(issue_id)
+    if not row:
+        abort(404, description="No attachment for this issue")
+
+    rel = row["filepath"]
+    rel_norm = rel.replace("\\", "/")
+    if rel_norm.startswith("/") or ".." in rel_norm:
+        abort(500, description="Invalid attachment filepath stored")
+
+    attachment_root = current_app.config.get("ATTACHMENT_ROOT", "/tmp/attachments")
+    abs_path = os.path.join(attachment_root, rel_norm)
+
+    if not os.path.isfile(abs_path):
+        abort(404, description="Attachment file missing on disk")
+
+    return send_file(
+        abs_path,
+        mimetype=row["content_type"],
+        as_attachment=False,
+        conditional=True,
+    )
 
 @bp.route("/issues", methods=["POST"])
 def create_issue():

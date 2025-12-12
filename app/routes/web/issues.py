@@ -47,7 +47,6 @@ def issues_list():
         search=search or "",
     )
 
-
 @bp.route("/issues/<issue_id>")
 def view_issue(issue_id):
     """
@@ -68,7 +67,6 @@ def view_issue(issue_id):
         action_types=action_types,
         form_error=None,
     )
-
 
 @bp.route("/issues/<issue_id>/add-action", methods=["POST"])
 def add_issue_action(issue_id):
