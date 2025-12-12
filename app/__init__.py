@@ -13,6 +13,13 @@ def initialise_application():
         static_url_path = "/maintenance/static"
     )
 
+    def format_dt(dt):
+        if not dt:
+            return ""
+        return dt.strftime("%H:%M"), dt.strftime("%d-%m-%Y")
+
+    app.jinja_env.filters["format_dt"] = format_dt
+
     register_blueprints(app)
     app.register_blueprint(health_bp, url_prefix="/maintenance")
     app.secret_key = os.environ["FLASK_SECRET"]
