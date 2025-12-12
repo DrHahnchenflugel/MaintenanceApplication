@@ -1,5 +1,5 @@
 import os
-from werkzeug.utilus import secure_filename
+from werkzeug.utils import secure_filename
 from flask import current_app
 from app.db import issues as issue_db
 
