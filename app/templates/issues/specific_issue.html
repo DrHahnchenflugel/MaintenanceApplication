@@ -1,7 +1,3 @@
-{% extends "base.html" %}
-{% block title %}Maintenance – Issue {{ issue.id }}{% endblock %}
-{% block page_title %}Issue {{ issue.id }}{% endblock %}
-
 {% block content %}
 
   {% if form_error %}
@@ -10,10 +6,10 @@
     </div>
   {% endif %}
 
-  <div class="row" style="gap:16px;align-items:flex-start;flex-wrap:wrap;">
+  <div class="issue-layout">
 
-    <!-- Left: Issue details -->
-    <div class="card" style="flex:2;min-width:280px;">
+    {# Top-left: Issue card #}
+    <div class="card issue-main">
       <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
         <h2 style="margin:0;">{{ issue.title }}</h2>
 
@@ -60,8 +56,16 @@
       </div>
     </div>
 
-    <!-- Right: Asset details -->
-    <div class="card" style="flex:1;min-width:240px;">
+    {# Top-middle: big image box #}
+    <div class="card issue-image">
+      <h3 style="margin-top:0;">Photos</h3>
+      <div class="image-placeholder image-placeholder--large">
+        IMAGE GOES HERE
+      </div>
+    </div>
+
+    {# Top-right: Asset info (+ generic image) #}
+    <div class="card asset-main">
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <h3 style="margin:0;">Asset</h3>
       </div>
@@ -76,71 +80,74 @@
         <div class="pill">{{ issue.asset.site_id or "—" }}</div>
       </div>
 
-      {# later you can wrap this in a link to your asset detail page #}
+      {# slot for generic make/model image #}
+      <div class="image-placeholder image-placeholder--small">
+        GENERIC IMAGE FOR THIS MAKE / MODEL / VARIANT
+      </div>
     </div>
 
-  </div>
+    {# Bottom-left: Actions table #}
+    <div class="card actions-card">
+      <h3 style="margin-top:0;">Actions</h3>
 
-  <!-- Actions timeline -->
-  <div class="card" style="margin-top:16px;">
-    <h3 style="margin-top:0;">Actions</h3>
+      <div class="table table--scrollable">
+        <div class="thead--three">
+          <div>When</div>
+          <div>Type</div>
+          <div>Details</div>
+        </div>
 
-    <div class="table">
-      <div class="thead--three">
-        <div>When</div>
-        <div>Type</div>
-        <div>Details</div>
-      </div>
-
-      {% if issue.actions %}
-        {% for a in issue.actions %}
-          <div class="trow--three">
-            <div>{{ a.created_at }}</div>
-            <div>{{ a.type.label }}</div>
-            <div>
-              <div style="white-space:pre-wrap;">{{ a.body }}</div>
-              <div class="muted">by {{ a.created_by.name }}</div>
+        {% if issue.actions %}
+          {% for a in issue.actions %}
+            <div class="trow--three">
+              <div>{{ a.created_at }}</div>
+              <div>{{ a.type.label }}</div>
+              <div>
+                <div style="white-space:pre-wrap;">{{ a.body }}</div>
+                <div class="muted">by {{ a.created_by.name }}</div>
+              </div>
             </div>
+          {% endfor %}
+        {% else %}
+          <div class="trow--three">
+            <div>-</div><div>-</div><div>No actions yet.</div>
           </div>
-        {% endfor %}
-      {% else %}
-        <div class="trow--three">
-          <div>-</div><div>-</div><div>No actions yet.</div>
-        </div>
-      {% endif %}
-    </div>
-  </div>
-
-  <!-- Status history -->
-  <div class="card" style="margin-top:16px;">
-    <h3 style="margin-top:0;">Status history</h3>
-
-    <div class="table">
-      <div class="thead--four">
-        <div>When</div>
-        <div>From</div>
-        <div>To</div>
-        <div>By</div>
+        {% endif %}
       </div>
-
-      {% if issue.status_history %}
-        {% for h in issue.status_history %}
-          <div class="trow--four">
-            <div>{{ h.changed_at }}</div>
-            <div>{{ h.from_status.label if h.from_status else "—" }}</div>
-            <div>{{ h.to_status.label }}</div>
-            <div>{{ h.changed_by or "—" }}</div>
-          </div>
-        {% endfor %}
-      {% else %}
-        <div class="trow--four">
-          <div>-</div><div>-</div><div>-</div><div>-</div>
-        </div>
-      {% endif %}
     </div>
-  </div>
 
-  <!-- Add update / action form -->
+    {# Bottom-right: Status changes table #}
+    <div class="card status-card">
+      <h3 style="margin-top:0;">Status Changes</h3>
+
+      <div class="table table--scrollable">
+        <div class="thead--four">
+          <div>When</div>
+          <div>From</div>
+          <div>To</div>
+          <div>By</div>
+        </div>
+
+        {% if issue.status_history %}
+          {% for h in issue.status_history %}
+            <div class="trow--four">
+              <div>{{ h.changed_at }}</div>
+              <div>{{ h.from_status.label if h.from_status else "—" }}</div>
+              <div>{{ h.to_status.label }}</div>
+              <div>{{ h.changed_by or "—" }}</div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <div class="trow--four">
+            <div>-</div><div>-</div><div>-</div><div>-</div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div> {# end .issue-layout #}
+
+  {# Full-width: Add update form #}
   <div class="card" style="margin-top:16px;">
     <h3 style="margin-top:0;">Add update</h3>
 
