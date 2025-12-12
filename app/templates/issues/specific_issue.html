@@ -47,8 +47,8 @@
             <label style="font-weight:bold;">Opened</label>
             {% set time, date = issue.created_at | format_dt %}
             <div class="pill">
-                {{ time }}
                 <div class="muted">{{ date }}</div>
+                {{ time }}
             </div>
           </div>
         </div>
@@ -58,8 +58,8 @@
             <label style="font-weight:bold;">Last update</label>
             {% set time, date = issue.last_action_at | format_dt %}
             <div class="pill">
-                {{ time }}
                 <div class="muted">{{ date }}</div>
+                {{ time }}
             </div>
           </div>
 
@@ -67,8 +67,8 @@
             <label style="font-weight:bold;">Closed</label>
               {% set time, date = issue.closed_at | format_dt %}
             <div class="pill">
-                {{ time }}
                 <div class="muted">{{ date }}</div>
+                {{ time }}
             </div>
           </div>
         </div>
