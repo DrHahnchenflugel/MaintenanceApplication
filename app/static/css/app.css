@@ -31,7 +31,7 @@
 html,
 body {
     height: 100%;
-    overflow: hidden; /* page scroll handled inside .content */
+    overflow: hidden; /* scrolling handled inside .content */
 }
 
 body {
@@ -46,7 +46,6 @@ a {
     text-decoration: none;
 }
 
-/* minor helpers */
 #assetForm {
     display: contents;
 }
@@ -174,8 +173,6 @@ a {
    3. GENERIC UI ELEMENTS (CARDS, ROW/COLUMN, BADGES, BUTTONS)
    ========================================================= */
 
-/* Layout helpers */
-
 .row {
     display: flex;
     gap: 16px;
@@ -187,8 +184,6 @@ a {
     flex-direction: column;
     gap: 16px;
 }
-
-/* Cards */
 
 .card {
     background: var(--panel);
@@ -330,20 +325,6 @@ a {
     z-index: 1000;
 }
 
-/* Misc UI */
-
-.actions {
-    display: flex;
-    gap: 0.5rem;
-    justify-content: flex-end;
-    margin-top: 1rem;
-}
-
-.full-logo {
-    width: clamp(96px, 8vw, 10000px);
-    height: auto;
-}
-
 
 /* =========================================================
    4. TABLES & ISSUE-SPECIFIC TABLE LAYOUTS
@@ -364,7 +345,6 @@ a {
 }
 
 /* 3-column table (When / Type / Details) */
-
 .thead--three,
 .trow--three {
     display: grid;
@@ -376,7 +356,6 @@ a {
 }
 
 /* 4-column table (When / From / To / By) */
-
 .thead--four,
 .trow--four {
     display: grid;
@@ -388,7 +367,6 @@ a {
 }
 
 /* 6-column table variant */
-
 .thead--six,
 .trow--six {
     display: grid;
@@ -400,7 +378,6 @@ a {
 }
 
 /* sticky headers */
-
 .thead--six,
 .thead--four,
 .thead--three {
@@ -429,44 +406,35 @@ a {
    5. ISSUE DETAIL PAGE LAYOUT
    ========================================================= */
 
-/* Grid that arranges issue, photos, right column, and actions */
-
+/* 3×3 grid:
+   row1: issue-main | issue-image | asset-main
+   row2: actions    | actions     | status-card
+   row3: actions    | actions     | update-form
+*/
 .issue-layout {
     display: grid;
     gap: 16px;
-    grid-template-columns: 2fr 2fr 1.5fr;
-    grid-template-rows: 30vh 1fr;  /* top row, bottom row */
-    grid-template-areas:
-        "issue-main  issue-image  right-col"
-        "actions     actions      update-form";
-    align-items: stretch;
-    min-height: 0;
-}
 
-.update-form {
-    grid-area: update-form;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
+    grid-template-columns: 2fr 2fr 1.5fr;
+    grid-template-rows: 30vh 30vh auto;
+
+    grid-template-areas:
+        "issue-main  issue-image  asset-main"
+        "actions     actions      status-card"
+        "actions     actions      update-form";
+
+    align-items: stretch;
     min-height: 0;
 }
 
 .issue-main   { grid-area: issue-main; }
 .issue-image  { grid-area: issue-image; }
+.asset-main   { grid-area: asset-main; }
+.status-card  { grid-area: status-card; }
+.update-form  { grid-area: update-form; }
 .actions-card { grid-area: actions; }
 
-/* Right column wrapper (asset + status) */
-
-.right-col {
-    grid-area: right-col;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    min-height: 0;
-}
-
-/* ---------- Issue main card ---------- */
-
+/* issue main card scroll */
 .issue-main {
     display: flex;
     flex-direction: column;
@@ -492,14 +460,7 @@ a {
     min-height: 0;
 }
 
-/* ---------- Photos card ---------- */
-
-.issue-image {
-    /* card styles inherited; nothing special needed */
-}
-
-/* ---------- Actions & Status cards ---------- */
-
+/* actions & status are flex columns with scrollable tables */
 .actions-card,
 .status-card {
     display: flex;
@@ -508,18 +469,19 @@ a {
     min-height: 0;
 }
 
-/* ---------- Asset card inside right column ---------- */
+/* update-form: just a card in the grid; no internal scroll needed */
 
-.asset-main {
-    /* standard card; height driven by content */
+/* Photos */
+.issue-image {
+    /* nothing special; inherits .card */
 }
 
+/* Asset card layout */
 .asset-main-body {
     display: grid;
-    grid-template-columns: 1.2fr 1fr;   /* left = fields, right = image */
+    grid-template-columns: 1.2fr 1fr;
     gap: 12px;
     margin-top: 12px;
-    flex: 0 0 auto; /* keep this compact; don't stretch */
     overflow: hidden;
 }
 
@@ -536,12 +498,7 @@ a {
     align-items: flex-start;
 }
 
-.asset-image .image-placeholder--small {
-    width: 100%;
-}
-
-/* responsive reflow for small screens */
-
+/* Responsive reflow for smaller screens */
 @media (max-width: 960px) {
     .issue-layout {
         grid-template-columns: 1fr;
@@ -549,14 +506,16 @@ a {
         grid-template-areas:
             "issue-main"
             "issue-image"
-            "right-col"
+            "asset-main"
+            "status-card"
+            "update-form"
             "actions";
     }
 }
 
 
 /* =========================================================
-   6. IMAGES & PLACEHOLDERS
+   6. IMAGE PLACEHOLDERS
    ========================================================= */
 
 .image-placeholder {
@@ -584,11 +543,8 @@ a {
 /* =========================================================
    7. MISC / OTHER LAYOUTS (NON-ISSUE PAGES)
    ========================================================= */
-/* These are used on other pages (asset overview, dashboards, etc.)
-   and kept here but separated so they don't clutter the issue layout.
-   --------------------------------------------------------- */
 
-/* Generic container (if used elsewhere) */
+/* Generic container used elsewhere */
 .container {
     display: flex;
 }
@@ -610,7 +566,7 @@ a {
     overflow-y: auto;
 }
 
-/* 4-column + position table (used only where referenced) */
+/* 4-column + position table (if you use it) */
 .trow--four_three_position {
     display: grid;
     grid-template-columns: 240px 1fr 0.5fr 0.5fr;
@@ -620,8 +576,7 @@ a {
     border-bottom: 1px solid var(--line);
 }
 
-/* Asset overview page grid */
-
+/* Asset overview page grid (other screen) */
 .asset-layout {
     display: grid;
     gap: 16px;
