@@ -3,12 +3,6 @@ from flask import Flask
 from .routes import register_blueprints
 from .health import health_bp
 
-def format_dt(dt):
-    if not dt:
-        return ""
-    return dt.strftime("%H:%M"), dt.strftime("%d-%m-%Y")
-app.jinja_env.filters["format_dt"] = format_dt
-
 def initialise_application():
     from dotenv import load_dotenv
     load_dotenv()
@@ -18,6 +12,7 @@ def initialise_application():
         static_folder = "static",
         static_url_path = "/maintenance/static"
     )
+
     register_blueprints(app)
     app.register_blueprint(health_bp, url_prefix="/maintenance")
     app.secret_key = os.environ["FLASK_SECRET"]
