@@ -7,6 +7,10 @@ bp = Blueprint("api_v2", __name__, url_prefix="/maintenance/api/v2")
 # Import modules so they register routes on this blueprint
 from . import asset     # noqa: F401
 from . import issues    # noqa: F401
+from . import health    # noqa: F401
+from . import sites     # noqa: F401
+from . import asset_statuses #noqa:F401
+from . import asset_categories #noqa:F401
 
 @bp.route("/", methods=["GET"])
 def api_v2_root():
