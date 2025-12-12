@@ -72,23 +72,26 @@
 
     {# Top-right: Asset info (+ generic image) #}
     <div class="card asset-main">
-      <div style="display:flex;justify-content:space-between;align-items:center;">
-        <h3 style="margin:0;">Asset</h3>
-      </div>
+      <h3 style="margin:0;">Asset</h3>
+      <div class="asset-main-body">
+        <div class="asset-fields">
+          <div class="field">
+            <label style="font-weight:bold;">Tag</label>
+            <div class="pill">{{ issue.asset.asset_tag }}</div>
+          </div>
 
-      <div class="field" style="margin-top:12px;">
-        <label style="font-weight:bold;">Tag</label>
-        <div class="pill">{{ issue.asset.asset_tag }}</div>
-      </div>
+          <div class="field">
+            <label style="font-weight:bold;">Site ID</label>
+            <div class="pill">{{ issue.asset.site_id or "—" }}</div>
+          </div>
+        </div>
 
-      <div class="field" style="margin-top:12px;">
-        <label style="font-weight:bold;">Site ID</label>
-        <div class="pill">{{ issue.asset.site_id or "—" }}</div>
-      </div>
+        <div class="asset-image">
+          <div class="image-placeholder image-placeholder--small">
+            GENERIC IMAGE FOR THIS MAKE / MODEL / VARIANT
+          </div>
+        </div>
 
-      {# slot for generic make/model image #}
-      <div class="image-placeholder image-placeholder--small">
-        GENERIC IMAGE FOR THIS MAKE / MODEL / VARIANT
       </div>
     </div>
 
