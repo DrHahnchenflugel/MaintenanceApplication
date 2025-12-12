@@ -424,8 +424,9 @@ a {
     gap: 16px;
 
     grid-template-columns: 2fr 2fr 1.5fr;
-    /* Let rows grow with content; bottom cards’ min-heights will drive height */
-    grid-template-rows: auto auto;
+
+    /* Top row ~45% of viewport, bottom row ~40% (rest is header/footer) */
+    grid-template-rows: minmax(0, 45vh) minmax(0, 40vh);
 
     grid-template-areas:
         "issue-main  issue-image  right-col"
@@ -437,22 +438,13 @@ a {
 
 .issue-main   { grid-area: issue-main; }
 .issue-image  { grid-area: issue-image; }
-
 .actions-card {
-    grid-area: actions;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    min-height: 32vh;   /* taller actions area */
+    /* min-height: 32vh; */
 }
-
-.right-col {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    min-height: 0;
-    overflow: hidden;
-}
+.right-col    { grid-area: right-col; }
 
 /* Issue main card scrolls internally */
 .issue-main {
@@ -460,7 +452,7 @@ a {
     flex-direction: column;
     overflow: hidden;
     min-height: 0;
-    flex: 1 1 0;
+    /* flex: 1 1 0; */
 }
 
 .issue-main-header {
@@ -500,12 +492,12 @@ a {
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    min-height: 26vh;   /* taller than before */
+    /* min-height: 26vh; */
 }
 
 /* Add update: slightly taller than before */
 .update-form {
-    min-height: 18vh;   /* small bump in height */
+    /* min-height: 18vh; */
 }
 
 /* Tables inside flex cards take available height and scroll */
