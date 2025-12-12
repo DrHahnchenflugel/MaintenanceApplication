@@ -94,6 +94,7 @@ a {
     position: sticky;
     top: 0;
     height: 100dvh;
+    overflow: hidden;   /* <- add this */
 }
 
 .brand {
@@ -323,6 +324,14 @@ a {
     bottom: 20px;
     right: 20px;
     z-index: 1000;
+}
+
+/* logo */
+.full-logo {
+    display: block;
+    width: clamp(96px, 8vw, 180px);
+    height: auto;
+    margin: 0 auto;
 }
 
 
