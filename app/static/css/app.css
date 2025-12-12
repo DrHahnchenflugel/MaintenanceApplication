@@ -357,9 +357,9 @@ a {
 .thead--three,
 .trow--three {
     display: grid;
-    grid-template-columns: 240px 1fr 1fr;
+    grid-template-columns: 200px 120px 1fr;
     gap: 12px;
-    align-items: center;
+    align-items: flex-start;
     padding: 10px 14px;
     border-bottom: 1px solid var(--line);
 }
