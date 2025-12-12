@@ -87,27 +87,29 @@
         </script>
 
         <script>
-            const siteCache = new Map();
-            async function getSite(siteId) {
-              if (!siteId) return null;
+          const siteCache = new Map();
 
-              if (siteCache.has(siteId)) {
-                return siteCache.get(siteId);
-              }
+          async function getSite(siteId) {
+            if (!siteId) return null;
 
-              const res = await fetch(
-                `/maintenance/api/v2/sites/${siteId}`
-              );
+            const cleanId = String(siteId).trim();
+            if (!cleanId) return null;
 
-              if (!res.ok) {
-                console.warn("Failed to fetch site", siteId);
-                return null;
-              }
-
-              const site = await res.json();
-              siteCache.set(siteId, site);
-              return site;
+            if (siteCache.has(cleanId)) {
+              return siteCache.get(cleanId);
             }
+
+            const res = await fetch(`/maintenance/api/v2/sites/${encodeURIComponent(cleanId)}`);
+
+            if (!res.ok) {
+              console.warn("Failed to fetch site", cleanId, res.status);
+              return null;
+            }
+
+            const site = await res.json();
+            siteCache.set(cleanId, site);
+            return site;
+          }
         </script>
     </body>
 </html>
