@@ -85,5 +85,29 @@
             if (e.key === "Escape") closeImgModal();
           });
         </script>
+
+        <script>
+            const siteCache = new Map();
+            async function getSite(siteId) {
+              if (!siteId) return null;
+
+              if (siteCache.has(siteId)) {
+                return siteCache.get(siteId);
+              }
+
+              const res = await fetch(
+                `/maintenance/api/v2/sites/${siteId}`
+              );
+
+              if (!res.ok) {
+                console.warn("Failed to fetch site", siteId);
+                return null;
+              }
+
+              const site = await res.json();
+              siteCache.set(siteId, site);
+              return site;
+            }
+        </script>
     </body>
 </html>

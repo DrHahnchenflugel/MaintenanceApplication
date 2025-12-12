@@ -115,9 +115,13 @@
               <div class="pill">{{ issue.asset.asset_tag }}</div>
             </div>
 
-            <div class="field">
-              <label style="font-weight:bold;">Site ID</label>
-              <div class="pill">{{ issue.asset.site_id or "—" }}</div>
+            <div
+              class="field"
+              x-data="{ site: null }"
+              x-init="site = await getSite('{{ issue.asset.site_id }}')"
+            >
+              <label style="font-weight:bold;">Site</label>
+              <div class="pill" x-text="site?.fullname ?? '—'"></div>
             </div>
           </div>
 
