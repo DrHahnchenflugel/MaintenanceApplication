@@ -319,7 +319,7 @@ a{
     display: grid;
     gap: 16px;
     grid-template-columns: 2fr 2fr 1.5fr;
-    grid-template-rows: minmax(0, 220px) minmax(0, 260px);
+    grid-template-rows: 350px 350px;
     grid-template-areas:
         "issue-main  issue-image  asset-main"
         "actions     actions      status";
