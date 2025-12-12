@@ -326,7 +326,22 @@ a{
     align-items: stretch;
 }
 
-.issue-main   { grid-area: issue-main; }
+.issue-main {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;      /* clip to the card height from the grid */
+}
+
+.issue-main-header {
+    flex: 0 0 auto;        /* title + status pill */
+}
+
+.issue-main-scroll {
+    flex: 1 1 auto;        /* take remaining card height */
+    overflow-y: auto;      /* scroll inside the card */
+    margin-top: 12px;      /* spacing under header */
+}
+
 .issue-image  { grid-area: issue-image; }
 .asset-main   { grid-area: asset-main; }
 .actions-card { grid-area: actions; }
