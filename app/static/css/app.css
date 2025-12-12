@@ -357,11 +357,11 @@ a{
     font-size: .9rem;
     color: var(--muted);
     text-align: center;
-    padding: 16px;
+    padding: 8px;
 }
 
 .image-placeholder--large {
-    height: 20vh;
+    height: 24vh;
 }
 
 .image-placeholder--small {
