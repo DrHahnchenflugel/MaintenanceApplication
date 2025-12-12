@@ -354,7 +354,7 @@ def get_issue_attachment(issue_id: str):
     Return attachment metadata for an issue, or None.
     Expected keys: filepath, content_type
     """
-    return issues_db.get_issue_attachment_by_issue_id(issue_id)
+    return issue_db.get_issue_attachment_by_issue_id(issue_id)
 
 def add_issue_attachment(issue_id: str, file):
     if file is None or file.filename == "":
@@ -366,12 +366,12 @@ def add_issue_attachment(issue_id: str, file):
         raise ValueError("Missing content type")
 
     # Pull allowed types from DB
-    allowed_types = issues_db.list_accepted_attachment_content_types()
+    allowed_types = issue_db.list_accepted_attachment_content_types()
     if content_type not in allowed_types:
         raise ValueError(f"Unsupported content type: {content_type}")
 
     # Enforce 1 attachment per issue
-    existing = issues_db.get_issue_attachment_by_issue_id(issue_id)
+    existing = issue_db.get_issue_attachment_by_issue_id(issue_id)
     if existing:
         raise ValueError("Issue already has an attachment")
 
@@ -394,14 +394,14 @@ def add_issue_attachment(issue_id: str, file):
 
     file.save(abs_path)
 
-    return issues_db.create_issue_attachment(
+    return issue_db.create_issue_attachment(
         issue_id=issue_id,
         filepath=rel_path,
         content_type=content_type,
     )
 
 def list_accepted_attachment_content_types():
-    return issues_db.list_accepted_attachment_content_types()
+    return issue_db.list_accepted_attachment_content_types()
 
 def create_accepted_attachment_content_type(data: dict):
     content_type = (data.get("content_type") or "").strip().lower()
@@ -412,9 +412,9 @@ def create_accepted_attachment_content_type(data: dict):
     if "/" not in content_type:
         raise ValueError("Invalid MIME type format")
 
-    return issues_db.create_accepted_attachment_content_type(content_type)
+    return issue_db.create_accepted_attachment_content_type(content_type)
 
 def delete_accepted_attachment_content_type(content_type: str):
-    ok = issues_db.delete_accepted_attachment_content_type(content_type)
+    ok = issue_db.delete_accepted_attachment_content_type(content_type)
     if not ok:
         raise ValueError("Content type not found")
