@@ -61,7 +61,6 @@
       </div>
     </div>
 
-
     {# Top-middle: big image box #}
     <div class="card issue-image">
       <h3 style="margin-top:0;">Photos</h3>
@@ -70,32 +69,65 @@
       </div>
     </div>
 
-    {# Top-right: Asset info (+ generic image) #}
-    <div class="card asset-main">
-      <h3 style="margin:0;">Asset</h3>
-      <div class="asset-main-body">
-        <div class="asset-fields">
-          <div class="field">
-            <label style="font-weight:bold;">Tag</label>
-            <div class="pill">{{ issue.asset.asset_tag }}</div>
+    {# Right column: Asset (top) + Status (bottom) #}
+    <div class="right-col">
+
+      {# Asset info + MMV image #}
+      <div class="card asset-main">
+        <h3 style="margin:0;">Asset</h3>
+        <div class="asset-main-body">
+          <div class="asset-fields">
+            <div class="field">
+              <label style="font-weight:bold;">Tag</label>
+              <div class="pill">{{ issue.asset.asset_tag }}</div>
+            </div>
+
+            <div class="field">
+              <label style="font-weight:bold;">Site ID</label>
+              <div class="pill">{{ issue.asset.site_id or "—" }}</div>
+            </div>
           </div>
 
-          <div class="field">
-            <label style="font-weight:bold;">Site ID</label>
-            <div class="pill">{{ issue.asset.site_id or "—" }}</div>
+          <div class="asset-image">
+            <div class="image-placeholder image-placeholder--small">
+              GENERIC IMAGE FOR THIS MAKE / MODEL / VARIANT
+            </div>
           </div>
         </div>
-
-        <div class="asset-image">
-          <div class="image-placeholder image-placeholder--small">
-            GENERIC IMAGE FOR THIS MAKE / MODEL / VARIANT
-          </div>
-        </div>
-
       </div>
-    </div>
 
-    {# Bottom-left: Actions table #}
+      {# Status changes (fills the rest of right column) #}
+      <div class="card status-card">
+        <h3 style="margin-top:0;">Status Changes</h3>
+
+        <div class="table table--scrollable">
+          <div class="thead--four">
+            <div>When</div>
+            <div>From</div>
+            <div>To</div>
+            <div>By</div>
+          </div>
+
+          {% if issue.status_history %}
+            {% for h in issue.status_history %}
+              <div class="trow--four">
+                <div>{{ h.changed_at }}</div>
+                <div>{{ h.from_status.label if h.from_status else "—" }}</div>
+                <div>{{ h.to_status.label }}</div>
+                <div>{{ h.changed_by or "—" }}</div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="trow--four">
+              <div>-</div><div>-</div><div>-</div><div>-</div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+
+    </div> {# end .right-col #}
+
+    {# Bottom-left: Actions table (separate grid area) #}
     <div class="card actions-card">
       <h3 style="margin-top:0;">Actions</h3>
 
@@ -120,35 +152,6 @@
         {% else %}
           <div class="trow--three">
             <div>-</div><div>-</div><div>No actions yet.</div>
-          </div>
-        {% endif %}
-      </div>
-    </div>
-
-    {# Bottom-right: Status changes table #}
-    <div class="card status-card">
-      <h3 style="margin-top:0;">Status Changes</h3>
-
-      <div class="table table--scrollable">
-        <div class="thead--four">
-          <div>When</div>
-          <div>From</div>
-          <div>To</div>
-          <div>By</div>
-        </div>
-
-        {% if issue.status_history %}
-          {% for h in issue.status_history %}
-            <div class="trow--four">
-              <div>{{ h.changed_at }}</div>
-              <div>{{ h.from_status.label if h.from_status else "—" }}</div>
-              <div>{{ h.to_status.label }}</div>
-              <div>{{ h.changed_by or "—" }}</div>
-            </div>
-          {% endfor %}
-        {% else %}
-          <div class="trow--four">
-            <div>-</div><div>-</div><div>-</div><div>-</div>
           </div>
         {% endif %}
       </div>
