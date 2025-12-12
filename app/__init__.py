@@ -15,7 +15,7 @@ def initialise_application():
 
     def format_dt(dt):
         if not dt:
-            return ""
+            return ["",""]
         return dt.strftime("%H:%M"), dt.strftime("%d-%m-%Y")
 
     app.jinja_env.filters["format_dt"] = format_dt
