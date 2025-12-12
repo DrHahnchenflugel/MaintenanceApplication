@@ -441,13 +441,13 @@ a {
 .issue-image  { grid-area: issue-image; }
 .actions-card {
     grid-area: actions;
-    grid-column: 1 / 3;      /* ← span column 1 and 2 explicitly */
+    grid-column: 1 / 3;
     display: flex;
     flex-direction: column;
+    height: 40vh;
+    min-height: 40vh;
     overflow: hidden;
-    min-height: 32vh;        /* keep it tall */
 }
-
 
 .issue-main,
 .issue-image {
@@ -502,8 +502,9 @@ a {
 .status-card {
     display: flex;
     flex-direction: column;
+    height: 28vh;
+    min-height: 28vh;
     overflow: hidden;
-    /* min-height: 26vh; */
 }
 
 /* Add update: slightly taller than before */
