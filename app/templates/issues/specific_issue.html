@@ -45,14 +45,22 @@
 
           <div class="field" style="flex:1;">
             <label style="font-weight:bold;">Opened</label>
-            <div class="pill">{{ issue.created_at }}</div>
+            {% set time, date = issue.created_at | format_dt %}
+            <div class="pill">
+                {{ time }}
+                <div class="muted">{{ date }}</div>
+            </div>
           </div>
         </div>
 
         <div class="row" style="gap:12px;margin-top:12px;">
           <div class="field" style="flex:1;">
             <label style="font-weight:bold;">Last update</label>
-            <div class="pill">{{ issue.last_action_at or "—" }}</div>
+            {% set time, date = issue.last_action_at | format_dt %}
+            <div class="pill">
+                {{ time }}
+                <div class="muted">{{ date }}</div>
+            </div>
           </div>
 
           <div class="field" style="flex:1;">
