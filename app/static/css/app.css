@@ -422,9 +422,10 @@ a {
 .issue-layout {
     display: grid;
     gap: 16px;
-
     grid-template-columns: 2fr 2fr 1.5fr;
-    grid-template-rows: 35vh auto;
+
+    /* NEW — proportional heights */
+    grid-template-rows: 0.9fr 1.4fr;
 
     grid-template-areas:
         "issue-main  issue-image  right-col"
@@ -432,12 +433,27 @@ a {
 
     align-items: stretch;
     min-height: 0;
+    flex: 1 1 auto;
 }
 
 .issue-main   { grid-area: issue-main; }
 .issue-image  { grid-area: issue-image; }
-.actions-card { grid-area: actions; }
-.right-col    { grid-area: right-col; }
+
+.actions-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+    flex: 1.3 1 0;
+}
+
+.right-col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 0;
+    overflow: hidden;
+}
 
 /* Issue main card scrolls internally */
 .issue-main {
@@ -445,6 +461,7 @@ a {
     flex-direction: column;
     overflow: hidden;
     min-height: 0;
+    flex: 1 1 0;
 }
 
 .issue-main-header {
@@ -482,20 +499,23 @@ a {
     overflow: hidden;
 }
 
+/* Asset small fixed-ish height */
 .asset-main {
-    /* natural height, no flex needed */
+    flex: 0 0 auto;
 }
 
+/* Status changes: biggest */
 .status-card {
-    flex: 1 1 0;
+    flex: 1.6 1 0;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     min-height: 0;
 }
 
+/* Add update: slightly taller than before */
 .update-form {
-    /* sits at the bottom of the column */
+    flex: 1 1 0;
 }
 
 /* Tables inside flex cards take available height and scroll */
