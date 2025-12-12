@@ -500,9 +500,43 @@ a {
 }
 
 .issue-main,
-.issue-image {
-    min-height: 0;
-    height: 100%;
+/* Make the Photos card use its full height for the image area */
+.issue-image{
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+/* The frame takes all remaining height under the h3 */
+.issue-photo-frame{
+  flex: 1 1 auto;
+  min-height: 0;
+  margin-top: 12px;
+}
+
+/* Button fills the frame */
+.photo-thumb-btn{
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: zoom-in;
+}
+
+/* Image fills the frame without distortion */
+.photo-thumb{
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: contain;   /* change to cover if you want cropping */
+  border-radius: 8px;
+}
+
+/* Placeholder that actually fills the frame */
+.image-placeholder--fill{
+  width: 100%;
+  height: 100%;
 }
 
 .right-col    { grid-area: right-col; }

@@ -77,14 +77,27 @@
        ───────────────────────────── #}
     <div class="card issue-image">
       <h3 style="margin-top:0;">Photos</h3>
-      <div class="image-placeholder image-placeholder--large">
-          {% if issue.get("id") %}
-          <img
-              src="/maintenance/api/v2/issues/{{ issue['id'] }}/attachment"
-              alt="NO IMAGE"
-              style="max-width: 100%; border-radius: 8px;"
+
+      <div class="issue-photo-frame">
+        {% if issue.get("attachment") %}
+          <button
+            type="button"
+            class="photo-thumb-btn"
+            onclick="openImgModal('/maintenance/api/v2/issues/{{ issue['id'] }}/attachment')"
+            aria-label="Open issue photo"
           >
-          {% endif %}
+            <img
+              class="photo-thumb"
+              src="/maintenance/api/v2/issues/{{ issue['id'] }}/attachment"
+              alt="Issue photo"
+              loading="lazy"
+            />
+          </button>
+        {% else %}
+          <div class="image-placeholder image-placeholder--fill">
+            No photo
+          </div>
+        {% endif %}
       </div>
     </div>
 
