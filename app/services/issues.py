@@ -356,49 +356,65 @@ def get_issue_attachment(issue_id: str):
     """
     return issue_db.get_issue_attachment_by_issue_id(issue_id)
 
-def add_issue_attachment(issue_id: str, file):
-    if file is None or file.filename == "":
-        raise ValueError("No file provided")
+def add_issue_attachment(issue_id: str, file_storage):
+    # file_storage is request.files.get("file")
 
-    # MIME type from Werkzeug (browser-provided but still useful)
-    content_type = file.mimetype
+    if file_storage is None or not getattr(file_storage, "filename", ""):
+        raise ValueError("Missing file")
+
+    content_type = (file_storage.mimetype or "").lower().strip()
     if not content_type:
         raise ValueError("Missing content type")
 
-    # Pull allowed types from DB
-    allowed_types = issue_db.list_accepted_attachment_content_types()
-    if content_type not in allowed_types:
+    accepted = set(issues_db.list_accepted_attachment_content_types())
+    if content_type not in accepted:
         raise ValueError(f"Unsupported content type: {content_type}")
 
-    # Enforce 1 attachment per issue
-    existing = issue_db.get_issue_attachment_by_issue_id(issue_id)
+    existing = issues_db.get_issue_attachment_by_issue_id(issue_id)
     if existing:
         raise ValueError("Issue already has an attachment")
 
-    # Use filename ONLY to infer extension for storage
-    filename = secure_filename(file.filename)
-    if "." not in filename:
-        raise ValueError("File must have an extension")
+    attachment_root = current_app.config.get("ATTACHMENT_ROOT", "/tmp/attachments")
 
-    ext = filename.rsplit(".", 1)[1].lower()
+    ext_map = {
+        "image/jpeg": "jpg",
+        "image/png": "png",
+        "image/webp": "webp",
+    }
+    ext = ext_map.get(content_type)
+    if not ext:
+        raise ValueError(f"Unsupported content type: {content_type}")
 
-    root = current_app.config["ATTACHMENT_ROOT"]
-
-    # Storage layout: issues/<issue_id>/attachment.<ext>
     rel_dir = f"issues/{issue_id}"
-    abs_dir = os.path.join(root, rel_dir)
+    rel_path = f"{rel_dir}/attachment.{ext}"
+
+    abs_dir = os.path.join(attachment_root, rel_dir)
+    abs_path = os.path.join(attachment_root, rel_path)
+
     os.makedirs(abs_dir, exist_ok=True)
 
-    rel_path = f"{rel_dir}/attachment.{ext}"
-    abs_path = os.path.join(root, rel_path)
+    # CRITICAL: rewind stream (fixes 0-byte save after any prior reads)
+    try:
+        file_storage.stream.seek(0)
+    except Exception:
+        pass
 
-    file.save(abs_path)
+    file_storage.save(abs_path)
 
-    return issue_db.create_issue_attachment(
+    # Guardrail: fail fast if file saved empty
+    if not os.path.isfile(abs_path) or os.path.getsize(abs_path) == 0:
+        try:
+            os.remove(abs_path)
+        except Exception:
+            pass
+        raise ValueError("Uploaded file saved as 0 bytes")
+
+    row = issues_db.create_issue_attachment(
         issue_id=issue_id,
         filepath=rel_path,
         content_type=content_type,
     )
+    return row
 
 def list_accepted_attachment_content_types():
     return issue_db.list_accepted_attachment_content_types()

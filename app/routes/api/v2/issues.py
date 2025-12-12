@@ -113,25 +113,15 @@ def get_issue_attachment(issue_id):
 
 @bp.route("/issues/<issue_id>/attachment", methods=["POST"])
 def upload_issue_attachment(issue_id):
-    issue_id = parse_uuid_path(issue_id, "issue_id")
+    issue_id = validate_uuid_path(issue_id, "issue_id")
 
-    if "file" not in request.files:
-        abort(400, description="Missing file")
-
-    file = request.files["file"]
-
+    f = request.files.get("file")
     try:
-        result = issue_service.add_issue_attachment(issue_id, file)
+        row = issue_service.add_issue_attachment(issue_id, f)
     except ValueError as e:
         abort(400, description=str(e))
 
-    return jsonify({
-        "issue_id": issue_id,
-        "attachment": {
-            "content_type": result["content_type"],
-            "filename": result["filepath"].split("/")[-1],
-        },
-    }), 201
+    return jsonify(row), 201
 
 @bp.route("/attachment-content-types", methods=["GET"])
 def list_attachment_content_types():
