@@ -359,9 +359,15 @@ a {
     display: grid;
     grid-template-columns: 200px 120px 1fr;
     gap: 12px;
-    align-items: flex-start;
+    align-items: start;
     padding: 10px 14px;
     border-bottom: 1px solid var(--line);
+}
+
+.trow--three div:nth-child(3),
+.thead--three div:nth-child(3) {
+    white-space: normal;
+    word-break: break-word;
 }
 
 /* 4-column table (When / From / To / By) */
