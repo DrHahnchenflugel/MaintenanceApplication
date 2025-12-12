@@ -127,10 +127,11 @@
             {% for h in issue.status_history %}
               <div class="trow--status">
                 {% set time, date = h.changed_at | format_dt %}
-                <div>
+                <div class="status-when">
                     <div class="muted">{{ date }}</div>
                     {{ time }}
                 </div>
+
                 <div>{{ h.to_status.label }}</div>
               </div>
             {% endfor %}
@@ -206,10 +207,12 @@
           {% for a in issue.actions %}
             <div class="trow--three">
               {% set time, date = a.created_at | format_dt %}
-              <div>
+
+              <div class="status-when">
                 <div class="muted">{{ date }}</div>
                 {{ time }}
               </div>
+
               <div>{{ a.type.label }}</div>
               <div>
                 <div style="white-space:pre-wrap;">{{ a.body }}</div>
