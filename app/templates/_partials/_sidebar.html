@@ -6,11 +6,11 @@
 
     <hr style="border: 1px solid #ccc; margin: 20px 0;">
     <nav class="nav">
-        <a href="{{ url_for('app.dashboard') }}" class="{{ 'is-active' if request.endpoint == 'app.dashboard' else 'not-active' }}">Dashboard</a>
-        <a href="{{ url_for('app.issues_list', f='active') }}" class="{{ 'is-active' if request.endpoint == 'app.issues_active' else 'not-active' }}">Active Issues</a>
-        <a href="{{ url_for('app.issues_list', f='closed') }}" class="not-active">Past Issues</a>
-        <a href="{{ url_for('app.issues_list', f='blocked') }}" class="not-active">Blocked Issues</a>
-        <a href="{{ url_for('app.assets_list') }}" class="{{ 'is-active' if request.endpoint == 'app.assets' else 'not-active' }}">Inventory</a>
+        <a href="#" class="{{ 'is-active' if request.endpoint == 'app.dashboard' else 'not-active' }}">Dashboard</a>
+        <a href="#" class="{{ 'is-active' if request.endpoint == 'app.issues_active' else 'not-active' }}">Active Issues</a>
+        <a href="#" class="not-active">Past Issues</a>
+        <a href="#" class="not-active">Blocked Issues</a>
+        <a href="#" class="{{ 'is-active' if request.endpoint == 'app.assets' else 'not-active' }}">Inventory</a>
         <a href="#" class="not-active">Settings</a>
     </nav>
 </aside>
