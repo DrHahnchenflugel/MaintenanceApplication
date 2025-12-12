@@ -5,10 +5,10 @@ def list_site_rows():
     sql = text("""
         SELECT
             id,
-            code,
-            name
+            shorthand,
+            fullname
         FROM site
-        ORDER BY name ASC, code ASC
+        ORDER BY fullname ASC, shorthand ASC
     """)
 
     with get_connection() as conn:

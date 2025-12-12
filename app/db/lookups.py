@@ -17,15 +17,14 @@ def list_asset_status_rows():
 
     return [dict(r) for r in rows]
 
-def list_asset_category_rows():
+def list_category_rows():
     sql = text("""
         SELECT
             id,
-            code,
-            label,
-            display_order
-        FROM asset_category
-        ORDER BY display_order ASC, code ASC
+            name,
+            label
+        FROM category
+        ORDER BY label ASC, name ASC
     """)
 
     with get_connection() as conn:
