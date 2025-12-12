@@ -366,11 +366,11 @@ def add_issue_attachment(issue_id: str, file_storage):
     if not content_type:
         raise ValueError("Missing content type")
 
-    accepted = set(issues_db.list_accepted_attachment_content_types())
+    accepted = set(issue_db.list_accepted_attachment_content_types())
     if content_type not in accepted:
         raise ValueError(f"Unsupported content type: {content_type}")
 
-    existing = issues_db.get_issue_attachment_by_issue_id(issue_id)
+    existing = issue_db.get_issue_attachment_by_issue_id(issue_id)
     if existing:
         raise ValueError("Issue already has an attachment")
 
@@ -409,7 +409,7 @@ def add_issue_attachment(issue_id: str, file_storage):
             pass
         raise ValueError("Uploaded file saved as 0 bytes")
 
-    row = issues_db.create_issue_attachment(
+    row = issue_db.create_issue_attachment(
         issue_id=issue_id,
         filepath=rel_path,
         content_type=content_type,
