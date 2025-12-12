@@ -89,7 +89,7 @@ def get_issue(issue_id):
 def get_issue_attachment(issue_id):
     issue_id = parse_uuid_path(issue_id, "issue_id")
 
-    row = issues_service.get_issue_attachment(issue_id)
+    row = issue_service.get_issue_attachment(issue_id)
     if not row:
         abort(404, description="No attachment for this issue")
 
