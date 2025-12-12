@@ -126,6 +126,7 @@ def get_issue(issue_id: str):
             "asset_tag": r["asset_tag"],
             "site_id": r["site_id"],
         },
+        "has_attachment": issue_db.get_issue_attachment_by_issue_id(issue_id=issue_id) is not None,
         "reported_by": r["reported_by"],
         "created_at": r["created_at"],
         "updated_at": r["updated_at"],
