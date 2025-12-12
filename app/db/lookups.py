@@ -1,25 +1,34 @@
-from app.db.db import query_all
+from sqlalchemy import text
+from app.db.connection import get_connection
 
-def list_asset_statuses():
-    sql = """
-        select
-            asset_status_id,
+def list_asset_status_rows():
+    sql = text("""
+        SELECT
+            id,
             code,
-            display_name,
+            label,
             display_order
-        from asset_statuses
-        order by display_order asc, display_name asc
-    """
-    return query_all(sql)
+        FROM asset_status
+        ORDER BY display_order ASC, code ASC
+    """)
 
-def list_asset_categories():
-    sql = """
-        select
-            asset_category_id,
+    with get_connection() as conn:
+        rows = conn.execute(sql).mappings().all()
+
+    return [dict(r) for r in rows]
+
+def list_asset_category_rows():
+    sql = text("""
+        SELECT
+            id,
             code,
-            display_name,
+            label,
             display_order
-        from asset_categories
-        order by display_order asc, display_name asc
-    """
-    return query_all(sql)
+        FROM asset_category
+        ORDER BY display_order ASC, code ASC
+    """)
+
+    with get_connection() as conn:
+        rows = conn.execute(sql).mappings().all()
+
+    return [dict(r) for r in rows]

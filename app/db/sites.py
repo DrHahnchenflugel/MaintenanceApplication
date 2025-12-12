@@ -1,14 +1,17 @@
-from app.db.db import query_all
+from sqlalchemy import text
+from app.db.connection import get_connection
 
-def list_sites(page: int = 1, page_size: int = 50):
-    offset = (page - 1) * page_size
-    sql = """
-        select
-            site_id,
-            site_code,
-            site_name
-        from sites
-        order by site_name asc
-        limit %s offset %s
-    """
-    return query_all(sql, (page_size, offset))
+def list_site_rows():
+    sql = text("""
+        SELECT
+            id,
+            code,
+            name
+        FROM site
+        ORDER BY name ASC, code ASC
+    """)
+
+    with get_connection() as conn:
+        rows = conn.execute(sql).mappings().all()
+
+    return [dict(r) for r in rows]
