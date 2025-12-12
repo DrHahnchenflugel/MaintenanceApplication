@@ -69,7 +69,7 @@
       </div>
     </div>
 
-    {# Right column: Asset (top) + Status (bottom) #}
+    {# Right column: Asset (top) + Status (middle) + Add update (bottom) #}
     <div class="right-col">
 
       {# Asset info + MMV image #}
@@ -96,7 +96,7 @@
         </div>
       </div>
 
-      {# Status changes (fills the rest of right column) #}
+      {# Status changes #}
       <div class="card status-card">
         <h3 style="margin-top:0;">Status Changes</h3>
 
@@ -123,6 +123,51 @@
             </div>
           {% endif %}
         </div>
+      </div>
+
+      {# Add update form (bottom of right column) #}
+      <div class="card update-form">
+        <h3 style="margin-top:0;">Add update</h3>
+
+        <form method="post" action="{{ url_for('app.add_issue_action', issue_id=issue.id) }}"
+              class="row" style="gap:12px;flex-wrap:wrap;">
+
+          <div class="field" style="flex:1;min-width:180px;">
+            <label style="font-weight:bold;">Action type</label>
+            <select name="action_type_code" required>
+              {% for at in action_types %}
+                <option value="{{ at.code }}">{{ at.label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="field" style="flex:1;min-width:180px;">
+            <label style="font-weight:bold;">New status (optional)</label>
+            <select name="new_status_id">
+              <option value="">(no status change)</option>
+              {% for st in status_options %}
+                <option value="{{ st.id }}">{{ st.label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="field" style="flex:1;min-width:180px;">
+            <label style="font-weight:bold;">Created by</label>
+            <input type="text" name="created_by" placeholder="Your name or initials">
+          </div>
+
+          <div class="field" style="flex-basis:100%;margin-top:12px;">
+            <label style="font-weight:bold;">Details</label>
+            <textarea name="body" rows="3" required
+                      placeholder="What did you do / what happened?"
+                      style="width:100%;"></textarea>
+          </div>
+
+          <div style="flex-basis:100%;margin-top:8px;">
+            <button type="submit" class="btn btn--ok">Save update</button>
+            <a class="btn" href="{{ url_for('app.issues_list') }}">Back to list</a>
+          </div>
+        </form>
       </div>
 
     </div> {# end .right-col #}
@@ -158,50 +203,5 @@
     </div>
 
   </div> {# end .issue-layout #}
-
-  {# Full-width: Add update form #}
-  <div class="card" style="margin-top:16px;">
-    <h3 style="margin-top:0;">Add update</h3>
-
-    <form method="post" action="{{ url_for('app.add_issue_action', issue_id=issue.id) }}"
-          class="row" style="gap:12px;flex-wrap:wrap;">
-
-      <div class="field" style="flex:1;min-width:180px;">
-        <label style="font-weight:bold;">Action type</label>
-        <select name="action_type_code" required>
-          {% for at in action_types %}
-            <option value="{{ at.code }}">{{ at.label }}</option>
-          {% endfor %}
-        </select>
-      </div>
-
-      <div class="field" style="flex:1;min-width:180px;">
-        <label style="font-weight:bold;">New status (optional)</label>
-        <select name="new_status_id">
-          <option value="">(no status change)</option>
-          {% for st in status_options %}
-            <option value="{{ st.id }}">{{ st.label }}</option>
-          {% endfor %}
-        </select>
-      </div>
-
-      <div class="field" style="flex:1;min-width:180px;">
-        <label style="font-weight:bold;">Created by</label>
-        <input type="text" name="created_by" placeholder="Your name or initials">
-      </div>
-
-      <div class="field" style="flex-basis:100%;margin-top:12px;">
-        <label style="font-weight:bold;">Details</label>
-        <textarea name="body" rows="3" required
-                  placeholder="What did you do / what happened?"
-                  style="width:100%;"></textarea>
-      </div>
-
-      <div style="flex-basis:100%;margin-top:8px;">
-        <button type="submit" class="btn btn--ok">Save update</button>
-        <a class="btn" href="{{ url_for('app.issues_list') }}">Back to list</a>
-      </div>
-    </form>
-  </div>
 
 {% endblock %}
