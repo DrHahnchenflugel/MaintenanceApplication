@@ -132,7 +132,7 @@
                     {{ time }}
                 </div>
 
-                <div>{{ h.to_status.label }}</div>
+                <div class="status-what">{{ h.to_status.label }}</div>
               </div>
             {% endfor %}
           {% else %}
@@ -213,7 +213,7 @@
                 {{ time }}
               </div>
 
-              <div>{{ a.type.label }}</div>
+              <div class="status-what">{{ a.type.label }}</div>
               <div>
                 <div style="white-space:pre-wrap;">{{ a.body }}</div>
                 <div class="muted">by {{ a.created_by.name }}</div>

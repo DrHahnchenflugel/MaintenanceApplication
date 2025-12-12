@@ -372,6 +372,13 @@ a {
     line-height: 1.2;
 }
 
+.status-what {
+    display: flex;
+    flex-direction: column;
+    justify-content: center; /* 👈 vertical centering */
+    line-height: 1.2;
+}
+
 /* sticky header */
 .thead--status {
     font-weight: bold;
