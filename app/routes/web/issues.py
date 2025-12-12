@@ -1,14 +1,114 @@
-from flask import render_template, url_for
-from . import bp as web_bp
+from flask import render_template, request, redirect, url_for, abort
+from . import bp  # this is your "app" blueprint (Blueprint("app", ...))
 
-@web_bp.get("/issues", strict_slashes=False)
-def issues_index():
+from app.services import issues as issue_service
+
+
+@bp.route("/issues")
+def issues_list():
     """
-    Render the issues page shell. The actual data comes from the v2 API.
+    Server-rendered issues list page.
+    Query params:
+      - status: optional status code (OPEN, IN_PROGRESS, BLOCKED, CLOSED)
+      - q:      optional search text (title/description)
     """
-    api_issues_url = url_for("api_v2.list_issues")
+
+    # Read filters from query string
+    status_code = (request.args.get("status") or "").upper() or None
+    search = request.args.get("q") or None
+
+    # Get all statuses so we can render the dropdown and map codes -> ids
+    status_options = issue_service.list_issue_statuses()
+    status_by_code = {s["code"]: s for s in status_options}
+
+    # Build filters for the service layer
+    filters = {
+        "site_id": None,
+        "asset_id": None,
+        "status_id": None,
+        "reported_by": None,
+        "created_from": None,
+        "created_to": None,
+        "closed": None,      # let list_issues treat None as "open by default"
+        "search": search,
+    }
+
+    if status_code and status_code in status_by_code:
+        filters["status_id"] = status_by_code[status_code]["id"]
+
+    # For now: single page, large page_size. You can paginate later.
+    result = issue_service.list_issues(page=1, page_size=200, filters=filters)
 
     return render_template(
-        "issues/viewIssues.html",
-        api_issues_url=api_issues_url,
+        "issues/list.html",
+        issues=result["items"],
+        status_options=status_options,
+        cur_status=status_code,
+        search=search or "",
     )
+
+
+@bp.route("/issues/<issue_id>")
+def view_issue(issue_id):
+    """
+    Show a single issue with actions + status history.
+    """
+
+    issue = issue_service.get_issue(issue_id)
+    if issue is None:
+        abort(404)
+
+    status_options = issue_service.list_issue_statuses()
+    action_types = issue_service.list_action_types()
+
+    return render_template(
+        "issues/specific_issue.html",
+        issue=issue,
+        status_options=status_options,
+        action_types=action_types,
+        form_error=None,
+    )
+
+
+@bp.route("/issues/<issue_id>/add-action", methods=["POST"])
+def add_issue_action(issue_id):
+    """
+    Handle the "Add update" form on the issue detail page.
+    """
+
+    body = (request.form.get("body") or "").strip()
+    action_type_code = (request.form.get("action_type_code") or "").strip().upper()
+    created_by = request.form.get("created_by") or None
+    new_status_id = request.form.get("new_status_id") or None
+
+    data = {
+        "action_type_code": action_type_code,
+        "body": body,
+        "created_by": created_by,
+        "new_status_id": new_status_id or None,
+    }
+
+    try:
+        result = issue_service.add_issue_action(issue_id, data)
+    except ValueError as e:
+        # Validation error – re-render page with inline error
+        issue = issue_service.get_issue(issue_id)
+        if issue is None:
+            abort(404)
+
+        status_options = issue_service.list_issue_statuses()
+        action_types = issue_service.list_action_types()
+
+        return render_template(
+            "issues/specific_issue.html",
+            issue=issue,
+            status_options=status_options,
+            action_types=action_types,
+            form_error=str(e),
+        ), 400
+
+    if result is None:
+        # Issue not found in service
+        abort(404)
+
+    return redirect(url_for("app.view_issue", issue_id=issue_id))

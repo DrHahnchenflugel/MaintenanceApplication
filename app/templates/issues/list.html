@@ -1,65 +1,85 @@
 {% extends "base.html" %}
-{% block title %} Maintenance - Active Issues {% endblock %}
-{% block page_title %} Active Issues {% endblock %}
+{% block title %}Maintenance – Issues{% endblock %}
+{% block page_title %}Issues{% endblock %}
 
 {% block content %}
-  <!-- Filter bar -->
-  <form method="get" class="card" style="display:flex;align-items:center;gap:12px;">
-    <label class="field" style="display:flex;align-items:center;gap:8px;margin:0;">
-      <span class="muted">Filter</span>
-      <span class="card">
-          <span class="muted"><b>Status:  </b></span>
-          <select name="f" onchange="this.form.submit()">
-            <option value="active"      {{ 'selected' if cur_filter=='active' else '' }}>Active</option>
-            <option value="open"        {{ 'selected' if cur_filter=='open' else '' }}>Open</option>
-            <option value="in_progress" {{ 'selected' if cur_filter=='in_progress' else '' }}>In Progress</option>
-            <option value="blocked"     {{ 'selected' if cur_filter=='blocked' else '' }}>Blocked</option>
-            <option value="closed"      {{ 'selected' if cur_filter=='closed' else '' }}>Closed</option>
-            <option value="all"         {{ 'selected' if cur_filter=='all' else '' }}>All</option>
-          </select>
-      </span>
 
+  <!-- Filter/search bar -->
+  <form method="get" class="card" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+    <label class="field" style="display:flex;align-items:center;gap:8px;margin:0;">
+      <span class="muted"><strong>Status</strong></span>
       <span class="card">
-          <span class="muted"><b>Location:  </b></span>
-          <select name="loc" onchange="this.form.submit()">
-              <option value="ALL" {{ 'selected' if cur_loc=='ALL' else '' }}>All</option>
-              {% for loc in locations %}
-                    <option value="{{ loc }}" {{ 'selected' if cur_loc==loc else '' }}> {{ loc }}</option>
-              {% endfor %}
-          </select>
+        <select name="status" onchange="this.form.submit()">
+          <option value="" {{ 'selected' if not cur_status }}>All</option>
+          {% for st in status_options %}
+            <option value="{{ st.code }}"
+                    {{ 'selected' if cur_status == st.code else '' }}>
+              {{ st.label }}
+            </option>
+          {% endfor %}
+        </select>
       </span>
     </label>
-    <noscript><button class="btn">Apply</button></noscript>
+
+    <label class="field" style="display:flex;align-items:center;gap:8px;margin:0;flex:1;">
+      <span class="muted"><strong>Search</strong></span>
+      <input type="text" name="q" value="{{ search }}" placeholder="Title or description"
+             style="flex:1;min-width:180px;">
+    </label>
+
+    <noscript>
+      <button class="btn">Apply</button>
+    </noscript>
   </form>
 
   {% if issues %}
-    <div class="table table--issues">
+    <div class="table table--issues" style="margin-top:16px;">
       <div class="thead--four">
-        <div>Asset Name</div>
+        <div>Asset</div>
         <div>Title</div>
         <div>Opened</div>
         <div>Status</div>
       </div>
 
       {% for issue in issues %}
-        <a class="trow--four" href="{{ url_for('app.view_issue', issue_uuid=issue.get('workOrder_uuid')) }}">
-          <div>#{{ issue.get('asset_friendly_tag') }}
-              <span class="muted">
-                  ({{ issue.get('site_location_shorthand') }})
-              </span>
+        <a class="trow--four"
+           href="{{ url_for('app.view_issue', issue_id=issue.id) }}">
+          <div>
+            #{{ issue.asset.asset_tag }}
+            {% if issue.asset.site_id %}
+              <span class="muted">({{ issue.asset.site_id }})</span>
+              {# later you can render a human-friendly site name instead of the UUID #}
+            {% endif %}
           </div>
-          <div>{{ issue.get('workOrder_raw_issue_description') }}</div>
-          <div>{{ issue.get('workOrder_created_at') }}</div>
-          <div class="badge badge--outline-{{ 'warn' if issue.get('workOrder_status') == 'IN_PROGRESS'
-                                        else 'ok' if issue.get('workOrder_status') == 'OPEN'
-                                        else 'bad' if issue.get('workOrder_status') == 'BLOCKED'
-                                        else 'blue' }}">
-            {{ issue.get('workOrder_status').replace('_', ' ') }}
+
+          <div>
+            {{ issue.title }}
+            {% if issue.reported_by %}
+              <span class="muted">— {{ issue.reported_by }}</span>
+            {% endif %}
+          </div>
+
+          <div>
+            {{ issue.created_at }}
+            {% if issue.last_action_at %}
+              <span class="muted">(last: {{ issue.last_action_at }})</span>
+            {% endif %}
+          </div>
+
+          {% set code = issue.status.code %}
+          <div class="badge badge--outline-{{
+                'ok'   if code == 'OPEN'
+           else 'warn' if code == 'IN_PROGRESS'
+           else 'bad'  if code == 'BLOCKED'
+           else 'blue'
+          }}">
+            {{ issue.status.label }}
           </div>
         </a>
       {% endfor %}
     </div>
   {% else %}
-    <p>No issues for this filter.</p>
+    <p style="margin-top:16px;">No issues match this filter.</p>
   {% endif %}
+
 {% endblock %}

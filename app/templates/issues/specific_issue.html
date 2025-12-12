@@ -1,197 +1,188 @@
 {% extends "base.html" %}
-{% block title %} Maintenance - Issue {{ issue.get('work_order_id') }} {% endblock %}
-{% block page_title %} Maintenance - Issue {{ issue.get('work_order_id') }} {% endblock %}
-
+{% block title %}Maintenance – Issue {{ issue.id }}{% endblock %}
+{% block page_title %}Issue {{ issue.id }}{% endblock %}
 
 {% block content %}
-  <div class="row" style="gap:16px; align-items:flex-start;">
+
+  {% if form_error %}
+    <div class="card" style="border-left:4px solid #c0392b;margin-bottom:12px;">
+      <strong>Error:</strong> {{ form_error }}
+    </div>
+  {% endif %}
+
+  <div class="row" style="gap:16px;align-items:flex-start;flex-wrap:wrap;">
+
     <!-- Left: Issue details -->
-    <div class="card" style="flex:2;">
-      <div style="display:flex; justify-content:space-between; align-items:center;">
-        <h2 style="margin:0;">Issue #{{ issue.get('work_order_id') }}</h2>
-        <span class="badge badge--{{ 'warn' if issue.get('workOrder_status') == 'IN_PROGRESS'
-                                        else 'ok' if issue.get('workOrder_status') == 'OPEN'
-                                        else 'bad' if issue.get('workOrder_status') == 'BLOCKED'
-                                        else 'blue' }}">{{ issue.get('work_order_status') }}</span>
+    <div class="card" style="flex:2;min-width:280px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
+        <h2 style="margin:0;">{{ issue.title }}</h2>
+
+        {% set code = issue.status.code %}
+        <span class="badge badge--{{
+              'ok'   if code == 'OPEN'
+         else 'warn' if code == 'IN_PROGRESS'
+         else 'bad'  if code == 'BLOCKED'
+         else 'blue'
+        }}">
+          {{ issue.status.label }}
+        </span>
       </div>
 
       <div class="field" style="margin-top:12px;">
-        <label style="font-size:1.2rem; font-weight:bold;">Description</label>
-        <div class="pill" style="white-space:pre-wrap;">{{ issue.get('raw_issue_description') }}</div>
+        <label style="font-weight:bold;">Description</label>
+        <div class="pill" style="white-space:pre-wrap;">
+          {{ issue.description }}
+        </div>
       </div>
 
-      <div class="row" style="gap:12px; margin-top:12px;">
-          <div class="field" style="flex:1;">
-              <label style="font-size:1.2rem; font-weight:bold;">Opened</label>
-              <div class="pill">{{ issue.get('work_order_created_at') }}</div>
+      <div class="row" style="gap:12px;margin-top:12px;">
+        <div class="field" style="flex:1;">
+          <label style="font-weight:bold;">Reported by</label>
+          <div class="pill">{{ issue.reported_by or "—" }}</div>
         </div>
 
-        {% if issue.get('work_order_status') != 'OPEN' %}
-            <div class="field" style="flex:1;">
-              <label style="font-size:1.2rem; font-weight:bold;">Closed</label>
-              <div class="pill">{{ issue.get('work_order_closed_at')
-                  if issue.get('work_order_closed_at') else "—" }}</div>
-            </div>
-        {% endif %}
+        <div class="field" style="flex:1;">
+          <label style="font-weight:bold;">Opened</label>
+          <div class="pill">{{ issue.created_at }}</div>
+        </div>
       </div>
 
-        {% if issue.get('work_order_status') != 'OPEN' %}
-          <div class="field" style="margin-top:12px;">
-            <label style="font-size:1.2rem; font-weight:bold;">Close note</label>
-            <div class="pill" style="white-space:pre-wrap;">{{ issue.get('work_order_close_note')
-                if issue.get('work_order_close_note') else "—" }}</div>
-          </div>
-        {% endif %}
+      <div class="row" style="gap:12px;margin-top:12px;">
+        <div class="field" style="flex:1;">
+          <label style="font-weight:bold;">Last update</label>
+          <div class="pill">{{ issue.last_action_at or "—" }}</div>
+        </div>
+
+        <div class="field" style="flex:1;">
+          <label style="font-weight:bold;">Closed</label>
+          <div class="pill">{{ issue.closed_at or "—" }}</div>
+        </div>
+      </div>
     </div>
 
     <!-- Right: Asset details -->
-      <div class="card" style="flex:1;">
-        <a href="{{ url_for('app.view_asset', asset_uuid=issue.get('asset_uuid')) }}">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <h3 style="margin:0;">Asset</h3>
-            <span class="badge  badge--outline-{{ 'ok' if issue.get('asset_status') == 'ACTIVE'
-                                        else 'blue' if issue.get('asset_status') == 'RETIRED'
-                                        else 'bad' if issue.get('asset_status') == 'LOST'
-                                        else 'warn' }}">{{ issue.get('asset_status') }}</span>
-          </div>
-
-          <div class="field" style="margin-top:12px;">
-            <label style="font-size:1.2rem; font-weight:bold;">Tag</label>
-            <div class="pill">{{ issue.get('asset_friendly_tag') }}</div>
-          </div>
-
-          <div class="field" style="margin-top:12px;">
-            <label style="font-size:1.2rem; font-weight:bold;">Make / Model / Variant</label>
-            <div class="pill">{{ issue.get('asset_make') }} {{ issue.get('asset_model') }} {{ issue.get('asset_variant') }}</div>
-          </div>
-
-          <div class="field" style="margin-top:12px;">
-              <label style="font-size:1.2rem; font-weight:bold;">Site</label>
-              <div class="pill">{{ issue.get('site_location_shorthand') }}</div>
-          </div>
-
-            {% if issue[16] %}
-              <div class="row" style="gap:12px; margin-top:12px;">
-                <div class="field" style="flex:1;">
-                  <label style="font-size:1.2rem; font-weight:bold;">Retired at</label>
-                  <div class="pill">{{ issue.get('asset_retired_at') if issue.get('asset_retired_at') else "—" }}</div>
-                </div>
-                <div class="field" style="flex:1;">
-                  <label style="font-size:1.2rem; font-weight:bold;">Retired reason</label>
-                  <div class="pill">{{ issue.get('asset_retired_reason') if issue.get('asset_retired_reason') else "—" }}</div>
-                </div>
-              </div>
-            {% endif %}
-        </a>
+    <div class="card" style="flex:1;min-width:240px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <h3 style="margin:0;">Asset</h3>
       </div>
+
+      <div class="field" style="margin-top:12px;">
+        <label style="font-weight:bold;">Tag</label>
+        <div class="pill">{{ issue.asset.asset_tag }}</div>
+      </div>
+
+      <div class="field" style="margin-top:12px;">
+        <label style="font-weight:bold;">Site ID</label>
+        <div class="pill">{{ issue.asset.site_id or "—" }}</div>
+      </div>
+
+      {# later you can wrap this in a link to your asset detail page #}
+    </div>
+
   </div>
 
-  <!-- Attachments -->
+  <!-- Actions timeline -->
   <div class="card" style="margin-top:16px;">
-      <h3 style="margin:0 0 8px 0;">Attachments</h3>
+    <h3 style="margin-top:0;">Actions</h3>
 
-      {% if not issue.get('attachment_storage_path') %}
-        <div class="pill">No attachments.</div>
-      {% else %}
-        {% set att_url = url_for('app.serve_attachment', subpath=issue.get('attachment_storage_path')) %}
-        {% if issue.get('attachment_mime_type') and issue.get('attachment_mime_type').startswith('image/') %}
-          <a href="{{ att_url }}" target="_blank" rel="noopener">
-            <img src="{{ att_url }}" alt="Attachment"
-                 style="width:220px; height:160px; object-fit:cover; border-radius:8px;">
-          </a>
-        {% else %}
-          <a class="btn" href="{{ att_url }}" target="_blank" rel="noopener">{{ issue.get('attachment_mime_type') }}</a>
-        {% endif %}
-      {% endif %}
-  </div>
-
-  <!-- Work Log -->
-  <div class="table">
+    <div class="table">
       <div class="thead--three">
-        <div>Timestamp</div>
-        <div>Action Taken</div>
-        <div>Result</div>
+        <div>When</div>
+        <div>Type</div>
+        <div>Details</div>
       </div>
 
-
-      {% for entry in work_logs %}
-        <div class="trow--three">
-            <div>{{ entry.get('created_at') }}</div>
-            <div>{{ entry.get('action_taken') }}</div>
-            <div>{{ entry.get('result') }}</div>
-        </div>
+      {% if issue.actions %}
+        {% for a in issue.actions %}
+          <div class="trow--three">
+            <div>{{ a.created_at }}</div>
+            <div>{{ a.type.label }}</div>
+            <div>
+              <div style="white-space:pre-wrap;">{{ a.body }}</div>
+              <div class="muted">by {{ a.created_by.name }}</div>
+            </div>
+          </div>
+        {% endfor %}
       {% else %}
         <div class="trow--three">
-            <div>-</div>
-            <div>-</div>
-            <div>-</div>
+          <div>-</div><div>-</div><div>No actions yet.</div>
         </div>
-      {% endfor %}
-
-       <div class="trow--three" id="new-entry-row">
-            <div colspan="3" style="text-align:center;">
-                <button class="btn btn--brand" id="add-update-btn">+ Update/Resolve Issue</button>
-            </div>
-        </div>
-
-      <form method="post" action="{{ url_for('app.update_issue', issue_uuid=issue.get('work_order_uuid')) }}">
-          <div class="trow--four_three_position" id="update-form-row" style="display:none;">
-              <div></div>
-              <div>
-                  <input type="text" name="action_taken" placeholder="Action Taken" required>
-              </div>
-              <div>
-                  <input type="text" name="result" placeholder="Result" required>
-              </div>
-              <div>
-                  <select name="status">
-                      <option value="OPEN">OPEN</option>
-                      <option value="IN_PROGRESS">IN PROGRESS</option>
-                      <option value="BLOCKED">BLOCKED</option>
-                      <option value="CLOSED">CLOSED</option>
-                      <!-- TODO: add BLOCKED as an option -->
-                  </select>
-              </div>
-          </div>
-
-          <div class="trow--three" id="submit-row" style="display:none;">
-              <div colspan="3" style="text-align:center;">
-                  <button type="submit" class="btn btn--ok">Save</button>
-              </div>
-          </div>
-        </form>
+      {% endif %}
+    </div>
   </div>
 
-  <!-- Actions -->
-  <div class="row" style="gap:8px; margin-top:16px;">
-    <a class="btn btn--brand" href="{{ url_for('app.issues_list') }}">Back to Issues</a>
+  <!-- Status history -->
+  <div class="card" style="margin-top:16px;">
+    <h3 style="margin-top:0;">Status history</h3>
+
+    <div class="table">
+      <div class="thead--four">
+        <div>When</div>
+        <div>From</div>
+        <div>To</div>
+        <div>By</div>
+      </div>
+
+      {% if issue.status_history %}
+        {% for h in issue.status_history %}
+          <div class="trow--four">
+            <div>{{ h.changed_at }}</div>
+            <div>{{ h.from_status.label if h.from_status else "—" }}</div>
+            <div>{{ h.to_status.label }}</div>
+            <div>{{ h.changed_by or "—" }}</div>
+          </div>
+        {% endfor %}
+      {% else %}
+        <div class="trow--four">
+          <div>-</div><div>-</div><div>-</div><div>-</div>
+        </div>
+      {% endif %}
+    </div>
   </div>
 
+  <!-- Add update / action form -->
+  <div class="card" style="margin-top:16px;">
+    <h3 style="margin-top:0;">Add update</h3>
 
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const addBtn = document.getElementById("add-update-btn");
-        const newRow = document.getElementById("new-entry-row");
-        const formRow = document.getElementById("update-form-row");
-        const submitRow = document.getElementById("submit-row");
+    <form method="post" action="{{ url_for('app.add_issue_action', issue_id=issue.id) }}"
+          class="row" style="gap:12px;flex-wrap:wrap;">
 
-        addBtn.addEventListener("click", function(e) {
-            e.preventDefault();
-            newRow.style.display = "none";   // hide the button row
-            formRow.style.display = "grid";  // show the inputs
-            submitRow.style.display = "grid"; // show submit
-        });
-    });
+      <div class="field" style="flex:1;min-width:180px;">
+        <label style="font-weight:bold;">Action type</label>
+        <select name="action_type_code" required>
+          {% for at in action_types %}
+            <option value="{{ at.code }}">{{ at.label }}</option>
+          {% endfor %}
+        </select>
+      </div>
 
-  const statusSel = document.getElementById('status-select');
-  const resultInp = document.getElementById('result-input');
-  function tweak() {
-    const isClosed = statusSel.value === 'CLOSED';
-    resultInp.placeholder = isClosed ? "Close reason (required)" : "Result";
-    resultInp.required = isClosed;  // only force when closing
-  }
-  statusSel.addEventListener('change', tweak);
-  tweak();
-</script>
+      <div class="field" style="flex:1;min-width:180px;">
+        <label style="font-weight:bold;">New status (optional)</label>
+        <select name="new_status_id">
+          <option value="">(no status change)</option>
+          {% for st in status_options %}
+            <option value="{{ st.id }}">{{ st.label }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="field" style="flex:1;min-width:180px;">
+        <label style="font-weight:bold;">Created by</label>
+        <input type="text" name="created_by" placeholder="Your name or initials">
+      </div>
+
+      <div class="field" style="flex-basis:100%;margin-top:12px;">
+        <label style="font-weight:bold;">Details</label>
+        <textarea name="body" rows="3" required
+                  placeholder="What did you do / what happened?"
+                  style="width:100%;"></textarea>
+      </div>
+
+      <div style="flex-basis:100%;margin-top:8px;">
+        <button type="submit" class="btn btn--ok">Save update</button>
+        <a class="btn" href="{{ url_for('app.issues_list') }}">Back to list</a>
+      </div>
+    </form>
+  </div>
 
 {% endblock %}
