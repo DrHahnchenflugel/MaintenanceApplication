@@ -695,3 +695,93 @@ def get_issue_attachment_by_issue_id(issue_id: str):
         return None
 
     return dict(row)
+
+def create_issue_attachment(
+    issue_id: str,
+    filepath: str,
+    content_type: str,
+):
+    sql = text("""
+        INSERT INTO issue_attachment (
+            issue_id,
+            filepath,
+            content_type,
+            created_at
+        )
+        VALUES (
+            :issue_id,
+            :filepath,
+            :content_type,
+            NOW()
+        )
+        RETURNING
+            id,
+            issue_id,
+            filepath,
+            content_type
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(
+            sql,
+            {
+                "issue_id": issue_id,
+                "filepath": filepath,
+                "content_type": content_type,
+            },
+        ).mappings().first()
+
+    if row is None:
+        raise RuntimeError("Failed to create issue_attachment")
+
+    return dict(row)
+
+def list_accepted_attachment_content_types():
+    sql = text("""
+        SELECT content_type
+        FROM accepted_attachment_content_type
+    """)
+
+    with get_connection() as conn:
+        rows = conn.execute(sql).mappings().all()
+
+    return [r["content_type"] for r in rows]
+
+def create_accepted_attachment_content_type(content_type: str):
+    sql = text("""
+        INSERT INTO accepted_attachment_content_type (
+            content_type
+        )
+        VALUES (
+            :content_type
+        )
+        RETURNING
+            id,
+            content_type
+    """)
+
+    with get_connection() as conn:
+        try:
+            row = conn.execute(
+                sql,
+                {"content_type": content_type},
+            ).mappings().first()
+        except Exception as e:
+            # rely on DB unique constraint
+            raise
+
+    if row is None:
+        raise RuntimeError("Failed to insert accepted_attachment_content_type")
+
+    return dict(row)
+
+def delete_accepted_attachment_content_type(content_type: str):
+    sql = text("""
+        DELETE FROM accepted_attachment_content_type
+        WHERE content_type = :content_type
+    """)
+
+    with get_connection() as conn:
+        result = conn.execute(sql, {"content_type": content_type})
+
+    return result.rowcount > 0

@@ -1,3 +1,6 @@
+import os
+from werkzeug.utilus import secure_filename
+from flask import current_app
 from app.db import issues as issue_db
 
 def list_issues(page: int, page_size: int, filters: dict):
@@ -352,3 +355,66 @@ def get_issue_attachment(issue_id: str):
     Expected keys: filepath, content_type
     """
     return issues_db.get_issue_attachment_by_issue_id(issue_id)
+
+def add_issue_attachment(issue_id: str, file):
+    if file is None or file.filename == "":
+        raise ValueError("No file provided")
+
+    # MIME type from Werkzeug (browser-provided but still useful)
+    content_type = file.mimetype
+    if not content_type:
+        raise ValueError("Missing content type")
+
+    # Pull allowed types from DB
+    allowed_types = issues_db.list_accepted_attachment_content_types()
+    if content_type not in allowed_types:
+        raise ValueError(f"Unsupported content type: {content_type}")
+
+    # Enforce 1 attachment per issue
+    existing = issues_db.get_issue_attachment_by_issue_id(issue_id)
+    if existing:
+        raise ValueError("Issue already has an attachment")
+
+    # Use filename ONLY to infer extension for storage
+    filename = secure_filename(file.filename)
+    if "." not in filename:
+        raise ValueError("File must have an extension")
+
+    ext = filename.rsplit(".", 1)[1].lower()
+
+    root = current_app.config["ATTACHMENT_ROOT"]
+
+    # Storage layout: issues/<issue_id>/attachment.<ext>
+    rel_dir = f"issues/{issue_id}"
+    abs_dir = os.path.join(root, rel_dir)
+    os.makedirs(abs_dir, exist_ok=True)
+
+    rel_path = f"{rel_dir}/attachment.{ext}"
+    abs_path = os.path.join(root, rel_path)
+
+    file.save(abs_path)
+
+    return issues_db.create_issue_attachment(
+        issue_id=issue_id,
+        filepath=rel_path,
+        content_type=content_type,
+    )
+
+def list_accepted_attachment_content_types():
+    return issues_db.list_accepted_attachment_content_types()
+
+def create_accepted_attachment_content_type(data: dict):
+    content_type = (data.get("content_type") or "").strip().lower()
+
+    if not content_type:
+        raise ValueError("Missing content_type")
+
+    if "/" not in content_type:
+        raise ValueError("Invalid MIME type format")
+
+    return issues_db.create_accepted_attachment_content_type(content_type)
+
+def delete_accepted_attachment_content_type(content_type: str):
+    ok = issues_db.delete_accepted_attachment_content_type(content_type)
+    if not ok:
+        raise ValueError("Content type not found")

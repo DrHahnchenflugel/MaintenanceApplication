@@ -111,6 +111,56 @@ def get_issue_attachment(issue_id):
         conditional=True,
     )
 
+@bp.route("/issues/<issue_id>/attachment", methods=["POST"])
+def upload_issue_attachment(issue_id):
+    issue_id = parse_uuid_path(issue_id, "issue_id")
+
+    if "file" not in request.files:
+        abort(400, description="Missing file")
+
+    file = request.files["file"]
+
+    try:
+        result = issue_service.add_issue_attachment(issue_id, file)
+    except ValueError as e:
+        abort(400, description=str(e))
+
+    return jsonify({
+        "issue_id": issue_id,
+        "attachment": {
+            "content_type": result["content_type"],
+            "filename": result["filepath"].split("/")[-1],
+        },
+    }), 201
+
+@bp.route("/attachment-content-types", methods=["GET"])
+def list_attachment_content_types():
+    items = issue_service.list_accepted_attachment_content_types()
+    return jsonify({"items": items})
+
+@bp.route("/attachment-content-types", methods=["POST"])
+def create_attachment_content_type():
+    data = request.get_json(silent=True) or {}
+
+    try:
+        result = issue_service.create_accepted_attachment_content_type(data)
+    except ValueError as e:
+        abort(400, description=str(e))
+    except Exception:
+        # likely unique constraint
+        abort(409, description="Duplicate content_type")
+
+    return jsonify(result), 201
+
+@bp.route("/attachment-content-types/<content_type>", methods=["DELETE"])
+def delete_attachment_content_type(content_type):
+    try:
+        issue_service.delete_accepted_attachment_content_type(content_type)
+    except ValueError as e:
+        abort(404, description=str(e))
+
+    return "", 204
+
 @bp.route("/issues", methods=["POST"])
 def create_issue():
     data = request.get_json(silent=True) or {}
