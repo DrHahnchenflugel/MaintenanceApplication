@@ -45,27 +45,22 @@
 
           <div class="field" style="flex:1;">
             <label style="font-weight:bold;">Opened</label>
-            <div class="pill">
-                {{ issue.created_at.strftime("%H:%M") }}
-                <div class="muted"> {{ issue.created_at.strftime("%d-%m-%Y") }} </div>
-            </div>
+            <div class="pill">{{ issue.created_at }}</div>
           </div>
         </div>
 
         <div class="row" style="gap:12px;margin-top:12px;">
           <div class="field" style="flex:1;">
             <label style="font-weight:bold;">Last update</label>
-            <div class="pill">
-                {{ issue.last_action_at.strftime("%H:%M") or "—" }}
-                <div class="muted"> {{ issue.last_action_at.strftime("%d-%m-%Y") }}</div>
-            </div>
+            <div class="pill">{{ issue.last_action_at or "—" }}</div>
           </div>
 
           <div class="field" style="flex:1;">
             <label style="font-weight:bold;">Closed</label>
+              {% set time, date = issue.closed_at | format_dt %}
             <div class="pill">
-                {{ issue.closed_at.strftime("%H:%M") or "—" }}
-                <div class="muted"> {{ issue.closed_at.strftime("%d-%m-%Y") }} </div>
+                {{ time }}
+                <div class="muted">{{ date }}</div>
             </div>
           </div>
         </div>
@@ -123,10 +118,7 @@
           {% if issue.status_history %}
             {% for h in issue.status_history %}
               <div class="trow--status">
-                <div>
-                    {{ h.changed_at.strftime("%H:%M") }}
-                    <div class="muted">{{ h.changed_at.strftime("%d-%m-%Y") }}</div>
-                </div>
+                <div>{{ h.changed_at }}</div>
                 <div>{{ h.to_status.label }}</div>
               </div>
             {% endfor %}
