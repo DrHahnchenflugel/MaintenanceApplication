@@ -106,25 +106,22 @@
         <h3 style="margin-top:0;">Status Changes</h3>
 
         <div class="table table--scrollable">
-          <div class="thead--four">
+          <div class="thead--scrollable">
             <div>When</div>
-            <div>From</div>
-            <div>To</div>
-            <div>By</div>
+            <div>New Status</div>
           </div>
 
           {% if issue.status_history %}
             {% for h in issue.status_history %}
-              <div class="trow--four">
+              <div class="trow--status">
                 <div>{{ h.changed_at }}</div>
-                <div>{{ h.from_status.label if h.from_status else "—" }}</div>
                 <div>{{ h.to_status.label }}</div>
-                <div>{{ h.changed_by or "—" }}</div>
               </div>
             {% endfor %}
           {% else %}
             <div class="trow--four">
-              <div>-</div><div>-</div><div>-</div><div>-</div>
+                <div>-</div>
+                <div>-</div>
             </div>
           {% endif %}
         </div>

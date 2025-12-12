@@ -353,6 +353,35 @@ a {
     scrollbar-gutter: stable;
 }
 
+/* Status Changes: 2-column table (When / New status) */
+.thead--status,
+.trow--status {
+    display: grid;
+    grid-template-columns: 210px 1fr;  /* When | New status */
+    gap: 12px;
+    align-items: start;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
+}
+
+/* sticky header */
+.thead--status {
+    font-weight: bold;
+    background: var(--panel);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.trow--status {
+    text-decoration: none;
+    color: inherit;
+}
+
+.trow--status:hover {
+    background: var(--panel-lighter);
+}
+
 /* 3-column table (When / Type / Details) */
 .thead--three,
 .trow--three {
