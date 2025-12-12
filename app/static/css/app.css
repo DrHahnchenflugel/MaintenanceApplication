@@ -1,3 +1,7 @@
+/* =========================================================
+   1. THEME VARIABLES & GLOBAL RESET
+   ========================================================= */
+
 :root {
     --bg:#0f1115;
 
@@ -20,170 +24,173 @@
     --blue:#2596be;
 }
 
-*{
-    box-sizing:border-box;
+* {
+    box-sizing: border-box;
 }
 
-html,body{
-    height:100%;
-    overflow: hidden;
+html,
+body {
+    height: 100%;
+    overflow: hidden; /* page scroll handled inside .content */
 }
 
-body{
-    margin:0;
-    font-family:system-ui, -apple-system,Segoe UI,Roboto,Ubuntu;
-    color:var(--text);
-    background:var(--bg);
+body {
+    margin: 0;
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu;
+    color: var(--text);
+    background: var(--bg);
 }
 
-a{
-    color:inherit;
-    text-decoration:none;
+a {
+    color: inherit;
+    text-decoration: none;
 }
 
+/* minor helpers */
 #assetForm {
-  display: contents;
+    display: contents;
 }
 
 .muted {
-  color: var(--muted);
-  margin-top: 0.5rem;
+    color: var(--muted);
+    margin-top: 0.5rem;
 }
 
-.layout{
-    display:grid;
-    grid-template-columns:240px 1fr;
-    min-height:100dvh;
-    height:auto;
-    /*overflow: hidden;*/
+
+/* =========================================================
+   2. LAYOUT SHELL (SIDEBAR, HEADER, CONTENT, FOOTER)
+   ========================================================= */
+
+.layout {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+    min-height: 100dvh;
+    height: auto;
 }
 
-.container {
-  display: flex;
-}
-
-.main{
-    display:flex;
-    flex-direction:column;
-    min-height:0;
-    /*overflow: visible;*/
+.main {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
     overflow: hidden;
 }
 
-.content{
-    padding:20px;
-    display:flex;
-    flex-direction:column;
-    flex:1;
-    overflow:auto;
-    min-height:0;
-    -webkit-overflow-scrolling:touch;
-    padding-bottom:calc(20px + env(safe-area-inset-bottom));
+.content {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: auto;
+    min-height: 0;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
 }
 
-.header{
-    display:grid;
+/* Sidebar */
+
+.sidebar {
+    background: var(--panel);
+    border-right: 1px solid var(--line);
+    padding: 16px;
+    position: sticky;
+    top: 0;
+    height: 100dvh;
+}
+
+.brand {
+    font-weight: 700;
+    letter-spacing: .12em;
+    color: var(--brand);
+    margin-bottom: 12px;
+    font-size: .9rem;
+}
+
+.nav {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.nav a {
+    padding: 8px 10px;
+    border-radius: 8px;
+    color: var(--muted);
+}
+
+.nav a:hover {
+    background: #1f2430;
+    color: var(--text);
+}
+
+.nav a.is-active {
+    background: #1e293b;
+    color: var(--text);
+    font-weight: 600;
+}
+
+/* Header */
+
+.header {
+    display: grid;
     grid-template-columns: 1fr auto 1fr;
-    align-items:center;
-    padding:12px 20px;
-    border-bottom:1px solid var(--line);
+    align-items: center;
+    padding: 12px 20px;
+    border-bottom: 1px solid var(--line);
 }
 
-.header .top{
-    grid-column:1;
-    justify-self:start;
-    display:flex;
-    gap:8px;
+.header .top {
+    grid-column: 1;
+    justify-self: start;
+    display: flex;
+    gap: 8px;
 }
 
-.header h1{
-    grid-column:2;
-    justify-self:center;
-    margin:0;
-    letter-spacing:.12em;
-    font-size:1.5rem;
+.header h1 {
+    grid-column: 2;
+    justify-self: center;
+    margin: 0;
+    letter-spacing: .12em;
+    font-size: 1.5rem;
 }
 
-.header .meta{
-    grid-column:3;
-    justify-self:end;
+.header .meta {
+    grid-column: 3;
+    justify-self: end;
 }
 
-.footer{
-    margin-top:auto;
-    flex-shrink:0;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    /*background:var(--background);  <______________________________________I COMMENT THIS*/
+/* Footer */
+
+.footer {
+    margin-top: auto;
+    flex-shrink: 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: 52px 20px;
 }
 
-.sidebar {
-    background:var(--panel);
-    border-right:1px solid var(--line);
-    padding:16px;
-    position:sticky;
-    top:0;
-    height:100dvh;
-}
 
-.brand{
-    font-weight:700;
-    letter-spacing:.12em;
-    color:var(--brand);
-    margin-bottom:12px;
-    font-size:.9rem;
-}
+/* =========================================================
+   3. GENERIC UI ELEMENTS (CARDS, ROW/COLUMN, BADGES, BUTTONS)
+   ========================================================= */
 
-.nav{
-    display:flex;
-    flex-direction:column;
-    gap:6px;
-}
+/* Layout helpers */
 
-.nav a{
-    padding:8px 10px;
-    border-radius: 8px;
-    color:var(--muted);
-}
-
-.nav a:hover{
-    background:#1f2430;
-    color:var(--text);
-}
-
-.nav a.is-active{
-    background:#1e293b;
-    color:var(--text);
-    font-weight:600;
-}
-
-.badge{
-    display:inline-flex;
-    align-items:center;
-    padding:2px 8px;
-    border:1px solid var(--line);
-    border-radius:6px;
-    font-size:.8rem;
-    line-height:1;
-    background:rgba(255,255,255,0.02);
-}
-
-
-.row{
+.row {
     display: flex;
     gap: 16px;
     flex-wrap: wrap;
 }
 
-.column{
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
+.column {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
 }
 
-.card{
+/* Cards */
+
+.card {
     background: var(--panel);
     border: 1px solid var(--line);
     border-radius: 12px;
@@ -195,74 +202,108 @@ a{
          1px  1px 0 black;
 }
 
-.card--nobg{
+.card--nobg {
     background: var(--bg);
 }
 
-.card--ok{
+.card--ok {
     background: var(--panel-ok);
     border: 2px solid var(--ok);
 }
 
-.card--warn{
+.card--warn {
     background: var(--panel-warn);
     border: 2px solid var(--warn);
 }
 
-.card--bad{
+.card--bad {
     background: var(--panel-bad);
     border: 2px solid var(--bad);
 }
 
-.kpi{
-    font-size:1.8rem;
-    font-weight:700;
+/* Badges */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: .35em;
+
+    height: 1.6rem;
+    padding: 0 .75rem;
+    border-radius: 999px;
+
+    font-size: .9rem;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+
+    color: var(--text);
+    background: rgba(255,255,255,.02);
+    border: 1px solid var(--line);
+
+    flex: 0 0 auto;
+    justify-self: start;
 }
 
+.badge--xs { height: 1.25rem; padding: 0 .5rem; font-size: .75rem; }
+.badge--lg { height: 2rem;   padding: 0 1rem; font-size: 1rem; }
+
+.badge--ok   { border: var(--line); background: var(--ok); }
+.badge--warn { border: var(--line); background: var(--warn); }
+.badge--bad  { border: var(--line); background: var(--bad); }
+.badge--blue { border: var(--line); background: var(--blue); }
+
+.badge--outline      { background: var(--bg); }
+.badge--outline-ok   { border: 2px solid var(--ok);   background: var(--bg); }
+.badge--outline-warn { border: 2px solid var(--warn); background: var(--bg); }
+.badge--outline-bad  { border: 2px solid var(--bad);  background: var(--bg); }
+.badge--outline-blue { border: 2px solid var(--blue); background: var(--bg); }
+
+/* Buttons */
 
 .btn {
     background: var(--panel);
-    color:var(--text);
+    color: var(--text);
     padding: 10px 14px;
     border: none;
     border-radius: 10px;
-    font-weight:700;
-    cursor:pointer;
+    font-weight: 700;
+    cursor: pointer;
 }
 
 .btn.secondary {
-  background: transparent;
-  color: var(--text);
+    background: transparent;
+    color: var(--text);
 }
 
-.btn--lg{
+.btn--lg {
     padding: 18px 28px;
-    height:10dvh;
-    width:20dvh;
+    height: 10dvh;
+    width: 20dvh;
     font-size: 1.2rem;
     font-weight: bold;
-    border:3px solid var(--brand);
-    border-radius:10px;
-    cursor:pointer;
-    color:var(--text);
+    border: 3px solid var(--brand);
+    border-radius: 10px;
+    cursor: pointer;
+    color: var(--text);
     display: flex;
     justify-content: center;
     align-items: center;
     text-align: center;
 }
 
-.btn--brand{
-    color:var(--brand);
-    text:var(--text);
+.btn--brand {
+    color: var(--brand);
 }
 
-.btn--bad{
+.btn--bad {
     background: var(--panel-bad);
     color: white;
     border: 3px solid var(--bad);
 }
 
-.btn--ok{
+.btn--ok {
     background: var(--panel-ok);
     color: white;
     border: 3px solid var(--ok);
@@ -273,34 +314,225 @@ a{
          1px  1px 0 black;
 }
 
-
-.btn--outline{
-    background:transparent;
-    color:var(--brand);
-    border:1px solid var(--brand);
-    padding:8px 12px;
-    border-radius:10px;
-    cursor:pointer;
+.btn--outline {
+    background: transparent;
+    color: var(--brand);
+    border: 1px solid var(--brand);
+    padding: 8px 12px;
+    border-radius: 10px;
+    cursor: pointer;
 }
 
 .btn--fixed--bottomright {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 1000;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
 }
+
+/* Misc UI */
+
+.actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
+}
+
+.full-logo {
+    width: clamp(96px, 8vw, 10000px);
+    height: auto;
+}
+
+
+/* =========================================================
+   4. TABLES & ISSUE-SPECIFIC TABLE LAYOUTS
+   ========================================================= */
 
 .table {
-  background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 10px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 10px;
 }
 
-.table--scrollable{
+/* used inside flex cards (actions/status) */
+.table--scrollable {
+    flex: 1 1 auto;
     overflow-y: auto;
     overflow-x: hidden;
     scrollbar-gutter: stable;
 }
+
+/* 3-column table (When / Type / Details) */
+
+.thead--three,
+.trow--three {
+    display: grid;
+    grid-template-columns: 240px 1fr 1fr;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
+}
+
+/* 4-column table (When / From / To / By) */
+
+.thead--four,
+.trow--four {
+    display: grid;
+    grid-template-columns: 180px 1fr 180px 120px;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
+}
+
+/* 6-column table variant */
+
+.thead--six,
+.trow--six {
+    display: grid;
+    grid-template-columns: 1fr 180px 180px 180px 180px 120px;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
+}
+
+/* sticky headers */
+
+.thead--six,
+.thead--four,
+.thead--three {
+    font-weight: bold;
+    background: var(--panel);
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.trow--six,
+.trow--four,
+.trow--three {
+    text-decoration: none;
+    color: inherit;
+}
+
+.trow--six:hover,
+.trow--four:hover,
+.trow--three:hover {
+    background: var(--panel-lighter);
+}
+
+
+/* =========================================================
+   5. ISSUE DETAIL PAGE LAYOUT
+   ========================================================= */
+
+/* Grid that arranges issue, photos, right column, and actions */
+
+.issue-layout {
+    display: grid;
+    gap: 16px;
+    grid-template-columns: 2fr 2fr 1.5fr;
+    grid-template-rows: 30vh 50vh;  /* top row, bottom row */
+    grid-template-areas:
+        "issue-main  issue-image  right-col"
+        "actions     actions      right-col";
+    align-items: stretch;
+    min-height: 0;
+}
+
+.issue-main   { grid-area: issue-main; }
+.issue-image  { grid-area: issue-image; }
+.actions-card { grid-area: actions; }
+
+/* Right column wrapper (asset + status) */
+
+.right-col {
+    grid-area: right-col;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-height: 0;
+}
+
+/* ---------- Issue main card ---------- */
+
+.issue-main {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.issue-main-header {
+    flex: 0 0 auto;
+}
+
+.issue-main-header h2 {
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.issue-main-scroll {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    margin-top: 12px;
+    min-height: 0;
+}
+
+/* ---------- Photos card ---------- */
+
+.issue-image {
+    /* card styles inherited; nothing special needed */
+}
+
+/* ---------- Actions & Status cards ---------- */
+
+.actions-card,
+.status-card {
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    min-height: 0;
+}
+
+/* ---------- Asset card inside right column ---------- */
+
+.asset-main {
+    /* standard card; height driven by content */
+}
+
+.asset-main-body {
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;   /* left = fields, right = image */
+    gap: 12px;
+    margin-top: 12px;
+    flex: 0 0 auto; /* keep this compact; don't stretch */
+    overflow: hidden;
+}
+
+.asset-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow: hidden;
+}
+
+.asset-image {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.asset-image .image-placeholder--small {
+    width: 100%;
+}
+
+/* responsive reflow for small screens */
 
 @media (max-width: 960px) {
     .issue-layout {
@@ -315,78 +547,9 @@ a{
 }
 
 
-.issue-layout {
-    display: grid;
-    gap: 16px;
-    grid-template-columns: 2fr 2fr 1.5fr;
-    grid-template-rows: 30vh 50vh;   /* keep your viewport-based rows */
-    grid-template-areas:
-        "issue-main  issue-image  right-col"
-        "actions     actions      right-col";
-    align-items: stretch;
-}
-
-.issue-main  { grid-area: issue-main; }
-.issue-image { grid-area: issue-image; }
-.actions-card { grid-area: actions; }
-
-/* NEW: wrapper for the whole right column */
-.right-col {
-    grid-area: right-col;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-}
-
-/* Asset + Status are now *inside* right-col, not grid items themselves */
-.asset-main {
-    /* stays a normal card; height = content */
-}
-
-.status-card {
-    flex: 1;                /* grow to fill remaining vertical space */
-    min-height: 0;
-    display: flex;
-    flex-direction: column; /* so inner table can scroll */
-}
-
-.issue-main-header {
-    flex: 0 0 auto;        /* title + status pill */
-}
-
-.issue-main-scroll {
-    flex: 1 1 auto;        /* take remaining card height */
-    overflow-y: auto;      /* scroll inside the card */
-    margin-top: 12px;      /* spacing under header */
-}
-
-
-.asset-main-body {
-    display: grid;
-    grid-template-columns: 1.2fr 1fr;   /* left = fields, right = image */
-    gap: 12px;
-    margin-top: 12px;
-    flex: 1; /* so it fills the vertical height of the card */
-    overflow: hidden;
-}
-
-.asset-fields {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    overflow: hidden; /* prevents text from spilling outside card */
-}
-
-.asset-image {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-}
-
-.asset-image .image-placeholder--small {
-    width: 100%;
-    height: 120px;   /* or whatever size you already picked */
-}
+/* =========================================================
+   6. IMAGES & PLACEHOLDERS
+   ========================================================= */
 
 .image-placeholder {
     border-radius: 8px;
@@ -409,162 +572,65 @@ a{
     height: 11vh;
 }
 
-.table--scrollable {
-    max-height: 60vh;
-    overflow-y: auto;
-    overflow-x: hidden;
+
+/* =========================================================
+   7. MISC / OTHER LAYOUTS (NON-ISSUE PAGES)
+   ========================================================= */
+/* These are used on other pages (asset overview, dashboards, etc.)
+   and kept here but separated so they don't clutter the issue layout.
+   --------------------------------------------------------- */
+
+/* Generic container (if used elsewhere) */
+.container {
+    display: flex;
 }
 
-.table--issues{
+/* KPI big number style */
+.kpi {
+    font-size: 1.8rem;
+    font-weight: 700;
+}
+
+/* Tables with fixed max-height on list pages */
+.table--issues {
     max-height: 85vh;
     overflow-y: auto;
 }
 
-.table--asset-issues{
+.table--asset-issues {
     max-height: 55vh;
     overflow-y: auto;
 }
 
-.thead--three,
-.trow--three {
-  display: grid;
-  grid-template-columns: 240px 1fr 1fr;
-  gap: 12px;
-  align-items: center;
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--line);
-}
-
+/* 4-column + position table (used only where referenced) */
 .trow--four_three_position {
-  display: grid;
-  grid-template-columns: 240px 1fr 0.5fr 0.5fr;
-  gap: 12px;
-  align-items: center;
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--line);
+    display: grid;
+    grid-template-columns: 240px 1fr 0.5fr 0.5fr;
+    gap: 12px;
+    align-items: center;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--line);
 }
 
-.thead--four,
-.trow--four {
-  display: grid;
-  grid-template-columns: 180px 1fr 180px 120px;
-  gap: 12px;
-  align-items: center;
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--line);
-}
-
-.thead--six,
-.trow--six {
-  display: grid;
-  grid-template-columns: 1fr 180px 180px 180px 180px 120px;
-  gap: 12px;
-  align-items: center;
-  padding: 10px 14px;
-  border-bottom: 1px solid var(--line);
-}
-
-.thead--six,
-.thead--four,
-.thead--three {
-  font-weight: bold;
-  background: var(--panel);
-  position: sticky;
-  top: 0;
-  z-index: 1;
-}
-
-.trow--six,
-.trow--four,
-.trow--four_three_position,
-.trow--three {
-  text-decoration: none;
-  color: inherit;
-}
-
-.trow--six:hover,
-.trow--four:hover,
-.trow--three:hover {
-  background: var(--panel-lighter);
-}
-
-.badge{
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  gap:.35em;
-
-  height:1.6rem;
-  padding:0 .75rem;
-  border-radius:999px;
-
-  font-size:.9rem;
-  font-weight:700;
-  line-height:1;
-  white-space:nowrap;
-
-  color:var(--text);
-  background:rgba(255,255,255,.02);
-  border:1px solid var(--line);
-
-  flex:0 0 auto;
-  justify-self:start;
-}
-
-.badge--xs{ height:1.25rem; padding:0 .5rem; font-size:.75rem; }
-.badge--lg{ height:2rem;    padding:0 1rem;  font-size:1rem;  }
-
-.badge--ok { border: var(--line); background: var(--ok); }
-.badge--warn { border: var(--line); background: var(--warn); }
-.badge--bad { border: var(--line); background: var(--bad); }
-.badge--blue {  border: var(--line); background: var(--blue); }
-
-.badge--outline      { background:var(--bg); }
-.badge--outline-ok   { border: 2px solid var(--ok); background:var(--bg); }
-.badge--outline-warn { border: 2px solid var(--warn); background:var(--bg); }
-.badge--outline-bad  { border: 2px solid var(--bad); background:var(--bg); }
-.badge--outline-blue { border: 2px solid var(--blue); background:var(--bg); }
-
-.actions {
-  display: flex;
-  gap: 0.5rem;
-  justify-content: flex-end;
-  margin-top: 1rem;
-}
-
-.full-logo {
-  width: clamp(96px, 8vw, 10000px);  /* guardrails */
-  height: auto;
-}
+/* Asset overview page grid */
 
 .asset-layout {
-    display:grid;
-    gap:16px;
+    display: grid;
+    gap: 16px;
 
     grid-template-columns: 1fr 1fr 1fr 1fr;
-
     grid-template-rows: minmax(0px,100px) auto 1fr;
 
     grid-template-areas:
         "asset-asset    asset-location    asset-meta    asset-status"
         "asset-metrics  asset-location    asset-meta    asset-status"
         "asset-history  asset-history     asset-history .";
-    align-items:start;
+    align-items: start;
 }
 
-.asset-asset {
-    grid-area: asset-asset;
-    align-self: stretch;
-    }
-.asset-location {
-    grid-area: asset-location;
-    align-self: stretch;
-    }
-.asset-meta  {
-    grid-area: asset-meta;
-    align-self: stretch;
-    }
-.asset-status { grid-area: asset-status; }
-.asset-metrics { grid-area: asset-metrics; }
+.asset-asset    { grid-area: asset-asset;    align-self: stretch; }
+.asset-location { grid-area: asset-location; align-self: stretch; }
+.asset-meta     { grid-area: asset-meta;     align-self: stretch; }
+.asset-status   { grid-area: asset-status; }
+.asset-metrics  { grid-area: asset-metrics; }
 .asset-history  { grid-area: asset-history; }
-
