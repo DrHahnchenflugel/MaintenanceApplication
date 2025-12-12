@@ -1,44 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{% block title %} Maintenance {% endblock %}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
-    <!--
-    <link rel="stylesheet" href="{{ url_for('static', filename='../app/static/css/app.css') }}">-->
-    {% block head_extra %}{% endblock %}
-</head>
-<body>
-    <div class="layout">
-        {% include "_partials/_sidebar.html" %}
+    <head>
+        <meta charset="UTF-8">
+        <title>{% block title %} Maintenance {% endblock %}</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+        <!--
+        <link rel="stylesheet" href="{{ url_for('static', filename='../app/static/css/app.css') }}">-->
+        {% block head_extra %}{% endblock %}
+    </head>
+    <body>
+        <div class="layout">
+            {% include "_partials/_sidebar.html" %}
 
-        <div class="main">
-            <header class="header">
-                <div class="top">
-                    <span class="badge badge--xs badge--mono">00:00 AM</span>
-                    <span class="badge badge--xs">THO</span>
+            <div class="main">
+                <header class="header">
+                    <div class="top">
+                        <span id="clock" class="badge badge--xs badge--mono">00:00 AM</span>
+                        <span class="badge badge--xs">THO</span>
+                    </div>
+
+                    <h1>{% block page_title %}MAINTENANCE{% endblock %}</h1>
+
+                    <div class="meta">
+                        <span id="date" class="badge">
+                            {% block header_right %} Monday, September 1 {% endblock %}
+                        </span>
+                    </div>
+                </header>
+
+                <main class="content">
+                    {% block content_header %}{% endblock %}
+                    {% block content %}{% endblock %}
+                </main>
+
+                <div class="footer">
+                    <div>{% block footer_left %}{% endblock %}</div>
+                    <div>{% block footer_center_right %}{% endblock %}</div>
                 </div>
-
-                <h1>{% block page_title %}MAINTENANCE{% endblock %}</h1>
-
-                <div class="meta">
-                    <span class="badge">
-                        {% block header_right %} Monday, September 1 {% endblock %}
-                    </span>
-                </div>
-            </header>
-
-            <main class="content">
-                {% block content_header %}{% endblock %}
-                {% block content %}{% endblock %}
-            </main>
-
-            <div class="footer">
-                <div>{% block footer_left %}{% endblock %}</div>
-                <div>{% block footer_center_right %}{% endblock %}</div>
             </div>
         </div>
-    </div>
-</body>
+
+        <script>
+        function updateDateTime() {
+            const now = new Date();
+
+            document.getElementById("clock").textContent =
+                now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+
+            document.getElementById("date").textContent =
+                now.toLocaleDateString("en-US", {
+                    weekday: "long",
+                    month: "long",
+                    day: "numeric"
+                });
+        }
+
+        updateDateTime();
+        setInterval(updateDateTime, 60000);
+        </script>
+    </body>
 </html>
