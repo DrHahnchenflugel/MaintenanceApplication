@@ -423,11 +423,11 @@ a {
     display: grid;
     gap: 16px;
 
-    /* Make columns: left = big, middle = big, right = slim */
+    /* two wide cols + one narrow */
     grid-template-columns: 2fr 2fr 1.4fr;
 
-    /* Top row short, bottom row tall */
-    grid-template-rows: 28vh 50vh;
+    /* short top row, tall bottom row */
+    grid-template-rows: 26vh auto;
 
     grid-template-areas:
         "issue-main  issue-image  right-col"
@@ -437,15 +437,17 @@ a {
     min-height: 0;
 }
 
-
 .issue-main   { grid-area: issue-main; }
 .issue-image  { grid-area: issue-image; }
 .actions-card {
+    grid-area: actions;
+    grid-column: 1 / 3;      /* ← span column 1 and 2 explicitly */
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    /* min-height: 32vh; */
+    min-height: 32vh;        /* keep it tall */
 }
+
 
 .issue-main,
 .issue-image {
