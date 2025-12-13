@@ -391,20 +391,15 @@ a {
     border-bottom: 1px solid var(--line);
 }
 
-/* Center date+time vertically */
-.status-when {
-    display: flex;
-    flex-direction: column;
-    justify-content: center; /* 👈 vertical centering */
-    line-height: 1.2;
+.status-when,
+.status-what {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;  /* was center */
+  align-items: flex-start;
+  line-height: 1.25;
 }
 
-.status-what {
-    display: flex;
-    flex-direction: column;
-    justify-content: center; /* 👈 vertical centering */
-    line-height: 1.2;
-}
 
 /* sticky header */
 .thead--status {
@@ -439,6 +434,22 @@ a {
 .thead--three div:nth-child(3) {
     white-space: normal;
     word-break: break-word;
+}
+
+.thead--three > div,
+.trow--three > div {
+  align-self: start;
+  line-height: 1.25;
+}
+
+.trow--three > div:first-child {
+  font-variant-numeric: tabular-nums;
+}
+
+.trow--three > div:first-child .time {
+  opacity: 0.7;
+  font-size: 12px;
+  margin-top: 2px;
 }
 
 /* 4-column table (When / From / To / By) */

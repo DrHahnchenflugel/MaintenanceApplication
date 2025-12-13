@@ -231,8 +231,8 @@
               {% set time, date = a.created_at | format_dt %}
 
               <div class="status-when">
-                <div class="muted">{{ date }}</div>
-                {{ time }}
+                {{ date }} <br>
+                  <span class="time"> {{ time }} </span>
               </div>
 
               <div>{{ a.type.label }}</div>
