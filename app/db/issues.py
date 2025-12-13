@@ -263,8 +263,6 @@ def get_issue_row(issue_id):
     if row is None:
         return None
 
-    print(dict(row))
-
     return dict(row)
 
 def list_issue_actions(issue_id):
