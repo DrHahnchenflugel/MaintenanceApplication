@@ -446,10 +446,11 @@ a {
   font-variant-numeric: tabular-nums;
 }
 
-.trow--three > div:first-child .time {
+.time {
   opacity: 0.7;
   font-size: 12px;
   margin-top: 2px;
+  font-variant-numeric: tabular-nums;
 }
 
 /* 4-column table (When / From / To / By) */
