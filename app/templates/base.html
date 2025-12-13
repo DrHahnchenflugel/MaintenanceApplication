@@ -5,9 +5,6 @@
         <title>{% block title %} Maintenance {% endblock %}</title>
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
-        <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-        <!--
-        <link rel="stylesheet" href="{{ url_for('static', filename='../app/static/css/app.css') }}">-->
         {% block head_extra %}{% endblock %}
     </head>
     <body>
@@ -85,32 +82,6 @@
           document.addEventListener("keydown", (e) => {
             if (e.key === "Escape") closeImgModal();
           });
-        </script>
-
-        <script>
-          const siteCache = new Map();
-
-          async function getSite(siteId) {
-            if (!siteId) return null;
-
-            const cleanId = String(siteId).trim();
-            if (!cleanId) return null;
-
-            if (siteCache.has(cleanId)) {
-              return siteCache.get(cleanId);
-            }
-
-            const res = await fetch(`/maintenance/api/v2/sites/${encodeURIComponent(cleanId)}`);
-
-            if (!res.ok) {
-              console.warn("Failed to fetch site", cleanId, res.status);
-              return null;
-            }
-
-            const site = await res.json();
-            siteCache.set(cleanId, site);
-            return site;
-          }
         </script>
     </body>
 </html>

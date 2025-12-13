@@ -115,20 +115,9 @@
               <div class="pill">{{ issue.asset.asset_tag }}</div>
             </div>
 
-            <div
-              class="field"
-              x-data="{
-                site: null,
-                async init() {
-                  const id = '{{ issue.asset.site_id or "" }}'.trim();
-                  if (!id) return;
-                  this.site = await getSite(id);
-                }
-              }"
-              x-init="init()"
-            >
+            <div class="field">
               <label style="font-weight:bold;">Site</label>
-              <div class="pill" x-text="TEST"></div>
+              <div class="pill">{{ issue.asset.site_fullname or "—" }}</div>
             </div>
           </div>
 

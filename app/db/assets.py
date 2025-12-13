@@ -24,7 +24,9 @@ def get_asset_row(asset_id):
             "retired_at": None,
             "retire_reason": None,
             "created_at": ...,
-            "updated_at": ...
+            "updated_at": ...,
+            "site_shorthand: ...,
+            "site_fullname"
         }
     """
 
@@ -41,8 +43,11 @@ def get_asset_row(asset_id):
             retired_at,
             retire_reason,
             created_at,
-            updated_at
+            updated_at,
+            site.shorthand AS site_shorthand,
+            site.fullname AS site_fullname
         FROM asset
+        JOIN site ON asset.site_id = site.id
         WHERE id = :id
     """)
 
