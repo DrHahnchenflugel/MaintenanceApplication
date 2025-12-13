@@ -5,6 +5,7 @@ from app.services import issues as issue_service
 
 
 @bp.route("/issues")
+@bp.route("/issues/")
 def issues_list():
     """
     Server-rendered issues list page.
@@ -48,6 +49,7 @@ def issues_list():
     )
 
 @bp.route("/issues/<issue_id>")
+@bp.route("/issues/<issue_id>/")
 def view_issue(issue_id):
     """
     Show a single issue with actions + status history.
