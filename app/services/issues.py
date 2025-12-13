@@ -136,8 +136,8 @@ def get_issue(issue_id: str):
         "last_action_type_label": r["last_action_type_label"],
         "actions": actions,
         "status_history": status_history,
-        "site_shorthand": site_shorthand,
-        "site_fullname": site_fullname
+        "site_shorthand": r["site_shorthand"],
+        "site_fullname": r["site_fullname"]
     }
 
 def create_issue(data: dict):
