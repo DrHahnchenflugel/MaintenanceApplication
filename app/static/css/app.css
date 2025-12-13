@@ -326,6 +326,18 @@ a {
     z-index: 1000;
 }
 
+.btn-secondary {
+  background: none;
+  border: none;
+  opacity: 0.7;
+}
+
+.btn-secondary:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+
 /* logo */
 .full-logo {
     display: block;
@@ -395,7 +407,7 @@ a {
 .status-what {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;  /* was center */
+  justify-content: flex-start;
   align-items: flex-start;
   line-height: 1.25;
 }
@@ -503,6 +515,40 @@ a {
 /* =========================================================
    5. ISSUE DETAIL PAGE LAYOUT
    ========================================================= */
+.issue-title {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+.issue-status {
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.12);
+}
+
+.issue-status.open {
+  background: rgba(80, 200, 140, 0.18);
+}
+
+.issue-status.closed {
+  background: rgba(220, 120, 120, 0.18);
+}
+
+.issue-meta {
+  font-size: 12px;
+  opacity: 0.65;
+}
+
+.card.activity {
+  padding: 22px;
+}
+
+.card.status-changes {
+  opacity: 0.9;
+}
+
 
 /* 2×3 grid:
    row1: issue-main | issue-image | right-col
