@@ -230,7 +230,7 @@ def get_issue_row(issue_id):
 
             last_action.last_action_at,
             last_action.last_action_type_code,
-            last_action.last_action_type_label
+            last_action.last_action_type_label,
             
             site.shorthand AS site_shorthand,
             site.fullname AS site_fullname 
