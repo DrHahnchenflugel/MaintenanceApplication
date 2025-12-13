@@ -40,7 +40,7 @@
         <div class="row" style="gap:12px;margin-top:12px;">
           <div class="field" style="flex:1;">
             <label style="font-weight:bold;">Reported by</label>
-            <div class="pill">{{ issue.reported_by or "—" }}</div>
+            <div class="pill">{{ issue.reported_by or "SYSTEM" }}</div>
           </div>
 
           <div class="field" style="flex:1;">
@@ -121,10 +121,12 @@
             </div>
           </div>
 
-          <div class="asset-image">
-            <div class="image-placeholder image-placeholder--small">
-              GENERIC IMAGE FOR THIS MAKE / MODEL / VARIANT
-            </div>
+          <div class="asset-meta">
+            <div class="mmv">{{ asset.make }} / {{ asset.model }} / {{ asset.variant }}</div>
+              <div class="pill {{ 'pill-active' }}">
+                  <a class="asset-link" href="/maintenance/assets/{{ asset.id }}">View asset →</a>
+              </div>
+              {{ asset.status }}
           </div>
         </div>
       </div>
@@ -161,56 +163,60 @@
       </div>
 
       {# Add update form at bottom of right column #}
-      <div class="card update-form">
-        <h3 style="margin-top:0;">Add update</h3>
+      {% if issue.status_code != "CLOSED %}
+          <div class="card update-form">
+            <h3 style="margin-top:0;">Add update</h3>
 
-        <form method="post" action="{{ url_for('app.add_issue_action', issue_id=issue.id) }}"
-              class="row" style="gap:12px;flex-wrap:wrap;">
+            <form method="post" action="{{ url_for('app.add_issue_action', issue_id=issue.id) }}"
+                  class="row" style="gap:12px;flex-wrap:wrap;">
 
-          <div class="field" style="flex:1;min-width:180px;">
-            <label style="font-weight:bold;">Action type</label>
-            <select name="action_type_code" required>
-              {% for at in action_types %}
-                <option value="{{ at.code }}">{{ at.label }}</option>
-              {% endfor %}
-            </select>
+              <div class="field" style="flex:1;min-width:180px;">
+                <label style="font-weight:bold;">Action type</label>
+                <select name="action_type_code" required>
+                  {% for at in action_types %}
+                    {% if t.code != "CREATED" %}
+                        <option value="{{ at.code }}">{{ at.label }}</option>
+                    {% endif %}
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="field" style="flex:1;min-width:180px;">
+                <label style="font-weight:bold;">New status (optional)</label>
+                <select name="new_status_id">
+                  <option value="">(no status change)</option>
+                  {% for st in status_options %}
+                    <option value="{{ st.id }}">{{ st.label }}</option>
+                  {% endfor %}
+                </select>
+              </div>
+
+              <div class="field" style="flex:1;min-width:180px;">
+                <label style="font-weight:bold;">Created by</label>
+                <input type="text" name="created_by" placeholder="Your name or initials (optional)">
+              </div>
+
+              <div class="field" style="flex-basis:100%;margin-top:12px;">
+                <label style="font-weight:bold;">Details</label>
+                <textarea name="body" rows="3" required
+                          placeholder="What did you do / what happened?"
+                          style="width:100%;"></textarea>
+              </div>
+
+              <div style="flex-basis:100%;margin-top:8px;">
+                <button type="submit" class="btn btn--ok">Save update</button>
+                <a class="btn" href="{{ url_for('app.issues_list') }}">Back to list</a>
+              </div>
+            </form>
           </div>
-
-          <div class="field" style="flex:1;min-width:180px;">
-            <label style="font-weight:bold;">New status (optional)</label>
-            <select name="new_status_id">
-              <option value="">(no status change)</option>
-              {% for st in status_options %}
-                <option value="{{ st.id }}">{{ st.label }}</option>
-              {% endfor %}
-            </select>
-          </div>
-
-          <div class="field" style="flex:1;min-width:180px;">
-            <label style="font-weight:bold;">Created by</label>
-            <input type="text" name="created_by" placeholder="Your name or initials (optional)">
-          </div>
-
-          <div class="field" style="flex-basis:100%;margin-top:12px;">
-            <label style="font-weight:bold;">Details</label>
-            <textarea name="body" rows="3" required
-                      placeholder="What did you do / what happened?"
-                      style="width:100%;"></textarea>
-          </div>
-
-          <div style="flex-basis:100%;margin-top:8px;">
-            <button type="submit" class="btn btn--ok">Save update</button>
-            <a class="btn" href="{{ url_for('app.issues_list') }}">Back to list</a>
-          </div>
-        </form>
-      </div>
+        {% endif %}
     </div>
 
     {# ─────────────────────────────
        Bottom-left: Actions table
        ───────────────────────────── #}
     <div class="card actions-card">
-      <h3 style="margin-top:0;">Actions</h3>
+      <h3 style="margin-top:0;">Activity</h3>
 
       <div class="table table--scrollable">
         <div class="thead--three">
@@ -231,14 +237,15 @@
 
               <div>{{ a.type.label }}</div>
               <div>
-                <div class="status-what muted" style="white-space:pre-wrap;">{{ a.body }}</div>
+                <div class="clamp muted" data-clamp="true">{{ a.body }}</div>
+                <button type="button" class="clamp-btn" hidden>Show more</button>
                 <div class="muted">by {{ a.created_by.name }}</div>
               </div>
             </div>
           {% endfor %}
         {% else %}
           <div class="trow--three">
-            <div>-</div><div>-</div><div>No actions yet.</div>
+            <div>-</div><div>-</div><div>No activity yet.</div>
           </div>
         {% endif %}
       </div>

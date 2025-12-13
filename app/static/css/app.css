@@ -334,6 +334,33 @@ a {
     margin: 0 auto;
 }
 
+.add-update label {
+  display: block;
+  font-size: 12px;
+  opacity: 0.75;
+  margin: 10px 0 6px;
+}
+
+.add-update input,
+.add-update select,
+.add-update textarea {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  color: inherit;
+  border-radius: 10px;
+  padding: 10px 12px;
+  outline: none;
+}
+
+.add-update textarea { min-height: 92px; resize: vertical; }
+
+.add-update input:focus,
+.add-update select:focus,
+.add-update textarea:focus {
+  border-color: rgba(120, 220, 180, 0.5); /* match your green-ish accent */
+  box-shadow: 0 0 0 3px rgba(120, 220, 180, 0.12);
+}
 
 /* =========================================================
    4. TABLES & ISSUE-SPECIFIC TABLE LAYOUTS
@@ -648,11 +675,22 @@ a {
     overflow: hidden;
 }
 
-.asset-image {
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
+.asset-meta .mmv { font-weight: 650; line-height: 1.35; }
+.asset-link { display: inline-block; margin-top: 10px; opacity: .85; }
+.asset-link:hover { opacity: 1; text-decoration: underline; }
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  margin-top: 10px;
+  border: 1px solid rgba(255,255,255,0.10);
 }
+.pill-active { background: rgba(80, 200, 140, 0.10); }
+.pill-retired { background: rgba(220, 120, 120, 0.10); }
+
 
 /* Responsive reflow for smaller screens */
 @media (max-width: 960px) {
@@ -666,6 +704,29 @@ a {
             "actions";
     }
 }
+
+.clamp {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  white-space: normal;
+}
+
+.clamp.is-open {
+  -webkit-line-clamp: unset;
+}
+.clamp-btn {
+  margin-top: 6px;
+  font-size: 12px;
+  opacity: 0.8;
+  background: none;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+}
+.clamp-btn:hover { opacity: 1; text-decoration: underline; }
+
 
 /* =========================================================
    6. IMAGE PLACEHOLDERS

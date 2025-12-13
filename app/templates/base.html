@@ -83,5 +83,19 @@
             if (e.key === "Escape") closeImgModal();
           });
         </script>
+
+        <script>
+          document.querySelectorAll('[data-clamp="true"]').forEach(el => {
+            const btn = el.parentElement.querySelector('.clamp-btn');
+            // If it overflows, show button
+            if (el.scrollHeight > el.clientHeight + 2) btn.hidden = false;
+
+            btn?.addEventListener('click', () => {
+              const open = el.classList.toggle('is-open');
+              btn.textContent = open ? 'Show less' : 'Show more';
+            });
+          });
+        </script>
+
     </body>
 </html>

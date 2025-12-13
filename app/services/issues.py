@@ -215,7 +215,7 @@ def add_issue_action(issue_id: str, data: dict):
 
     action_type_code = data.get("action_type_code")
     body = data.get("body")
-    created_by = data.get("created_by") or "-"
+    created_by = data.get("created_by") or "SYSTEM"
     new_status_id = data.get("new_status_id")
 
     if not action_type_code or not body:
