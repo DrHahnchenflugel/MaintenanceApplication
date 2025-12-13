@@ -174,7 +174,7 @@
                 <label style="font-weight:bold;">Action type</label>
                 <select name="action_type_code" required>
                   {% for at in action_types %}
-                    {% if t.code != "CREATED" %}
+                    {% if at.code != "CREATED" %}
                         <option value="{{ at.code }}">{{ at.label }}</option>
                     {% endif %}
                   {% endfor %}
