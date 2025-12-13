@@ -83,6 +83,8 @@ def get_issue(issue_id):
     if issue is None:
         abort(404, description="Issue not found")
 
+    print("==============================================")
+    print(jsonify(issue))
     return jsonify(issue)
 
 @bp.route("/issues/<issue_id>/attachment", methods=["GET"])
