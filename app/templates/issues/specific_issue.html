@@ -146,8 +146,8 @@
               <div class="trow--status">
                 {% set time, date = h.changed_at | format_dt %}
                 <div class="status-when">
-                    <div class="muted">{{ date }}</div>
-                    {{ time }}
+                    {{ date }}<br>
+                    <span class="time">{{ time }}</span>
                 </div>
 
                 <div class="status-what">{{ h.to_status.label }}</div>
