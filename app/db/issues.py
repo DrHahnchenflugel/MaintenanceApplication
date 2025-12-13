@@ -231,11 +231,17 @@ def get_issue_row(issue_id):
             last_action.last_action_at,
             last_action.last_action_type_code,
             last_action.last_action_type_label
+            
+            site.shorthand AS site_shorthand,
+            site.fullname AS site_fullname 
+            
         FROM issue
         JOIN issue_status
           ON issue.status_id = issue_status.id
         JOIN asset
           ON issue.asset_id = asset.id
+        JOIN site 
+          ON asset.site_id = site.id
         LEFT JOIN LATERAL (
             SELECT
                 ia.created_at AS last_action_at,
