@@ -1,0 +1,56 @@
+.table {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* Header + rows share structure */
+.table-head,
+.table-row {
+  display: grid;
+  gap: 12px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--line);
+}
+
+/* Header row */
+.table-head {
+  font-weight: 800;
+  background: var(--panel);
+}
+
+/* Data rows */
+.table-row {
+  color: inherit;
+  align-items: start;
+}
+
+.table-row:hover {
+  background: var(--panel-lighter);
+}
+
+/* Column layouts */
+.table-head--2,
+.table-row--2 {
+  grid-template-columns: 1fr 1fr;
+}
+
+.table-head--3,
+.table-row--3 {
+  grid-template-columns: 1fr 1fr 2fr;
+}
+
+/* Optional scroll wrapper for tables */
+.table-scroll {
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+}
+
+/* If you want sticky headers inside a scroll container */
+.table-scroll .table-head {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}

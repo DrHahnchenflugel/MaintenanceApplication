@@ -1,10 +1,15 @@
 {% extends "base.html" %}
+
 {% block title %}Maintenance – Issue{% endblock %}
 {% block page_title %}Issue{% endblock %}
 
+{% block page_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/issue.css') }}">
+{% endblock %}
+
 {% block content %}
   {% if form_error %}
-    <div class="card" style="border-left:4px solid #c0392b;margin-bottom:12px;">
+    <div class="card" class="card issue-error">
       <strong>Error:</strong> {{ form_error }}
     </div>
   {% endif %}
@@ -14,63 +19,60 @@
        Top-left: Issue details
        ───────────────────────────── #}
     <div class="card issue-main">
-      <div class="issue-main-header"
-           style="display:flex;justify-content:space-between;align-items:center;gap:12px;">
-          <h2 class="issue-title">{{ issue.title }}</h2>
+      {% set code = issue.status.code if issue.status else 'UNKNOWN' %}
 
-          {% set code = issue.status.code %}
-          <span class="issue-status {{
-              'open'   if code == 'OPEN'
-           else 'closed' if code == 'CLOSED'
-           else ''
-          }}">
-            {{ issue.status.label }}
-          </span>
+      <div class="issue-main-header">
+        <h2 class="issue-title">{{ issue.title }}</h2>
+        
+        <span class="issue-status status-{{ code|lower|replace('_','-') }}">
+          {{ issue.status.label if issue.status else 'Unknown' }}
+        </span>
       </div>
 
       <div class="issue-main-scroll">
-        <div class="field" style="margin-top:12px;">
-          <label style="font-weight:bold;">Description</label>
-          <div class="pill" style="white-space:pre-wrap;">
+        <div class="field issue-block">
+          <label class="issue-label">Description</label>
+          <div class="pill issue-description">
             {{ issue.description }}
           </div>
         </div>
 
         <div class="issue-meta">
-            <div class="row" style="gap:12px;margin-top:12px;">
-            <div class="field" style="flex:1;">
-              <label style="font-weight:bold;">Reported by</label>
+          <div class="row issue-row">
+            <div class="field">
+              <label class="issue-label">Reported by</label>
               <div class="pill">{{ issue.reported_by or "SYSTEM" }}</div>
             </div>
 
-            <div class="field" style="flex:1;">
-              <label style="font-weight:bold;">Opened</label>
+            <div class="field">
+              <label class="issue-label">Opened</label>
               {% set time, date = issue.created_at | format_dt %}
               <div class="pill">
                 <div class="muted">{{ date }}</div>
               </div>
             </div>
-            </div>
+          </div>
 
-            <div class="row" style="gap:12px;margin-top:12px;">
-            <div class="field" style="flex:1;">
-              <label style="font-weight:bold;">Last update</label>
+          <div class="row issue-row">
+            <div class="field">
+              <label class="issue-label">Last update</label>
               {% set time, date = issue.last_action_at | format_dt %}
               <div class="pill">
                 <div class="muted">{{ date }}</div>
               </div>
             </div>
 
-            <div class="field" style="flex:1;">
-              <label style="font-weight:bold;">Closed</label>
-              {% set time, date = issue.closed_at | format_dt %}
-              <div class="pill">
+            <div class="field">
+              <label class="issue-label">Closed</label>
+              {% if issue.closed_at %}
+                {% set time, date = issue.closed_at | format_dt %}
                 <div class="muted">{{ date }}</div>
-              </div>
+              {% else %}
+                <div class="muted">-</div>
+              {% endif %}            
             </div>
-            </div>
+          </div>
         </div>
-
       </div>
     </div>
 
@@ -78,25 +80,25 @@
        Top-middle: Photos
        ───────────────────────────── #}
     <div class="card issue-image">
-      <h3 style="margin-top:0;">Photo (Click to expand)</h3>
+      <h3 class="card-title">Photo (Click to expand)</h3>
 
       <div class="issue-photo-frame">
         {% if issue.get("has_attachment") %}
           <button
             type="button"
             class="photo-thumb-btn"
-            onclick="openImgModal('/maintenance/api/v2/issues/{{ issue['id'] }}/attachment')"
+            onclick="openImgModal('/maintenance/api/v2/issues/{{ issue.id }}/attachment')"
             aria-label="Open issue photo"
           >
             <img
               class="photo-thumb"
-              src="/maintenance/api/v2/issues/{{ issue['id'] }}/attachment"
+              src="/maintenance/api/v2/issues/{{ issue.id }}/attachment"
               alt="Issue photo"
               loading="lazy"
             />
           </button>
         {% else %}
-          <div class="image-placeholder image-placeholder--fill">
+          <div class="issue-photo-empty">
             No photo
           </div>
         {% endif %}
@@ -109,56 +111,63 @@
     <div class="right-col">
       {# Asset card at top #}
       <div class="card asset-main">
-        <h3 style="margin:0;">Asset</h3>
+        <h3 class="card-title">Asset</h3>
+        
         <div class="asset-main-body">
           <div class="asset-fields">
             <div class="field">
-              <label style="font-weight:bold;">Tag</label>
+              <label class="issue-label">Tag</label>
               <div class="pill">{{ issue.asset.asset_tag }}</div>
             </div>
 
             <div class="field">
-              <label style="font-weight:bold;">Site</label>
+              <label class="issue-label">Site</label>
               <div class="pill">{{ issue.site_fullname }}</div>
             </div>
           </div>
 
           <div class="asset-meta">
-            <div class="mmv">{{ issue.asset.make }} / {{ issue.asset.model }} / {{ issue.asset.variant }}</div>
-              <div class="pill {{ 'pill-active' }}">
-                  <a class="asset-link" href="/maintenance/assets/{{ issue.asset.id }}">View asset →</a>
-              </div>
-              {{ issue.asset.status }}
+            <div class="mmv">
+              {{ issue.asset.make }} / {{ issue.asset.model }} / {{ issue.asset.variant }}
+            </div>
+              
+            <div class="pill pill-active">
+              <a class="asset-link" href="/maintenance/assets/{{ issue.asset.id }}">
+                View asset:
+              </a>
+            </div>
+              
+            <div class="muted">{{ issue.asset.status }}</div>
           </div>
         </div>
       </div>
 
       {# Status card in the middle (flex:1, scrolls) #}
       <div class="card status-card status-changes">
-        <h3 style="margin-top:0;">Status Changes</h3>
+        <h3 class="card-title">Status Changes</h3>
 
-        <div class="table table--scrollable">
-          <div class="thead--status">
+        <div class="table">
+          <div class="table-head table-head--2">
             <div>When</div>
             <div>New Status</div>
           </div>
 
           {% if issue.status_history %}
             {% for h in issue.status_history %}
-              <div class="trow--status">
+              <div class="table-row table-row--2">
                 {% set time, date = h.changed_at | format_dt %}
-                  <div class="status-when">
-                    {{ date }} <br>
-                      <span class="time"> {{ time }} </span>
-                  </div>
+                <div>
+                  {{ date }} <br>
+                  <span class="time"> {{ time }} </span>
+                </div>
 
-                <div class="status-what">{{ h.to_status.label }}</div>
+                <div>{{ h.to_status.label }}</div>
               </div>
             {% endfor %}
           {% else %}
-            <div class="trow--four">
-                <div>-</div>
-                <div>-</div>
+            <div class="table-row table-row--2">
+              <div>-</div>
+              <div>-</div>
             </div>
           {% endif %}
         </div>
@@ -166,51 +175,64 @@
 
       {# Add update form at bottom of right column #}
       {% if issue.status_code != "CLOSED" %}
-          <div class="card update-form">
-            <h3 style="margin-top:0;">Add update</h3>
+        <div class="card update-form">
+          <h3 class="card-title">Add update</h3>
 
-            <form method="post" action="{{ url_for('app.add_issue_action', issue_id=issue.id) }}"
-                  class="row" style="gap:12px;flex-wrap:wrap;">
+          <form 
+            method="post" 
+            action="{{ url_for('app.add_issue_action', issue_id=issue.id) }}"
+            class="row issue-form"
+          >
 
-              <div class="field" style="flex:1;min-width:180px;">
-                <label style="font-weight:bold;">Action type</label>
-                <select name="action_type_code" required>
-                  {% for at in action_types %}
-                    {% if at.code != "CREATED" %}
-                        <option value="{{ at.code }}">{{ at.label }}</option>
-                    {% endif %}
-                  {% endfor %}
-                </select>
-              </div>
+            <div class="field">
+              <label class="issue-label">Action type</label>
+              <select name="action_type_code" required>
+                {% for at in action_types %}
+                  {% if at.code != "CREATED" %}
+                      <option value="{{ at.code }}">{{ at.label }}</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
 
-              <div class="field" style="flex:1;min-width:180px;">
-                <label style="font-weight:bold;">New status (optional)</label>
-                <select name="new_status_id">
-                  <option value="">(no status change)</option>
-                  {% for st in status_options %}
-                    <option value="{{ st.id }}">{{ st.label }}</option>
-                  {% endfor %}
-                </select>
-              </div>
+            <div class="field">
+              <label class="issue-label">New status (optional)</label>
+              <select name="new_status_id">
+                <option value="">(no status change)</option>
+                {% for st in status_options %}
+                  <option value="{{ st.id }}">{{ st.label }}</option>
+                {% endfor %}
+              </select>
+            </div>
 
-              <div class="field" style="flex:1;min-width:180px;">
-                <label style="font-weight:bold;">Created by</label>
-                <input type="text" name="created_by" placeholder="Your name or initials (optional)">
-              </div>
+            <div class="field">
+              <label class="issue-label">Created by</label>
+              <input 
+                type="text" 
+                name="created_by" 
+                placeholder="Your name or initials (optional)"
+              >
+            </div>
 
-              <div class="field" style="flex-basis:100%;margin-top:12px;">
-                <label style="font-weight:bold;">Details</label>
-                <textarea name="body" rows="3" required
-                          placeholder="What did you do / what happened?"
-                          style="width:100%;"></textarea>
-              </div>
+            <div class="field issue-form-wide">
+              <label class="issue-label">Details</label>
+              <textarea 
+                name="body" 
+                rows="3" 
+                required        
+                placeholder="What did you do / what happened?"
+                style="width:100%;"
+              ></textarea>
+            </div>
 
-              <div style="flex-basis:100%;margin-top:8px;">
-                <button type="submit" class="btn btn--ok">Save update</button>
-                <a class="btn btn-secondary" href="{{ url_for('app.issues_list') }}">Back to list</a>
-              </div>
-            </form>
-          </div>
+            <div class="issue-form-actions">
+              <button type="submit" class="btn btn--ok">Save update</button>
+              <a class="btn btn-secondary" href="{{ url_for('app.issues_list') }}">
+                Back to list
+              </a>
+            </div>
+          </form>
+        </div>
       {% endif %}
     </div>
 
@@ -218,10 +240,10 @@
        Bottom-left: Actions table
        ───────────────────────────── #}
     <div class="card actions-card activity">
-      <h3 style="margin-top:0;">Activity</h3>
+      <h3 class="card-title">Activity</h3>
 
-      <div class="table table--scrollable">
-        <div class="thead--three">
+      <div class="table">
+        <div class="table-head table-head--3">
           <div>When</div>
           <div>Type</div>
           <div>Details</div>
@@ -229,15 +251,16 @@
 
         {% if issue.actions %}
           {% for a in issue.actions %}
-            <div class="trow--three">
+            <div class="table-row table-row--3">
               {% set time, date = a.created_at | format_dt %}
 
-              <div class="status-when">
+              <div>
                 {{ date }} <br>
-                  <span class="time"> {{ time }} </span>
+                <span class="time"> {{ time }} </span>
               </div>
 
               <div>{{ a.type.label }}</div>
+              
               <div>
                 <div class="clamp muted" data-clamp="true">{{ a.body }}</div>
                 <button type="button" class="clamp-btn" hidden>Show more</button>
@@ -246,13 +269,13 @@
             </div>
           {% endfor %}
         {% else %}
-          <div class="trow--three">
-            <div>-</div><div>-</div><div>No activity yet.</div>
+          <div class="table-row table-row--3">
+            <div>-</div>
+            <div>-</div>
+            <div>No activity yet.</div>
           </div>
         {% endif %}
       </div>
     </div>
-
   </div> {# end .issue-layout #}
-
 {% endblock %}

@@ -1,16 +1,17 @@
 <aside class="sidebar">
-    <div style="text-align:center; padding:20px;">
-        <img class="full-logo" src="{{ url_for('static', filename='img/full-size-logo.png') }}" alt="Hi!">
-        <div style="font-size:1.6rem; font-weight:bold;">Maintenance</div>
+    <div class="sidebar-brand">
+        <img class="full-logo" src="{{ url_for('static', filename='img/full-size-logo.png') }}" alt="Maintenance System Logo">
+        <div class="sidebar-title">Maintenance</div>
     </div>
 
-    <hr style="border: 1px solid #ccc; margin: 20px 0;">
+    <hr class="sidebar-divider">
+
     <nav class="nav">
-        <a href="#" class="{{ 'is-active' if request.endpoint == 'app.dashboard' else 'not-active' }}">Dashboard</a>
-        <a href="#" class="{{ 'is-active' if request.endpoint == 'app.issues_active' else 'not-active' }}">Active Issues</a>
-        <a href="#" class="not-active">Past Issues</a>
-        <a href="#" class="not-active">Blocked Issues</a>
-        <a href="#" class="{{ 'is-active' if request.endpoint == 'app.assets' else 'not-active' }}">Inventory</a>
-        <a href="#" class="not-active">Settings</a>
+        <a href="#" {% if request.endpoint == 'app.dashboard' %}class="is-active"{% endif %}>Dashboard</a>
+        <a href="#" {% if request.endpoint == 'app.issues_active' %}class="is-active"{% endif %}>Active Issues</a>
+        <a href="#" {% if request.endpoint == 'app.issues_past' %}class="is-active"{% endif %}>Past Issues</a>
+        <a href="#" {% if request.endpoint == 'app.issues_blocked' %}class="is-active"{% endif %}>Blocked Issues</a>
+        <a href="#" {% if request.endpoint == 'app.inventory' %}class="is-active"{% endif %}>Inventory</a>
+        <a href="#" {% if request.endpoint == 'app.settings' %}class="is-active"{% endif %}>Settings</a>
     </nav>
 </aside>

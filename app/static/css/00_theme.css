@@ -1,0 +1,48 @@
+:root {
+  color-scheme: dark;
+
+  --bg:#0f1115;
+
+  --line:#323745;
+  --text:#e7ebf1;
+
+  --muted:#aab1bd;
+
+  --brand:#FF6600;
+
+  --panel:#171a21;
+  --panel-ok:#42806c;
+  --panel-warn:#c2410c;
+  --panel-bad:#884649;
+  --panel-lighter:#272b36;
+
+  --ok:#6ee7b7;
+  --warn:#fb923c;
+  --bad:#f87171;
+  --blue:#2596be;
+}
+
+* { box-sizing: border-box; }
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu;
+  color: var(--text);
+  background: var(--bg);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img { max-width: 100%; height: auto; }
+
+.muted { color: var(--muted); }
+
+.no-scroll { overflow: hidden; }

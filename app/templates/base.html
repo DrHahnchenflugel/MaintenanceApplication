@@ -1,101 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <title>{% block title %} Maintenance {% endblock %}</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
-        {% block head_extra %}{% endblock %}
-    </head>
-    <body>
-        <div class="layout">
-            {% include "_partials/_sidebar.html" %}
+  <head>
+    <meta charset="UTF-8">
+    <title>{% block title %} Maintenance {% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/00_theme.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/10_layout.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/20_components.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/30_tables.css') }}">
+    <script defer src="{{ url_for('static', filename='js/base.js') }}"></script>
+    {% block page_css %}{% endblock %}
+    {% block head_extra %}{% endblock %}
+  </head>
+  <body>
+    <div class="layout">
+      {% include "_partials/_sidebar.html" %}
 
-            <div class="main">
-                <header class="header">
-                    <div class="top">
-                        <span id="clock" class="badge badge--xs badge--mono">00:00 AM</span>
-                        <span class="badge badge--xs">THO</span>
-                    </div>
-
-                    <h1>{% block page_title %}MAINTENANCE{% endblock %}</h1>
-
-                    <div class="meta">
-                        <span id="date" class="badge">
-                            {% block header_right %} Monday, September 1 {% endblock %}
-                        </span>
-                    </div>
-                </header>
-
-                <main class="content">
-                    {% block content_header %}{% endblock %}
-                    {% block content %}{% endblock %}
-                </main>
-
-                <div class="footer">
-                    <div>{% block footer_left %}{% endblock %}</div>
-                    <div>{% block footer_center_right %}{% endblock %}</div>
-                </div>
-            </div>
-        </div>
-
-         <div id="imgModal" class="img-modal" onclick="closeImgModal()">
-            <img id="imgModalContent" class="img-modal-content" alt="Expanded issue photo">
+      <div class="main">
+        <header class="header">
+          <div class="top">
+            <span id="clock" class="badge badge--xs badge--mono">00:00 AM</span>
+            <span class="badge badge--xs">THO</span>
           </div>
 
-        <script>
-        function updateDateTime() {
-            const now = new Date();
+          <h1 class="header-title">{% block page_title %}MAINTENANCE{% endblock %}</h1>
 
-            document.getElementById("clock").textContent =
-                now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit" });
+          <div class="meta">
+            <span id="date" class="badge">
+              {% block header_right %} Monday, September 1 {% endblock %}
+            </span>
+          </div>
+        </header>
 
-            document.getElementById("date").textContent =
-                now.toLocaleDateString("en-US", {
-                    weekday: "long",
-                    month: "long",
-                    day: "numeric"
-                });
-        }
+        <main class="content">
+          {% block content_header %}{% endblock %}
+          {% block content %}{% endblock %}
+        </main>
 
-        updateDateTime();
-        setInterval(updateDateTime, 60000);
-        </script>
+        <footer class="footer">
+          <div>{% block footer_left %}{% endblock %}</div>
+          <div>{% block footer_center_right %}{% endblock %}</div>
+        </footer>
+      </div>
+    </div>
 
-        <script>
-          function openImgModal(src) {
-            const m = document.getElementById("imgModal");
-            const img = document.getElementById("imgModalContent");
-            img.src = src;
-            m.classList.add("open");
-            document.body.classList.add("no-scroll");
-          }
-
-          function closeImgModal() {
-            const m = document.getElementById("imgModal");
-            const img = document.getElementById("imgModalContent");
-            m.classList.remove("open");
-            document.body.classList.remove("no-scroll");
-            img.src = "";
-          }
-
-          document.addEventListener("keydown", (e) => {
-            if (e.key === "Escape") closeImgModal();
-          });
-        </script>
-
-        <script>
-          document.querySelectorAll('[data-clamp="true"]').forEach(el => {
-            const btn = el.parentElement.querySelector('.clamp-btn');
-            // If it overflows, show button
-            if (el.scrollHeight > el.clientHeight + 2) btn.hidden = false;
-
-            btn?.addEventListener('click', () => {
-              const open = el.classList.toggle('is-open');
-              btn.textContent = open ? 'Show less' : 'Show more';
-            });
-          });
-        </script>
-
-    </body>
+    <div id="imgModal" class="img-modal" onclick="closeImgModal()">
+      <img id="imgModalContent" class="img-modal-content" alt="Expanded issue photo">
+    </div>
+  </body>
 </html>
