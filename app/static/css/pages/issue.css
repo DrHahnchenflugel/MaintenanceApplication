@@ -66,7 +66,14 @@
 }
 
 
-.issue-main   { grid-area: issue-main; }
+.issue-main   { 
+  grid-area: issue-main; 
+  background: var(--panel);
+}
+.issue-main:hover{
+  background: var(--panel-lighter);
+}
+
 .issue-image  { grid-area: issue-image; }
 .actions-card {
     grid-area: actions;
