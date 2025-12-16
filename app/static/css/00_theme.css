@@ -1,48 +1,121 @@
+/* =========================================================
+   00_theme.css
+   Design tokens + global resets
+   ========================================================= */
+
 :root {
   color-scheme: dark;
 
-  --bg:#0f1115;
+  /* ---- Base colors ---- */
+  --bg: #0f1115;
+  --panel: #171a21;
+  --panel-lighter: #272b36;
 
-  --line:#323745;
-  --text:#e7ebf1;
+  --line: #323745;
 
-  --muted:#aab1bd;
+  --text: #e7ebf1;
+  --muted: #aab1bd;
 
-  --brand:#FF6600;
+  /* ---- Brand & semantic ---- */
+  --brand: #ff6600;
 
-  --panel:#171a21;
-  --panel-ok:#42806c;
-  --panel-warn:#c2410c;
-  --panel-bad:#884649;
-  --panel-lighter:#272b36;
+  --ok: #6ee7b7;
+  --warn: #fb923c;
+  --bad: #f87171;
+  --blue: #2596be;
 
-  --ok:#6ee7b7;
-  --warn:#fb923c;
-  --bad:#f87171;
-  --blue:#2596be;
+  /* Panel tints */
+  --panel-ok: #42806c;
+  --panel-warn: #c2410c;
+  --panel-bad: #884649;
 }
 
-* { box-sizing: border-box; }
+/* =========================================================
+   Global reset & base rules
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+}
 
 html,
 body {
-    height: 100%;
+  height: 100%;
 }
 
 body {
   margin: 0;
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu;
-  color: var(--text);
+  font-family:
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Ubuntu,
+    Cantarell,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+
   background: var(--bg);
+  color: var(--text);
+
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
+/* ---- Links ---- */
 a {
   color: inherit;
   text-decoration: none;
 }
 
-img { max-width: 100%; height: auto; }
+a:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
 
-.muted { color: var(--muted); }
+/* ---- Images ---- */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
 
-.no-scroll { overflow: hidden; }
+/* ---- Text helpers ---- */
+.muted {
+  color: var(--muted);
+}
+
+.no-scroll {
+  overflow: hidden;
+}
+
+/* =========================================================
+   Selection & scrollbars (subtle, optional)
+   ========================================================= */
+
+::selection {
+  background: rgba(255, 102, 0, 0.35);
+  color: var(--text);
+}
+
+/* WebKit scrollbar styling (safe, minimal) */
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: rgba(255,255,255,0.12);
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: content-box;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: rgba(255,255,255,0.2);
+}

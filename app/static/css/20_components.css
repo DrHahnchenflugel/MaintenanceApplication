@@ -1,78 +1,93 @@
+/* 20_components.css
+   Shared UI components (cards, rows, badges, buttons, pills, nav)
+*/
 
+/* ---- Flex row helper ---- */
 .row {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
 }
 
-
+/* ---- Card ---- */
 .card {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 16px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
 }
 
-/* Generic container used elsewhere */
+/* Optional: clickable card affordance (safe to use anywhere) */
+.card--clickable { cursor: pointer; }
+.card--clickable:active { transform: scale(0.99); }
+
+/* ---- Generic container ---- */
 .container {
-    display: flex;
+  display: flex;
 }
 
-
-/* Badges */
-
+/* ---- Badges ---- */
 .badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: .35em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .35em;
 
-    height: 1.6rem;
-    padding: 0 .75rem;
-    border-radius: 999px;
+  height: 1.6rem;
+  padding: 0 .75rem;
+  border-radius: 999px;
 
-    font-size: .9rem;
-    font-weight: 700;
-    line-height: 1;
-    white-space: nowrap;
+  font-size: .9rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
 
-    color: var(--text);
-    background: rgba(255,255,255,.02);
-    border: 1px solid var(--line);
+  color: var(--text);
+  background: rgba(255,255,255,.02);
+  border: 1px solid var(--line);
 
-    flex: 0 0 auto;
-    justify-self: start;
+  flex: 0 0 auto;
+  justify-self: start;
 }
 
-.badge--xs { height: 1.25rem; padding: 0 .5rem; font-size: .75rem; }
+.badge--xs {
+  height: 1.25rem;
+  padding: 0 .5rem;
+  font-size: .75rem;
+}
 
-/* Buttons */
+.badge--mono {
+  font-variant-numeric: tabular-nums;
+}
 
+/* ---- Buttons ---- */
 .btn {
-    background: var(--panel);
-    color: var(--text);
-    padding: 10px 14px;
-    border: none;
-    border-radius: 10px;
-    font-weight: 700;
-    cursor: pointer;
+  background: var(--panel);
+  color: var(--text);
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
 }
+
 .btn--ok {
-    background: var(--panel-ok);
-    color: white;
-    border: 3px solid var(--ok);
-    text-shadow:
-        -1px -1px 0 black,
-         1px -1px 0 black,
-        -1px  1px 0 black,
-         1px  1px 0 black;
+  background: var(--panel-ok);
+  color: white;
+  border: 3px solid var(--ok);
+  text-shadow:
+    -1px -1px 0 black,
+     1px -1px 0 black,
+    -1px  1px 0 black,
+     1px  1px 0 black;
 }
 
-
+/* Secondary button style (link-like) */
 .btn.btn-secondary {
   background: none;
   border: none;
   opacity: 0.7;
+  padding: 10px 6px; /* keeps click target reasonable */
 }
 
 .btn.btn-secondary:hover {
@@ -80,7 +95,23 @@
   text-decoration: underline;
 }
 
+/* A simple icon button (useful for future modals, etc.) */
+.icon-btn {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,.03);
+  color: var(--text);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
 
+.icon-btn:hover { background: rgba(255,255,255,.06); }
+
+/* ---- Clamp helpers ---- */
 .clamp {
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -90,7 +121,6 @@
 
   overflow: hidden;
 }
-
 
 .clamp.is-open {
   -webkit-line-clamp: unset;
@@ -106,8 +136,13 @@
   padding: 0;
   cursor: pointer;
 }
-.clamp-btn:hover { opacity: 1; text-decoration: underline; }
 
+.clamp-btn:hover {
+  opacity: 1;
+  text-decoration: underline;
+}
+
+/* ---- Small text helpers ---- */
 .time {
   opacity: 0.7;
   font-size: 12px;
@@ -115,17 +150,21 @@
   font-variant-numeric: tabular-nums;
 }
 
+.muted { color: var(--muted); }
+
+/* ---- Sidebar logo ---- */
 .full-logo {
-    display: block;
-    width: clamp(96px, 8vw, 180px);
-    height: auto;
-    margin: 0 auto;
+  display: block;
+  width: clamp(96px, 8vw, 180px);
+  height: auto;
+  margin: 0 auto;
 }
 
+/* ---- Sidebar nav ---- */
 .nav {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .nav a {
@@ -147,6 +186,7 @@
   font-weight: 600;
 }
 
+/* ---- Pills ---- */
 .pill {
   display: inline-flex;
   align-items: center;
@@ -156,4 +196,19 @@
   margin: 0;
   border: 1px solid rgba(255,255,255,0.10);
 }
-.pill-active { background: rgba(80, 200, 140, 0.10); }
+
+.pill-active {
+  background: rgba(80, 200, 140, 0.10);
+}
+
+/* ---- Overlay safety ---- */
+.no-scroll { overflow: hidden; }
+
+/* =========================================================
+   Touch affordances: slightly larger hit targets on tablet/phone
+   ========================================================= */
+@media (max-width: 1024px) {
+  .btn { padding: 11px 15px; }
+  .nav a { padding: 10px 12px; }
+  .pill { padding: 5px 11px; }
+}

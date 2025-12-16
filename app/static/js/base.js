@@ -38,8 +38,12 @@
     if (!m || !img) return;
 
     m.classList.remove("open");
-    document.body.classList.remove("no-scroll");
     img.src = "";
+
+    // Only remove no-scroll if sidebar drawer isn't open
+    const sidebar = document.getElementById("sidebar");
+    const drawerOpen = sidebar && sidebar.classList.contains("is-open");
+    if (!drawerOpen) document.body.classList.remove("no-scroll");
   }
 
   // Make them available to HTML onclick=""
@@ -67,16 +71,61 @@
     });
   }
 
-  // ---- Boot ----
+  // ---- Sidebar drawer (tablet/phone) ----
+  function initSidebarDrawer() {
+    const sidebar = document.getElementById("sidebar");
+    const scrim = document.getElementById("sidebarScrim");
+    const btn = document.getElementById("navToggle");
+    if (!sidebar || !scrim || !btn) return;
+
+    function openNav() {
+      sidebar.classList.add("is-open");
+      scrim.hidden = false;
+      document.body.classList.add("no-scroll");
+    }
+
+    function closeNav() {
+      sidebar.classList.remove("is-open");
+      scrim.hidden = true;
+
+      // Only remove no-scroll if image modal isn't open
+      const imgModal = document.getElementById("imgModal");
+      const modalOpen = imgModal && imgModal.classList.contains("open");
+      if (!modalOpen) document.body.classList.remove("no-scroll");
+    }
+
+    btn.addEventListener("click", openNav);
+    scrim.addEventListener("click", closeNav);
+  }
+
+  // ---- Escape key: close top-most overlay ----
   document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") closeImgModal();
+    if (e.key !== "Escape") return;
+
+    // Close image modal first if open
+    const imgModal = document.getElementById("imgModal");
+    if (imgModal && imgModal.classList.contains("open")) {
+      closeImgModal();
+      return;
+    }
+
+    // Otherwise close sidebar if open
+    const sidebar = document.getElementById("sidebar");
+    const scrim = document.getElementById("sidebarScrim");
+    if (sidebar && sidebar.classList.contains("is-open")) {
+      sidebar.classList.remove("is-open");
+      if (scrim) scrim.hidden = true;
+      document.body.classList.remove("no-scroll");
+    }
   });
 
+  // ---- Boot ----
   document.addEventListener("DOMContentLoaded", () => {
     updateDateTime();
     setInterval(updateDateTime, 60000);
 
     initClampToggles();
+    initSidebarDrawer();
   });
 
   // Run again after images/fonts settle (helps clamp correctness)
