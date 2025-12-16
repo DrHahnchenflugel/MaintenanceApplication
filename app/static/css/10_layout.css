@@ -102,7 +102,7 @@ body { overflow: hidden; }
 /* =========================================================
    Tablet + phone: sidebar becomes a drawer; body scrolls
    ========================================================= */
-@media (max-width: 1024px) {
+@media (max-width: 1200px) {
   /* Switch to page-style scrolling */
   body { overflow: auto; }
 
