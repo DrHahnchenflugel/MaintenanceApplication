@@ -54,6 +54,17 @@
     align-items: stretch;
     min-height: 0;
 }
+/* tablets */
+@media (max-width: 1024px) {
+  .issue-layout {
+     /* two wide cols + one narrow */
+    grid-template-columns: 2fr 2fr 2.5fr;
+
+    /* short top row, tall bottom row */
+    grid-template-rows: 30vh auto;
+  }
+}
+
 
 .issue-main   { grid-area: issue-main; }
 .issue-image  { grid-area: issue-image; }
