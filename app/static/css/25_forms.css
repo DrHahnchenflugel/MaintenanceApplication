@@ -1,44 +1,47 @@
 /* =========================================================
-   25_forms.css
-   Scoped form styling — NO global input/select overrides
-   Applies ONLY inside .update-form
+   25_forms.css (scoped)
+   Applies ONLY to the Add Update form: .issue-form--update
    ========================================================= */
 
-/* -----------------------------
-   Form layout (Update form only)
-   ----------------------------- */
-
-.update-form .issue-form {
+/* --- Layout --- */
+.issue-form--update {
   display: grid;
   gap: 14px;
   align-items: start;
 }
 
-/* Desktop: compact but readable */
-@media (min-width: 1025px) {
-  .update-form .issue-form {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+/* Tablet/Desktop: 2-column, clean */
+@media (min-width: 769px) {
+  .issue-form--update {
+    grid-template-columns: 1fr 1fr;
   }
 
-  .update-form .issue-form .issue-form-wide {
-    grid-column: 1 / -1;
-  }
+  /* Put Created by on the right, action type on left */
+  .issue-form--update > .field:nth-child(1) { grid-column: 1; }
+  .issue-form--update > .field:nth-child(2) { grid-column: 2; }
+  .issue-form--update > .field:nth-child(3) { grid-column: 1 / -1; }
 
-  .update-form .issue-form-actions {
+  /* Details full width */
+  .issue-form--update .issue-form-wide { grid-column: 1 / -1; }
+
+  /* Actions full width */
+  .issue-form--update .issue-form-actions {
     grid-column: 1 / -1;
     display: flex;
     gap: 12px;
     align-items: center;
+    flex-wrap: wrap;
+    margin-top: 2px;
   }
 }
 
-/* Tablet / phone: vertical, touch-friendly */
-@media (max-width: 1024px) {
-  .update-form .issue-form {
+/* Phone: single column */
+@media (max-width: 768px) {
+  .issue-form--update {
     grid-template-columns: 1fr;
   }
 
-  .update-form .issue-form-actions {
+  .issue-form--update .issue-form-actions {
     display: flex;
     gap: 12px;
     align-items: center;
@@ -46,11 +49,8 @@
   }
 }
 
-/* -----------------------------
-   Labels (Update form only)
-   ----------------------------- */
-
-.update-form .issue-label {
+/* --- Labels --- */
+.issue-form--update .issue-label {
   display: block;
   margin-bottom: 6px;
   font-size: 12px;
@@ -58,18 +58,16 @@
   letter-spacing: 0.02em;
 }
 
-/* -----------------------------
-   Controls (scoped!)
-   ----------------------------- */
-
-.update-form input,
-.update-form select,
-.update-form textarea {
+/* --- Controls --- */
+.issue-form--update input,
+.issue-form--update select,
+.issue-form--update textarea {
   width: 100%;
   color: var(--text);
-  background: rgba(255,255,255,.03);
-  border: 1px solid rgba(255,255,255,.14);
-  border-radius: 10px;
+
+  background: rgba(255,255,255,.035);
+  border: 1px solid rgba(255,255,255,.16);
+  border-radius: 12px;
 
   padding: 10px 12px;
   font-size: 14px;
@@ -79,94 +77,56 @@
 }
 
 /* Height consistency */
-.update-form input,
-.update-form select {
-  height: 40px;
+.issue-form--update input,
+.issue-form--update select {
+  height: 42px;
 }
 
-/* Textarea comfort */
-.update-form textarea {
+/* Textarea should feel like the main input */
+.issue-form--update textarea {
+  min-height: 140px;
   resize: vertical;
-  min-height: 110px;
+  padding: 12px;
+  line-height: 1.4;
 }
 
 /* Placeholder */
-.update-form input::placeholder,
-.update-form textarea::placeholder {
+.issue-form--update input::placeholder,
+.issue-form--update textarea::placeholder {
   color: rgba(255,255,255,.35);
 }
 
 /* Hover */
-.update-form input:hover,
-.update-form select:hover,
-.update-form textarea:hover {
-  border-color: rgba(255,255,255,.22);
+.issue-form--update input:hover,
+.issue-form--update select:hover,
+.issue-form--update textarea:hover {
+  border-color: rgba(255,255,255,.24);
 }
 
 /* Focus */
-.update-form input:focus,
-.update-form select:focus,
-.update-form textarea:focus {
-  border-color: rgba(255,102,0,.55);
+.issue-form--update input:focus,
+.issue-form--update select:focus,
+.issue-form--update textarea:focus {
+  border-color: rgba(255,102,0,.6);
   box-shadow: 0 0 0 3px rgba(255,102,0,.18);
 }
 
-/* Disabled */
-.update-form input:disabled,
-.update-form select:disabled,
-.update-form textarea:disabled {
-  opacity: .55;
-  cursor: not-allowed;
-}
-
-/* -----------------------------
-   Select dropdown polish (scoped)
-   ----------------------------- */
-
-.update-form select {
-  appearance: none;
-  -webkit-appearance: none;
-
-  background-image:
-    linear-gradient(45deg, transparent 50%, rgba(255,255,255,.55) 50%),
-    linear-gradient(135deg, rgba(255,255,255,.55) 50%, transparent 50%);
-  background-position:
-    calc(100% - 16px) 50%,
-    calc(100% - 11px) 50%;
-  background-size: 6px 6px, 6px 6px;
-  background-repeat: no-repeat;
-
-  padding-right: 34px;
-}
-
-/* -----------------------------
-   Primary / secondary actions
-   ----------------------------- */
-
-.update-form .issue-form-actions .btn--ok {
+/* Actions */
+.issue-form--update .issue-form-actions .btn--ok {
   padding: 12px 16px;
-  border-radius: 12px;
+  border-radius: 14px;
 }
 
-.update-form .issue-form-actions .btn-secondary {
+.issue-form--update .issue-form-actions .btn-secondary {
   padding: 10px 6px;
-  opacity: 0.75;
+  opacity: 0.8;
 }
 
-/* -----------------------------
-   iOS Safari usability
-   Prevents zoom-on-focus
-   ----------------------------- */
-
+/* iOS Safari: prevent zoom on focus */
 @media (max-width: 1024px) {
-  .update-form input,
-  .update-form select,
-  .update-form textarea {
+  .issue-form--update input,
+  .issue-form--update select,
+  .issue-form--update textarea {
     font-size: 16px;
-  }
-
-  .update-form input,
-  .update-form select {
-    height: 44px;
   }
 }
