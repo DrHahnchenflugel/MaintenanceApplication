@@ -31,7 +31,7 @@
       <div class="issue-main-scroll">
         <div class="field issue-block">
           <label class="issue-label">Description</label>
-          <div class="pill issue-description">
+          <div class="issue-description">
             {{ issue.description }}
           </div>
         </div>
@@ -74,6 +74,39 @@
       </div>
     </div>
 
+    {# Asset card at top #}
+    <div class="card asset-main asset-main--slot">
+      <h3 class="card-title">Asset</h3>
+      
+      <div class="asset-main-body">
+        <div class="asset-fields">
+          <div class="field">
+            <label class="issue-label">Tag</label>
+            <div class="pill">{{ issue.asset.asset_tag }}</div>
+          </div>
+
+          <div class="field">
+            <label class="issue-label">Site</label>
+            <div class="pill">{{ issue.site_fullname }}</div>
+          </div>
+        </div>
+
+        <div class="asset-meta">
+          <div class="mmv">
+            {{ issue.asset.make.label }} / {{ issue.asset.model.label }} / {{ issue.asset.variant.label }}
+          </div>
+            
+          <div class="pill pill-active">
+            <a class="asset-link" href="/maintenance/assets/{{ issue.asset.id }}">
+              View asset
+            </a>
+          </div>
+            
+          <div class="muted">{{ issue.asset.status }}</div>
+        </div>
+      </div>
+    </div>
+
     {# ─────────────────────────────
        Top-middle: Photos
        ───────────────────────────── #}
@@ -107,39 +140,6 @@
        Right column: asset + status + update
        ───────────────────────────── #}
     <div class="right-col">
-      {# Asset card at top #}
-      <div class="card asset-main">
-        <h3 class="card-title">Asset</h3>
-        
-        <div class="asset-main-body">
-          <div class="asset-fields">
-            <div class="field">
-              <label class="issue-label">Tag</label>
-              <div class="pill">{{ issue.asset.asset_tag }}</div>
-            </div>
-
-            <div class="field">
-              <label class="issue-label">Site</label>
-              <div class="pill">{{ issue.site_fullname }}</div>
-            </div>
-          </div>
-
-          <div class="asset-meta">
-            <div class="mmv">
-              {{ issue.asset.make.label }} / {{ issue.asset.model.label }} / {{ issue.asset.variant.label }}
-            </div>
-              
-            <div class="pill pill-active">
-              <a class="asset-link" href="/maintenance/assets/{{ issue.asset.id }}">
-                View asset
-              </a>
-            </div>
-              
-            <div class="muted">{{ issue.asset.status }}</div>
-          </div>
-        </div>
-      </div>
-
       {# Status card in the middle (flex:1, scrolls) #}
       <div class="card status-card status-changes">
         <h3 class="card-title">Status Changes</h3>

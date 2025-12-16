@@ -1,5 +1,5 @@
 /* =========================================================
-   Issue page styles
+   issue.css
    ========================================================= */
 
 /* ---- Typography ---- */
@@ -7,6 +7,7 @@
   font-size: 22px;
   font-weight: 700;
   line-height: 1.25;
+  margin: 0;
 }
 
 .issue-status {
@@ -15,16 +16,12 @@
   padding: 6px 12px;
   border-radius: 999px;
   border: 1px solid rgba(255,255,255,0.12);
+  white-space: nowrap;
   flex: 0 0 auto;
 }
 
-.issue-status.open {
-  background: rgba(80, 200, 140, 0.18);
-}
-
-.issue-status.closed {
-  background: rgba(220, 120, 120, 0.18);
-}
+.issue-status.open { background: rgba(80, 200, 140, 0.18); }
+.issue-status.closed { background: rgba(220, 120, 120, 0.18); }
 
 .issue-meta {
   font-size: 12px;
@@ -32,13 +29,12 @@
 }
 
 /* =========================================================
-   Desktop layout (unchanged)
+   Desktop grid (your original vibe)
    ========================================================= */
 
 /*
-Grid:
-row 1: issue-main | issue-image | right-col
-row 2: actions    | actions     | right-col
+row1: issue-main | issue-image | right-col
+row2: actions    | actions     | right-col
 */
 .issue-layout {
   display: grid;
@@ -46,7 +42,6 @@ row 2: actions    | actions     | right-col
 
   grid-template-columns: 2fr 2fr 1.4fr;
   grid-template-rows: 26vh auto;
-
   grid-template-areas:
     "issue-main issue-image right-col"
     "actions    actions     right-col";
@@ -55,13 +50,16 @@ row 2: actions    | actions     | right-col
   min-height: 0;
 }
 
-.issue-main   { grid-area: issue-main; }
-.issue-image  { grid-area: issue-image; }
-.right-col    { grid-area: right-col; }
+.issue-main { grid-area: issue-main; }
+.issue-image { grid-area: issue-image; }
+.right-col { grid-area: right-col; }
 .actions-card { grid-area: actions; }
 
+/* Asset slot exists in DOM; on desktop it should NOT appear here */
+.asset-main--slot { display: none; }
+
 /* =========================================================
-   Issue main card
+   Issue main card (internal scroll on desktop)
    ========================================================= */
 
 .issue-main {
@@ -78,7 +76,6 @@ row 2: actions    | actions     | right-col
 }
 
 .issue-main-header h2 {
-  margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -89,6 +86,18 @@ row 2: actions    | actions     | right-col
   overflow-y: auto;
   margin-top: 12px;
   min-height: 0;
+}
+
+/* Description becomes normal text */
+.issue-description {
+  margin-top: 6px;
+  color: var(--text);
+  opacity: 0.92;
+  line-height: 1.45;
+
+  /* Important: handle long strings */
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 /* =========================================================
@@ -128,7 +137,7 @@ row 2: actions    | actions     | right-col
   height: 100%;
   display: grid;
   place-items: center;
-  opacity: 0.5;
+  opacity: 0.55;
 }
 
 /* =========================================================
@@ -143,9 +152,31 @@ row 2: actions    | actions     | right-col
   overflow: hidden;
 }
 
-.asset-main {
-  flex: 0 0 auto;
+.status-card {
+  display: flex;
+  flex-direction: column;
+  height: 31vh;
+  min-height: 31vh;
+  overflow: hidden;
+  opacity: 0.9;
 }
+
+/* =========================================================
+   Activity card sizing (desktop)
+   ========================================================= */
+
+.actions-card {
+  display: flex;
+  flex-direction: column;
+  height: 61vh;
+  min-height: 61vh;
+  overflow: hidden;
+  padding: 22px;
+}
+
+/* =========================================================
+   Asset card (shared styling)
+   ========================================================= */
 
 .asset-main-body {
   display: grid;
@@ -165,46 +196,31 @@ row 2: actions    | actions     | right-col
 .asset-meta .mmv {
   font-weight: 650;
   line-height: 1.35;
-}
-
-/* Status changes card */
-.status-card {
-  display: flex;
-  flex-direction: column;
-  height: 31vh;
-  min-height: 31vh;
-  overflow: hidden;
-  opacity: 0.9;
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 /* =========================================================
-   Activity
+   iPad / tablet: two columns, stack Issue + Asset on left,
+   Photo spans both rows on right
    ========================================================= */
 
-.actions-card {
-  display: flex;
-  flex-direction: column;
-  height: 61vh;
-  min-height: 61vh;
-  overflow: hidden;
-  padding: 22px;
-}
+@media (max-width: 1200px) {
+  /* Use named areas including the new asset slot */
+  .asset-main--slot { display: block; }
+  .asset-main--slot { grid-area: asset; }
 
-/* =========================================================
-   Tablet (landscape): 2-column reflow
-   ========================================================= */
-
-@media (max-width: 1024px) {
   .issue-layout {
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto;
+    grid-template-rows: auto auto auto;
     grid-template-areas:
-      "issue-main  issue-image"
-      "actions     actions"
-      "right-col   right-col";
+      "issue-main issue-image"
+      "asset     issue-image"
+      "actions   actions"
+      "right-col right-col";
   }
 
-  /* Let title wrap instead of brutal truncation */
+  /* Let titles wrap a bit on tablet */
   .issue-main-header h2 {
     white-space: normal;
     display: -webkit-box;
@@ -213,16 +229,7 @@ row 2: actions    | actions     | right-col
     overflow: hidden;
   }
 
-  /* Subtle touch affordance */
-  .issue-main {
-    cursor: pointer;
-  }
-
-  .issue-main:active {
-    transform: scale(0.99);
-  }
-
-  /* Chevron hint (no JS yet) */
+  /* Add chevron hint on the Issue card header */
   .issue-main-header::after {
     content: "›";
     margin-left: auto;
@@ -230,10 +237,27 @@ row 2: actions    | actions     | right-col
     font-size: 22px;
     line-height: 1;
   }
+
+  /* Stop forcing desktop-style fixed heights on tablet */
+  .actions-card,
+  .status-card {
+    height: auto;
+    min-height: unset;
+  }
+
+  /* Ensure the photo card can stretch */
+  .issue-image {
+    height: 100%;
+  }
+
+  /* Make description not scroll-inside-card on tablet unless needed */
+  .issue-main-scroll {
+    overflow: visible;
+  }
 }
 
 /* =========================================================
-   Tablet portrait + phone: single column
+   Phone: single column stack
    ========================================================= */
 
 @media (max-width: 768px) {
@@ -241,14 +265,13 @@ row 2: actions    | actions     | right-col
     grid-template-columns: 1fr;
     grid-template-areas:
       "issue-main"
+      "asset"
       "issue-image"
       "right-col"
       "actions";
   }
 
-  .actions-card,
-  .status-card {
-    height: auto;
-    min-height: unset;
+  .issue-image {
+    min-height: 320px; /* keeps photo usable on phone */
   }
 }
