@@ -1,8 +1,7 @@
 /* =========================================================
-   issue.css (desktop + tablet)
-   Goal:
-   - Desktop: internal scroll panels like before
-   - iPad/tablet: your new A,B,C / D,E,E layout
+   issue.css
+   Desktop: A(title) + B(scroll desc) + C(asset) inside issue card
+   iPad: keep the A,B,C / D,E,E layout you liked
    ========================================================= */
 
 /* ---- Titles/status ---- */
@@ -28,10 +27,6 @@
   opacity: 0.65;
 }
 
-/* If you’re using status-xxx classes now, keep it generic */
-.issue-status.status-open { background: rgba(80, 200, 140, 0.18); }
-.issue-status.status-closed { background: rgba(220, 120, 120, 0.18); }
-
 /* ---- Grid areas ---- */
 .issue-main { grid-area: issue-main; }
 .issue-image { grid-area: issue-image; }
@@ -47,7 +42,7 @@
   gap: 16px;
 
   grid-template-columns: 2fr 2fr 1.4fr;
-  grid-template-rows: 26vh auto;
+  grid-template-rows: 40vh auto;   /* taller top row */
 
   grid-template-areas:
     "issue-main issue-image status"
@@ -57,16 +52,17 @@
   min-height: 0;
 }
 
-/* Make top row cards behave */
-.issue-main,
-.issue-image {
+/* ---- Issue card becomes A/B/C stack ---- */
+.issue-main {
   display: flex;
   flex-direction: column;
   min-height: 0;
+  overflow: hidden;
 }
 
-/* Issue header */
+/* A: header */
 .issue-main-header {
+  flex: 0 0 auto;
   display: flex;
   align-items: flex-start;
   gap: 12px;
@@ -78,12 +74,13 @@
   white-space: nowrap;
 }
 
-/* Desktop: issue card scrolls internally */
-.issue-main-scroll {
+/* B: scrollable body */
+.issue-main-body {
   flex: 1 1 auto;
+  min-height: 0;
   overflow-y: auto;
   margin-top: 12px;
-  min-height: 0;
+  padding-right: 2px;
 }
 
 /* Description is normal text */
@@ -95,10 +92,11 @@
   word-break: break-word;
 }
 
-/* Compact asset strip */
+/* C: asset strip fixed at bottom */
 .issue-asset-strip {
-  margin-top: 14px;
-  padding-top: 14px;
+  flex: 0 0 auto;
+  margin-top: 12px;
+  padding-top: 12px;
   border-top: 1px solid rgba(255,255,255,0.08);
 
   display: grid;
@@ -120,7 +118,13 @@
   word-break: break-word;
 }
 
-/* Photo */
+/* ---- Photo card ---- */
+.issue-image {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
 .issue-photo-frame {
   flex: 1 1 auto;
   min-height: 0;
@@ -151,14 +155,13 @@
   opacity: 0.55;
 }
 
-/* Status column should be its own stack on desktop */
+/* ---- Status column ---- */
 .status-col {
   display: flex;
   flex-direction: column;
   min-height: 0;
 }
 
-/* Desktop: Status card is scrollable */
 .status-card {
   display: flex;
   flex-direction: column;
@@ -173,20 +176,13 @@
   overflow-y: auto;
 }
 
-/* Update card (desktop) */
-.update-slot {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-
-/* Desktop: Activity should be a scroll panel again */
+/* ---- Activity scroll panel (desktop) ---- */
 .actions-card {
   display: flex;
   flex-direction: column;
   min-height: 0;
   overflow: hidden;
-  height: 62vh;       /* controls desktop feel */
+  height: 62vh;
   max-height: 62vh;
 }
 
@@ -196,15 +192,14 @@
   overflow-y: auto;
 }
 
-/* Tables: prevent long text from exploding layout */
+/* Prevent long text nuking width */
 .table-row > div {
   overflow-wrap: anywhere;
   word-break: break-word;
 }
 
 /* =========================================================
-   iPad/tablet layout (A,B,C / D,E,E)
-   Keep natural heights, no forced vh panels
+   iPad/tablet (A,B,C / D,E,E) — keep natural heights
    ========================================================= */
 @media (max-width: 1200px) {
   .issue-layout {
@@ -216,14 +211,16 @@
       "update    actions     actions";
   }
 
-  /* Kill desktop fixed heights on tablet */
+  /* Don’t force vh panels on tablet */
   .actions-card {
     height: auto;
     max-height: none;
   }
 
-  /* Let sections flow naturally */
-  .issue-main-scroll {
+  /* On tablet, don’t trap scrolling inside issue/status/activity */
+  .issue-main-body,
+  .status-card .table-scroll,
+  .actions-card .table-scroll {
     overflow: visible;
   }
 
@@ -231,12 +228,7 @@
     height: auto;
   }
 
-  .status-card .table-scroll,
-  .actions-card .table-scroll {
-    overflow: visible;
-  }
-
-  /* Let title wrap a bit on tablet */
+  /* Let title wrap a bit */
   .issue-main-header h2 {
     white-space: normal;
     display: -webkit-box;
@@ -247,7 +239,7 @@
 }
 
 /* =========================================================
-   Phone layout (stack)
+   Phone stack
    ========================================================= */
 @media (max-width: 768px) {
   .issue-layout {
@@ -260,7 +252,5 @@
       "actions";
   }
 
-  .issue-image {
-    min-height: 320px;
-  }
+  .issue-image { min-height: 320px; }
 }

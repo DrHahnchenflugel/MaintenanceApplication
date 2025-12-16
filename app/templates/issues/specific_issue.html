@@ -17,20 +17,21 @@
   <div class="issue-layout">
 
     {# ─────────────────────────────
-       A: Issue details
+       A/B/C: Issue card
        ───────────────────────────── #}
     <div class="card issue-main">
       {% set code = issue.status.code if issue.status else 'UNKNOWN' %}
 
+      {# A: title + status #}
       <div class="issue-main-header">
         <h2 class="issue-title">{{ issue.title }}</h2>
-
         <span class="issue-status status-{{ code|lower|replace('_','-') }}">
           {{ issue.status.label if issue.status else 'Unknown' }}
         </span>
       </div>
 
-      <div class="issue-main-scroll">
+      {# B: description + meta (scrolls) #}
+      <div class="issue-main-body">
         <div class="field issue-block">
           <label class="issue-label">Description</label>
           <div class="issue-description">
@@ -48,9 +49,7 @@
             <div class="field">
               <label class="issue-label">Opened</label>
               {% set _, date = issue.created_at | format_dt %}
-              <div class="pill">
-                <div class="muted">{{ date }}</div>
-              </div>
+              <div class="pill"><div class="muted">{{ date }}</div></div>
             </div>
           </div>
 
@@ -58,9 +57,7 @@
             <div class="field">
               <label class="issue-label">Last update</label>
               {% set _, date = issue.last_action_at | format_dt %}
-              <div class="pill">
-                <div class="muted">{{ date }}</div>
-              </div>
+              <div class="pill"><div class="muted">{{ date }}</div></div>
             </div>
 
             <div class="field">
@@ -74,38 +71,38 @@
             </div>
           </div>
         </div>
+      </div>
 
-        {# Compact asset strip (keeps asset info without a whole extra card) #}
-        <div class="issue-asset-strip">
-          <div class="issue-asset-left">
-            <div class="field">
-              <label class="issue-label">Tag</label>
-              <div class="pill">{{ issue.asset.asset_tag }}</div>
-            </div>
-
-            <div class="field">
-              <label class="issue-label">Site</label>
-              <div class="pill">{{ issue.site_fullname }}</div>
-            </div>
+      {# C: robot info (fixed at bottom) #}
+      <div class="issue-asset-strip">
+        <div class="issue-asset-left">
+          <div class="field">
+            <label class="issue-label">Tag</label>
+            <div class="pill">{{ issue.asset.asset_tag }}</div>
           </div>
 
-          <div class="issue-asset-right">
-            <div class="mmv">
-              {{ issue.asset.make.label }} / {{ issue.asset.model.label }} / {{ issue.asset.variant.label }}
-            </div>
+          <div class="field">
+            <label class="issue-label">Site</label>
+            <div class="pill">{{ issue.site_fullname }}</div>
+          </div>
+        </div>
 
-            <div class="pill pill-active">
-              <a class="asset-link" href="/maintenance/assets/{{ issue.asset.id }}">
-                View asset
-              </a>
-            </div>
+        <div class="issue-asset-right">
+          <div class="mmv">
+            {{ issue.asset.make.label }} / {{ issue.asset.model.label }} / {{ issue.asset.variant.label }}
+          </div>
+
+          <div class="pill pill-active">
+            <a class="asset-link" href="/maintenance/assets/{{ issue.asset.id }}">
+              View asset
+            </a>
           </div>
         </div>
       </div>
     </div>
 
     {# ─────────────────────────────
-       B: Photo
+       Photo
        ───────────────────────────── #}
     <div class="card issue-image">
       <h3 class="card-title">Photo (Click to expand)</h3>
@@ -132,7 +129,7 @@
     </div>
 
     {# ─────────────────────────────
-       C: Status Changes (only)
+       Status Changes
        ───────────────────────────── #}
     <div class="status-col">
       <div class="card status-card status-changes">
@@ -166,7 +163,7 @@
     </div>
 
     {# ─────────────────────────────
-       D: Add update (own grid cell now)
+       Add update
        ───────────────────────────── #}
     {% if issue.status_code != "CLOSED" %}
       <div class="card update-form update-slot">
@@ -228,7 +225,7 @@
     {% endif %}
 
     {# ─────────────────────────────
-       E: Activity
+       Activity
        ───────────────────────────── #}
     <div class="card actions-card activity">
       <h3 class="card-title">Activity</h3>
