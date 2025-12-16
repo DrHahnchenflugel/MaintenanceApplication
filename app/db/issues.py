@@ -224,6 +224,9 @@ def get_issue_row(issue_id):
 
             asset.asset_tag,
             asset.site_id,
+            asset.make,
+            asset.model,
+            asset.variant
 
             issue_status.code  AS status_code,
             issue_status.label AS status_label,
