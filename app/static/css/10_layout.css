@@ -2,6 +2,22 @@
 /* Layout-level scroll policy */
 html, body { overflow: hidden; }
 
+/* tablets */
+@media (max-width: 1024px) {
+  .html,body {
+    overflow-x: hidden;
+    overflow-y: scroll;
+  }
+}
+
+/* phones */
+@media (max-width: 768px) {
+  .layout {
+    grid-template-columns: 1fr 4fr;
+  }
+}
+
+
 .layout {
     display: grid;
     grid-template-columns: 240px 1fr;
@@ -12,7 +28,7 @@ html, body { overflow: hidden; }
 /* tablets */
 @media (max-width: 1024px) {
   .layout {
-    grid-template-columns: 200px 1fr;
+    grid-template-columns: 1fr 6fr;
   }
 }
 
