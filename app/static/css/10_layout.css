@@ -9,6 +9,20 @@ html, body { overflow: hidden; }
     height: auto;
 }
 
+/* tablets */
+@media (max-width: 1024px) {
+  .layout {
+    grid-template-columns: 200px 1fr;
+  }
+}
+
+/* phones */
+@media (max-width: 768px) {
+  .layout {
+    grid-template-columns: 1fr;
+  }
+}
+
 .main {
     display: flex;
     flex-direction: column;
