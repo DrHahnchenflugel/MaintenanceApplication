@@ -66,12 +66,18 @@
 }
 
 
-.issue-main   { 
-  grid-area: issue-main; 
-  background: var(--panel);
+.issue-main   {grid-area: issue-main;}
+/* tablets */
+@media (max-width: 1024px) {
+  .issue-main {
+     box-shadow: 0 1px 0 rgba(0,0,0,.25);
+  }
 }
-.issue-main:hover{
-  background: var(--panel-lighter);
+
+.issue-summary__chev{
+  font-size:22px;
+  opacity:.55;
+  flex:0 0 auto;
 }
 
 .issue-image  { grid-area: issue-image; }
