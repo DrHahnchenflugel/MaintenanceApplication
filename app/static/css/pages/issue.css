@@ -75,10 +75,10 @@
 }
 
 .issue-issue-summary__chevron{
-  font-size:22px;
-  opacity:.55;
-  flex:0 0 auto;
-  align-items:end;
+  flex: 0 0 auto;
+  margin-left: 12px;
+  font-size: 22px;
+  opacity: .55;
 }
 
 .issue-image  { grid-area: issue-image; }
