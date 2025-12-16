@@ -9,32 +9,34 @@
 
 {% block content %}
   {% if form_error %}
-    <div class="card" class="card issue-error">
+    <div class="card issue-error">
       <strong>Error:</strong> {{ form_error }}
     </div>
   {% endif %}
 
   <div class="issue-layout">
+
     {# ─────────────────────────────
-       Top-left: Issue details
+       Issue details
        ───────────────────────────── #}
     <div class="card issue-main">
       {% set code = issue.status.code if issue.status else 'UNKNOWN' %}
 
       <div class="issue-main-header">
         <h2 class="issue-title">{{ issue.title }}</h2>
-        
         <span class="issue-status status-{{ code|lower|replace('_','-') }}">
           {{ issue.status.label if issue.status else 'Unknown' }}
         </span>
       </div>
+
       <div class="issue-main-scroll">
         <div class="field issue-block">
           <label class="issue-label">Description</label>
           <div class="issue-description">
-            {{ issue.description }}
+            {{ issue.description or "—" }}
           </div>
         </div>
+
         <div class="issue-meta">
           <div class="row issue-row">
             <div class="field">
@@ -44,7 +46,7 @@
 
             <div class="field">
               <label class="issue-label">Opened</label>
-              {% set time, date = issue.created_at | format_dt %}
+              {% set _, date = issue.created_at | format_dt %}
               <div class="pill">
                 <div class="muted">{{ date }}</div>
               </div>
@@ -54,7 +56,7 @@
           <div class="row issue-row">
             <div class="field">
               <label class="issue-label">Last update</label>
-              {% set time, date = issue.last_action_at | format_dt %}
+              {% set _, date = issue.last_action_at | format_dt %}
               <div class="pill">
                 <div class="muted">{{ date }}</div>
               </div>
@@ -63,21 +65,23 @@
             <div class="field">
               <label class="issue-label">Closed</label>
               {% if issue.closed_at %}
-                {% set time, date = issue.closed_at | format_dt %}
+                {% set _, date = issue.closed_at | format_dt %}
                 <div class="muted">{{ date }}</div>
               {% else %}
                 <div class="muted">-</div>
-              {% endif %}            
+              {% endif %}
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    {# Asset card at top #}
+    {# ─────────────────────────────
+       Asset (tablet slot)
+       ───────────────────────────── #}
     <div class="card asset-main asset-main--slot">
       <h3 class="card-title">Asset</h3>
-      
+
       <div class="asset-main-body">
         <div class="asset-fields">
           <div class="field">
@@ -93,22 +97,24 @@
 
         <div class="asset-meta">
           <div class="mmv">
-            {{ issue.asset.make.label }} / {{ issue.asset.model.label }} / {{ issue.asset.variant.label }}
+            {{ issue.asset.make.label }}
+            / {{ issue.asset.model.label }}
+            / {{ issue.asset.variant.label }}
           </div>
-            
+
           <div class="pill pill-active">
             <a class="asset-link" href="/maintenance/assets/{{ issue.asset.id }}">
               View asset
             </a>
           </div>
-            
+
           <div class="muted">{{ issue.asset.status }}</div>
         </div>
       </div>
     </div>
 
     {# ─────────────────────────────
-       Top-middle: Photos
+       Photo
        ───────────────────────────── #}
     <div class="card issue-image">
       <h3 class="card-title">Photo (Click to expand)</h3>
@@ -129,23 +135,21 @@
             />
           </button>
         {% else %}
-          <div class="issue-photo-empty">
-            No photo
-          </div>
+          <div class="issue-photo-empty">No photo</div>
         {% endif %}
       </div>
     </div>
 
     {# ─────────────────────────────
-       Right column: asset + status + update
+       Right column: status + update
        ───────────────────────────── #}
     <div class="right-col">
-      {# Status card in the middle (flex:1, scrolls) #}
+
       <div class="card status-card status-changes">
         <h3 class="card-title">Status Changes</h3>
 
         <div class="table table-scroll">
-          <div class="table-head table-scroll table-head--2">
+          <div class="table-head table-head--2">
             <div>When</div>
             <div>New Status</div>
           </div>
@@ -155,10 +159,9 @@
               <div class="table-row table-row--2">
                 {% set time, date = h.changed_at | format_dt %}
                 <div>
-                  {{ date }} <br>
-                  <span class="time"> {{ time }} </span>
+                  {{ date }}<br>
+                  <span class="time">{{ time }}</span>
                 </div>
-
                 <div>{{ h.to_status.label }}</div>
               </div>
             {% endfor %}
@@ -171,23 +174,21 @@
         </div>
       </div>
 
-      {# Add update form at bottom of right column #}
       {% if issue.status_code != "CLOSED" %}
         <div class="card update-form">
           <h3 class="card-title">Add update</h3>
 
-          <form 
-            method="post" 
+          <form
+            method="post"
             action="{{ url_for('app.add_issue_action', issue_id=issue.id) }}"
-            class="row issue-form"
+            class="issue-form"
           >
-
             <div class="field">
               <label class="issue-label">Action type</label>
               <select name="action_type_code" required>
                 {% for at in action_types %}
                   {% if at.code != "CREATED" %}
-                      <option value="{{ at.code }}">{{ at.label }}</option>
+                    <option value="{{ at.code }}">{{ at.label }}</option>
                   {% endif %}
                 {% endfor %}
               </select>
@@ -205,21 +206,20 @@
 
             <div class="field">
               <label class="issue-label">Created by</label>
-              <input 
-                type="text" 
-                name="created_by" 
+              <input
+                type="text"
+                name="created_by"
                 placeholder="Your name or initials (optional)"
               >
             </div>
 
             <div class="field issue-form-wide">
               <label class="issue-label">Details</label>
-              <textarea 
-                name="body" 
-                rows="3" 
-                required        
+              <textarea
+                name="body"
+                rows="3"
+                required
                 placeholder="What did you do / what happened?"
-                style="width:100%;"
               ></textarea>
             </div>
 
@@ -235,13 +235,13 @@
     </div>
 
     {# ─────────────────────────────
-       Bottom-left: Actions table
+       Activity
        ───────────────────────────── #}
     <div class="card actions-card activity">
       <h3 class="card-title">Activity</h3>
 
       <div class="table table-scroll">
-        <div class="table-head table-scroll table-head--3">
+        <div class="table-head table-head--3">
           <div>When</div>
           <div>Type</div>
           <div>Details</div>
@@ -251,14 +251,11 @@
           {% for a in issue.actions %}
             <div class="table-row table-row--3">
               {% set time, date = a.created_at | format_dt %}
-
               <div>
-                {{ date }} <br>
-                <span class="time"> {{ time }} </span>
+                {{ date }}<br>
+                <span class="time">{{ time }}</span>
               </div>
-
               <div>{{ a.type.label }}</div>
-              
               <div>
                 <div class="clamp muted" data-clamp="true">{{ a.body }}</div>
                 <button type="button" class="clamp-btn" hidden>Show more</button>
@@ -275,5 +272,6 @@
         {% endif %}
       </div>
     </div>
-  </div> {# end .issue-layout #}
+
+  </div>
 {% endblock %}
