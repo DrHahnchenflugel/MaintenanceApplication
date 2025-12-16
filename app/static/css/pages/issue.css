@@ -237,31 +237,40 @@
     overflow: hidden;
   }
 
-   /* Make the second row: update + activity share a fixed-ish height */
+  /* Row 2: update + activity same height + internal scroll */
   .update-slot,
   .actions-card {
-    height: 52vh;        /* adjust: 48–58vh depending on taste */
-    min-height: 420px;   /* prevents tiny height in short viewports */
+    height: 52vh;
+    min-height: 420px;
     max-height: 52vh;
-    overflow: hidden;    /* enables internal scroll children */
+    overflow: hidden;
   }
 
-  /* Let Activity scroll internally again on iPad */
   .actions-card .table-scroll {
     flex: 1 1 auto;
     min-height: 0;
     overflow-y: auto;
-  }
-
-  /* If you previously disabled this on tablet, re-enable it */
-  .status-card .table-scroll {
-    overflow-y: auto;
-  }
-
-  /* IMPORTANT: undo the earlier “overflow: visible” rule for tablet */
-  .actions-card .table-scroll,
-  .status-card .table-scroll {
     overflow-x: hidden;
+  }
+
+  /* Row 1: Status should NOT grow forever — make it scroll too */
+  .status-card {
+    height: 40vh;        /* adjust: 32–44vh */
+    min-height: 260px;
+    max-height: 40vh;
+    overflow: hidden;
+  }
+
+  .status-card .table-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+  }
+
+  /* IMPORTANT: if you had overflow: visible on tablet, override it */
+  .issue-main-body {
+    overflow-y: auto;    /* keep issue description scrollable if needed */
   }
 }
 
