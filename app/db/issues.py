@@ -226,7 +226,7 @@ def get_issue_row(issue_id):
             asset.site_id,
             asset.make,
             asset.model,
-            asset.variant
+            asset.variant,
 
             issue_status.code  AS status_code,
             issue_status.label AS status_label,
