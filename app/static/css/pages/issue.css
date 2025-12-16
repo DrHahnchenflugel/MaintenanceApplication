@@ -236,6 +236,33 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+
+   /* Make the second row: update + activity share a fixed-ish height */
+  .update-slot,
+  .actions-card {
+    height: 52vh;        /* adjust: 48–58vh depending on taste */
+    min-height: 420px;   /* prevents tiny height in short viewports */
+    max-height: 52vh;
+    overflow: hidden;    /* enables internal scroll children */
+  }
+
+  /* Let Activity scroll internally again on iPad */
+  .actions-card .table-scroll {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+
+  /* If you previously disabled this on tablet, re-enable it */
+  .status-card .table-scroll {
+    overflow-y: auto;
+  }
+
+  /* IMPORTANT: undo the earlier “overflow: visible” rule for tablet */
+  .actions-card .table-scroll,
+  .status-card .table-scroll {
+    overflow-x: hidden;
+  }
 }
 
 /* =========================================================
