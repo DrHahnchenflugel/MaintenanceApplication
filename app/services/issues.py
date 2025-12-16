@@ -125,9 +125,23 @@ def get_issue(issue_id: str):
             "id": r["asset_id"],
             "asset_tag": r["asset_tag"],
             "site_id": r["site_id"],
-            "make":r["make"],
-            "model":r["model"],
-            "variant":r["variant"],
+            "make":{
+                "id":r["make_id"],
+                "name":r["make_name"],
+                "label":r["make_label"],
+            },
+
+            "model":{
+                "id":r["model_id"],
+                "name":r["model_name"],
+                "label":r["model_label"],
+            },
+
+            "variant":{
+                "id":r["variant_id"],
+                "name":r["variant_name"],
+                "label":r["variant_label"],
+            },
         },
         "has_attachment": issue_db.get_issue_attachment_by_issue_id(issue_id=issue_id) is not None,
         "reported_by": r["reported_by"],

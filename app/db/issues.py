@@ -224,9 +224,18 @@ def get_issue_row(issue_id):
 
             asset.asset_tag,
             asset.site_id,
-            asset.make,
-            asset.model,
-            asset.variant,
+            
+            variant.id AS variant_id,
+            variant.name AS variant_name,
+            variant.label AS variant_label,
+               
+            model.id AS model_id,
+            model.name AS model_name,
+            model.label AS model_label,
+               
+            make.id AS make_id,
+            make.name AS make_name,
+            make.label AS make_label,
 
             issue_status.code  AS status_code,
             issue_status.label AS status_label,
@@ -257,6 +266,10 @@ def get_issue_row(issue_id):
             ORDER BY ia.created_at DESC
             LIMIT 1
         ) AS last_action ON TRUE
+        LEFT JOIN variant ON asset.variant_id = variant.id
+        LEFT JOIN model ON variant.model_id = model.id
+        LEFT JOIN make ON model.make_id = make.id
+
         WHERE issue.id = :id
     """)
 
