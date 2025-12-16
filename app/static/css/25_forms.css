@@ -1,37 +1,35 @@
 /* =========================================================
-   25_forms.css (scoped)
-   Applies ONLY to the Add Update form: .issue-form--update
+   25_forms.css
+   Scoped form styling — ONLY for .issue-form--update
    ========================================================= */
 
-/* --- Layout --- */
 .issue-form--update {
   display: grid;
   gap: 14px;
   align-items: start;
 }
 
-/* Tablet/Desktop: 2-column, clean */
+/* Tablet/Desktop: 2-column top controls, details full width */
 @media (min-width: 769px) {
   .issue-form--update {
     grid-template-columns: 1fr 1fr;
   }
 
-  /* Put Created by on the right, action type on left */
-  .issue-form--update > .field:nth-child(1) { grid-column: 1; }
-  .issue-form--update > .field:nth-child(2) { grid-column: 2; }
-  .issue-form--update > .field:nth-child(3) { grid-column: 1 / -1; }
+  /* Created by spans full width (feels less cramped) */
+  .issue-form--update > .field:nth-child(3) {
+    grid-column: 1 / -1;
+  }
 
-  /* Details full width */
-  .issue-form--update .issue-form-wide { grid-column: 1 / -1; }
+  .issue-form--update .issue-form-wide {
+    grid-column: 1 / -1;
+  }
 
-  /* Actions full width */
   .issue-form--update .issue-form-actions {
     grid-column: 1 / -1;
     display: flex;
     gap: 12px;
     align-items: center;
     flex-wrap: wrap;
-    margin-top: 2px;
   }
 }
 
@@ -49,7 +47,7 @@
   }
 }
 
-/* --- Labels --- */
+/* Labels */
 .issue-form--update .issue-label {
   display: block;
   margin-bottom: 6px;
@@ -58,13 +56,12 @@
   letter-spacing: 0.02em;
 }
 
-/* --- Controls --- */
+/* Controls */
 .issue-form--update input,
 .issue-form--update select,
 .issue-form--update textarea {
   width: 100%;
   color: var(--text);
-
   background: rgba(255,255,255,.035);
   border: 1px solid rgba(255,255,255,.16);
   border-radius: 12px;
@@ -76,13 +73,11 @@
   outline: none;
 }
 
-/* Height consistency */
 .issue-form--update input,
 .issue-form--update select {
   height: 42px;
 }
 
-/* Textarea should feel like the main input */
 .issue-form--update textarea {
   min-height: 140px;
   resize: vertical;

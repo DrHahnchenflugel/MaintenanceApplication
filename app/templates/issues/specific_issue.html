@@ -17,13 +17,14 @@
   <div class="issue-layout">
 
     {# ─────────────────────────────
-       Issue details
+       A: Issue details
        ───────────────────────────── #}
     <div class="card issue-main">
       {% set code = issue.status.code if issue.status else 'UNKNOWN' %}
 
       <div class="issue-main-header">
         <h2 class="issue-title">{{ issue.title }}</h2>
+
         <span class="issue-status status-{{ code|lower|replace('_','-') }}">
           {{ issue.status.label if issue.status else 'Unknown' }}
         </span>
@@ -73,48 +74,38 @@
             </div>
           </div>
         </div>
-      </div>
-    </div>
 
-    {# ─────────────────────────────
-       Asset (tablet slot)
-       ───────────────────────────── #}
-    <div class="card asset-main asset-main--slot">
-      <h3 class="card-title">Asset</h3>
+        {# Compact asset strip (keeps asset info without a whole extra card) #}
+        <div class="issue-asset-strip">
+          <div class="issue-asset-left">
+            <div class="field">
+              <label class="issue-label">Tag</label>
+              <div class="pill">{{ issue.asset.asset_tag }}</div>
+            </div>
 
-      <div class="asset-main-body">
-        <div class="asset-fields">
-          <div class="field">
-            <label class="issue-label">Tag</label>
-            <div class="pill">{{ issue.asset.asset_tag }}</div>
+            <div class="field">
+              <label class="issue-label">Site</label>
+              <div class="pill">{{ issue.site_fullname }}</div>
+            </div>
           </div>
 
-          <div class="field">
-            <label class="issue-label">Site</label>
-            <div class="pill">{{ issue.site_fullname }}</div>
-          </div>
-        </div>
+          <div class="issue-asset-right">
+            <div class="mmv">
+              {{ issue.asset.make.label }} / {{ issue.asset.model.label }} / {{ issue.asset.variant.label }}
+            </div>
 
-        <div class="asset-meta">
-          <div class="mmv">
-            {{ issue.asset.make.label }}
-            / {{ issue.asset.model.label }}
-            / {{ issue.asset.variant.label }}
+            <div class="pill pill-active">
+              <a class="asset-link" href="/maintenance/assets/{{ issue.asset.id }}">
+                View asset
+              </a>
+            </div>
           </div>
-
-          <div class="pill pill-active">
-            <a class="asset-link" href="/maintenance/assets/{{ issue.asset.id }}">
-              View asset
-            </a>
-          </div>
-
-          <div class="muted">{{ issue.asset.status }}</div>
         </div>
       </div>
     </div>
 
     {# ─────────────────────────────
-       Photo
+       B: Photo
        ───────────────────────────── #}
     <div class="card issue-image">
       <h3 class="card-title">Photo (Click to expand)</h3>
@@ -141,10 +132,9 @@
     </div>
 
     {# ─────────────────────────────
-       Right column: status + update
+       C: Status Changes (only)
        ───────────────────────────── #}
-    <div class="right-col">
-
+    <div class="status-col">
       <div class="card status-card status-changes">
         <h3 class="card-title">Status Changes</h3>
 
@@ -173,69 +163,72 @@
           {% endif %}
         </div>
       </div>
-
-      {% if issue.status_code != "CLOSED" %}
-        <div class="card update-form">
-          <h3 class="card-title">Add update</h3>
-
-          <form
-            method="post"
-            action="{{ url_for('app.add_issue_action', issue_id=issue.id) }}"
-            class="issue-form issue-form--update"
-          >
-            <div class="field">
-              <label class="issue-label">Action type</label>
-              <select name="action_type_code" required>
-                {% for at in action_types %}
-                  {% if at.code != "CREATED" %}
-                    <option value="{{ at.code }}">{{ at.label }}</option>
-                  {% endif %}
-                {% endfor %}
-              </select>
-            </div>
-
-            <div class="field">
-              <label class="issue-label">New status (optional)</label>
-              <select name="new_status_id">
-                <option value="">(no status change)</option>
-                {% for st in status_options %}
-                  <option value="{{ st.id }}">{{ st.label }}</option>
-                {% endfor %}
-              </select>
-            </div>
-
-            <div class="field">
-              <label class="issue-label">Created by</label>
-              <input
-                type="text"
-                name="created_by"
-                placeholder="Your name or initials (optional)"
-              >
-            </div>
-
-            <div class="field issue-form-wide">
-              <label class="issue-label">Details</label>
-              <textarea
-                name="body"
-                rows="3"
-                required
-                placeholder="What did you do / what happened?"
-              ></textarea>
-            </div>
-
-            <div class="issue-form-actions">
-              <button type="submit" class="btn btn--ok">Save update</button>
-              <a class="btn btn-secondary" href="{{ url_for('app.issues_list') }}">
-                Back to list
-              </a>
-            </div>
-          </form>
-        </div>
-      {% endif %}
     </div>
 
     {# ─────────────────────────────
-       Activity
+       D: Add update (own grid cell now)
+       ───────────────────────────── #}
+    {% if issue.status_code != "CLOSED" %}
+      <div class="card update-form update-slot">
+        <h3 class="card-title">Add update</h3>
+
+        <form
+          method="post"
+          action="{{ url_for('app.add_issue_action', issue_id=issue.id) }}"
+          class="issue-form issue-form--update"
+        >
+          <div class="field">
+            <label class="issue-label">Action type</label>
+            <select name="action_type_code" required>
+              {% for at in action_types %}
+                {% if at.code != "CREATED" %}
+                  <option value="{{ at.code }}">{{ at.label }}</option>
+                {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="field">
+            <label class="issue-label">New status (optional)</label>
+            <select name="new_status_id">
+              <option value="">(no status change)</option>
+              {% for st in status_options %}
+                <option value="{{ st.id }}">{{ st.label }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="field">
+            <label class="issue-label">Created by</label>
+            <input
+              type="text"
+              name="created_by"
+              placeholder="Your name or initials (optional)"
+            >
+          </div>
+
+          <div class="field issue-form-wide">
+            <label class="issue-label">Details</label>
+            <textarea
+              name="body"
+              rows="3"
+              required
+              placeholder="What did you do / what happened?"
+            ></textarea>
+          </div>
+
+          <div class="issue-form-actions">
+            <button type="submit" class="btn btn--ok">Save update</button>
+            <a class="btn btn-secondary" href="{{ url_for('app.issues_list') }}">
+              Back to list
+            </a>
+          </div>
+        </form>
+      </div>
+    {% endif %}
+
+    {# ─────────────────────────────
+       E: Activity
        ───────────────────────────── #}
     <div class="card actions-card activity">
       <h3 class="card-title">Activity</h3>
@@ -251,11 +244,14 @@
           {% for a in issue.actions %}
             <div class="table-row table-row--3">
               {% set time, date = a.created_at | format_dt %}
+
               <div>
                 {{ date }}<br>
                 <span class="time">{{ time }}</span>
               </div>
+
               <div>{{ a.type.label }}</div>
+
               <div>
                 <div class="clamp muted" data-clamp="true">{{ a.body }}</div>
                 <button type="button" class="clamp-btn" hidden>Show more</button>
