@@ -28,7 +28,50 @@
           {{ issue.status.label if issue.status else 'Unknown' }}
         </span>
       </div>
-      <span class="issue-summary__chevron">EXPAND ></span>
+      <div class="issue-main-scroll">
+        <div class="field issue-block">
+          <label class="issue-label">Description</label>
+          <div class="pill issue-description">
+            {{ issue.description }}
+          </div>
+        </div>
+        <div class="issue-meta">
+          <div class="row issue-row">
+            <div class="field">
+              <label class="issue-label">Reported by</label>
+              <div class="pill">{{ issue.reported_by or "SYSTEM" }}</div>
+            </div>
+
+            <div class="field">
+              <label class="issue-label">Opened</label>
+              {% set time, date = issue.created_at | format_dt %}
+              <div class="pill">
+                <div class="muted">{{ date }}</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="row issue-row">
+            <div class="field">
+              <label class="issue-label">Last update</label>
+              {% set time, date = issue.last_action_at | format_dt %}
+              <div class="pill">
+                <div class="muted">{{ date }}</div>
+              </div>
+            </div>
+
+            <div class="field">
+              <label class="issue-label">Closed</label>
+              {% if issue.closed_at %}
+                {% set time, date = issue.closed_at | format_dt %}
+                <div class="muted">{{ date }}</div>
+              {% else %}
+                <div class="muted">-</div>
+              {% endif %}            
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     {# ─────────────────────────────
