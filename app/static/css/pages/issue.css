@@ -74,10 +74,11 @@
   }
 }
 
-.issue-summary__chev{
+.issue-issue-summary__chevron{
   font-size:22px;
   opacity:.55;
   flex:0 0 auto;
+  align-items:end;
 }
 
 .issue-image  { grid-area: issue-image; }
