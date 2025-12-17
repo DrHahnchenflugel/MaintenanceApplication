@@ -294,7 +294,7 @@
 @media (max-width: 1200px) {
   .issue-layout {
     grid-template-columns: 1.35fr 1.45fr 1.2fr;
-    grid-template-rows: 42vh 42vh;
+    grid-template-rows: 42vh 46vh;
     align-items: stretch;
 
     grid-template-areas:
