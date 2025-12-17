@@ -317,13 +317,6 @@
     max-height: 32vh;
   }
 
-  /* Status bigger */
-  .status-card {
-    height: 40vh;
-    min-height: 260px;
-    max-height: 40vh;
-  }
-
   .status-card .table-scroll {
     flex: 1 1 auto;
     min-height: 0;
