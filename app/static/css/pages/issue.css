@@ -1,7 +1,7 @@
 /* =========================================================
    issue.css
    Desktop: A(title) + B(scroll desc) + C(asset) inside issue card
-   iPad: keep the A,B,C / D,E,E layout you liked
+   iPad: A,B,C / D,E,E layout
    ========================================================= */
 
 /* ---- Titles/status ---- */
@@ -42,7 +42,7 @@
   gap: 16px;
 
   grid-template-columns: 2fr 2fr 1.4fr;
-  grid-template-rows: 40vh auto;   /* taller top row */
+  grid-template-rows: 40vh auto;
 
   grid-template-areas:
     "issue-main issue-image status"
@@ -83,15 +83,6 @@
   padding-right: 2px;
 }
 
-/* Description is normal text */
-.issue-description {
-  margin-top: 6px;
-  line-height: 1.45;
-  opacity: 0.92;
-  overflow-wrap: anywhere;
-  word-break: break-word;
-}
-
 /* Truncated description preview -> opens modal */
 .issue-desc-preview {
   width: 100%;
@@ -110,7 +101,7 @@
 
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 4;  /* preview lines */
+  -webkit-line-clamp: 4;
   overflow: hidden;
 
   overflow-wrap: anywhere;
@@ -125,7 +116,6 @@
 /* ===============================
    Issue modal (compact)
    =============================== */
-
 .issue-modal {
   display: flex;
   flex-direction: column;
@@ -142,6 +132,12 @@
   margin: 0;
   font-size: 20px;
   font-weight: 700;
+  line-height: 1.25;
+}
+
+.text-modal .issue-modal__title {
+  font-size: 26px;
+  font-weight: 800;
   line-height: 1.25;
 }
 
@@ -169,12 +165,6 @@
   line-height: 1.5;
   opacity: 0.95;
   overflow-wrap: anywhere;
-}
-
-.text-modal .issue-modal__title {
-  font-size: 26px;
-  font-weight: 800;
-  line-height: 1.25;
 }
 
 /* C: asset strip fixed at bottom */
@@ -285,7 +275,21 @@
 }
 
 /* =========================================================
-   iPad/tablet (A,B,C / D,E,E) — keep natural heights
+   Add update card should allow form to fill it
+   ========================================================= */
+.update-slot {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.update-slot .issue-form--update {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* =========================================================
+   iPad/tablet (A,B,C / D,E,E)
    ========================================================= */
 @media (max-width: 1200px) {
   .issue-layout {
@@ -308,7 +312,7 @@
     flex-direction: column;
   }
 
-  /* Photo thinner */
+  /* Photo */
   .issue-image {
     justify-content: flex-start;
   }
@@ -317,14 +321,7 @@
     max-height: 32vh;
   }
 
-  .status-card .table-scroll {
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow-y: auto;
-    overflow-x: hidden;
-  }
-
-  /* Update + Activity same height */
+  /* Bottom row cards fill row height */
   .update-slot,
   .actions-card {
     height: 100%;
@@ -333,43 +330,28 @@
     overflow: hidden;
   }
 
-  .actions-card .table-scroll {
-    flex: 1 1 auto;
-    min-height: 0;
-    overflow-y: auto;
-  }
-
   /* Kill scrolling in issue summary */
-  .issue-main-body {
-    overflow: hidden;
-  }
-
-  .issue-desc-preview {
-    -webkit-line-clamp: 2;
-  }
-
-  .issue-meta {
-    overflow: hidden;
-  }
+  .issue-main-body { overflow: hidden; }
+  .issue-desc-preview { -webkit-line-clamp: 2; }
+  .issue-meta { overflow: hidden; }
 
   .issue-row{
-  flex-wrap: nowrap;         /* stop wrapping */
-  gap: 10px;
-}
+    flex-wrap: nowrap;
+    gap: 10px;
+  }
 
-.issue-row .field{
-  min-width: 0;              /* allow shrink */
-  flex: 1 1 0;
-}
+  .issue-row .field{
+    min-width: 0;
+    flex: 1 1 0;
+  }
 
-.issue-row .pill{
-  max-width: 100%;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;       /* keep pill to one line */
+  .issue-row .pill{
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
-}
-
 
 /* =========================================================
    Phone stack
