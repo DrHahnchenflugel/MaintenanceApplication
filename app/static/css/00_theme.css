@@ -150,6 +150,33 @@ textarea:focus-visible {
   opacity: 0.9;
 }
 
+/* Brand-accented card (use on important cards only) */
+.card--accent {
+  position: relative;
+  border-color: rgba(255,255,255,0.10);
+}
+
+.card--accent::before {
+  content: "";
+  position: absolute;
+  top: 12px;
+  bottom: 12px;
+  left: 0;
+  width: 4px;
+  border-radius: 12px;
+  background: rgba(255,102,0,0.9);
+  box-shadow: 0 10px 26px rgba(255,102,0,0.18);
+  opacity: 0.95;
+}
+
+/* tiny warm tint only inside the card (barely) */
+.card--accent {
+  background:
+    linear-gradient(90deg, rgba(255,102,0,0.06), rgba(0,0,0,0) 80%),
+    var(--panel);
+}
+
+
 /* Optional: “featured” lift (for one card max) */
 .card--featured{
   position: relative;
