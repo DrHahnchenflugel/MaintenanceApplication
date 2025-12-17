@@ -138,24 +138,6 @@ textarea:focus-visible {
   border-color: var(--brand-border);
 }
 
-.card--brand::before{
-  content:"";
-  position:absolute;
-  inset:-1px;
-  border-radius: inherit;
-  pointer-events:none;
-
-  /* soft top-left wash (intentional, not a hairline) */
-  background:
-    radial-gradient(
-      520px 220px at 10% 0%,
-      rgba(255,102,0,0.18),
-      rgba(255,102,0,0.08) 35%,
-      rgba(255,102,0,0.00) 70%
-    );
-  opacity: 0.9;
-}
-
 /* Brand-accented card (use on important cards only) */
 .card--accent{
   position: relative;
