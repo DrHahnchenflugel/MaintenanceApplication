@@ -39,14 +39,89 @@
           <button
             type="button"
             class="issue-desc-preview"
-            onclick="openTextModalFromEl('issueDescFull', 'Description')"
-            aria-label="Open full description"
+            onclick="openTextModalFromEl('issueModalFull', 'Issue')"
+            aria-label="Open full issue details"
           >
             {{ issue.description or "—" }}
           </button>
 
-          {# full text lives here safely (no attribute escaping issues) #}
-          <div id="issueDescFull" hidden>{{ issue.description or "—" }}</div>
+          {# Full issue info for modal (cloned into modal on click) #}
+          <div id="issueModalFull" hidden>
+            {% set code = issue.status.code if issue.status else 'UNKNOWN' %}
+
+            <div class="issue-modal">
+              <div class="issue-main-header issue-modal__header">
+                <h2 class="issue-title">{{ issue.title }}</h2>
+                <span class="issue-status status-{{ code|lower|replace('_','-') }}">
+                  {{ issue.status.label if issue.status else 'Unknown' }}
+                </span>
+              </div>
+
+              <div class="issue-modal__meta">
+                <div class="row issue-row">
+                  <div class="field">
+                    <label class="issue-label">Reported by</label>
+                    <div class="pill">{{ issue.reported_by or "SYSTEM" }}</div>
+                  </div>
+
+                  <div class="field">
+                    <label class="issue-label">Opened</label>
+                    {% set _, date = issue.created_at | format_dt %}
+                    <div class="pill"><div class="muted">{{ date }}</div></div>
+                  </div>
+                </div>
+
+                <div class="row issue-row">
+                  <div class="field">
+                    <label class="issue-label">Last update</label>
+                    {% set _, date = issue.last_action_at | format_dt %}
+                    <div class="pill"><div class="muted">{{ date }}</div></div>
+                  </div>
+
+                  <div class="field">
+                    <label class="issue-label">Closed</label>
+                    {% if issue.closed_at %}
+                      {% set _, date = issue.closed_at | format_dt %}
+                      <div class="pill"><div class="muted">{{ date }}</div></div>
+                    {% else %}
+                      <div class="pill"><div class="muted">-</div></div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+
+              <div class="field issue-block">
+                <label class="issue-label">Description</label>
+                <div class="issue-modal__desc">{{ issue.description or "—" }}</div>
+              </div>
+
+              <div class="issue-asset-strip">
+                <div class="issue-asset-left">
+                  <div class="field">
+                    <label class="issue-label">Tag</label>
+                    <div class="pill">{{ issue.asset.asset_tag }}</div>
+                  </div>
+
+                  <div class="field">
+                    <label class="issue-label">Site</label>
+                    <div class="pill">{{ issue.site_fullname }}</div>
+                  </div>
+                </div>
+
+                <div class="issue-asset-right">
+                  <div class="mmv">
+                    {{ issue.asset.make.label }} / {{ issue.asset.model.label }} / {{ issue.asset.variant.label }}
+                  </div>
+
+                  <div class="pill pill-active">
+                    <a class="asset-link" href="/maintenance/assets/{{ issue.asset.id }}">
+                      View asset
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div class="issue-meta">
