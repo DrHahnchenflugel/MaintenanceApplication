@@ -19,7 +19,7 @@
     {# ─────────────────────────────
        A/B/C: Issue card
        ───────────────────────────── #}
-    <div class="card issue-main">
+    <div class="card issue-main card--accent">
       {% set code = issue.status.code if issue.status else 'UNKNOWN' %}
 
       {# A: title + status #}
@@ -161,7 +161,7 @@
     {# ─────────────────────────────
        Photo
        ───────────────────────────── #}
-    <div class="card issue-image">
+    <div class="card issue-image card--accent">
       <h3 class="card-title">Photo (Click to expand)</h3>
 
       <div class="issue-photo-frame">
