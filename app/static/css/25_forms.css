@@ -5,8 +5,65 @@
 
 .issue-form--update {
   display: grid;
-  gap: 14px;
+  gap: 12px;
   align-items: start;
+}
+
+/* Always make fields stack cleanly */
+.issue-form--update .field {
+  min-width: 0;
+}
+
+issue-form--update input,
+.issue-form--update select {
+  height: 44px;              /* consistent */
+  padding: 10px 12px;
+  border-radius: 12px;
+}
+
+.issue-form--update .issue-label {
+  margin-bottom: 6px;
+  font-weight: 650;          /* reads better */
+}
+
+.issue-form-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.issue-form-actions .btn--ok {
+  height: 44px;
+  padding: 0 16px;
+  border-radius: 12px;
+}
+
+.issue-form-actions .btn-secondary {
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 8px;
+  opacity: 0.75;
+}
+
+.issue-form--update select {
+  appearance: none;
+  background-image:
+    linear-gradient(45deg, transparent 50%, rgba(255,255,255,.55) 50%),
+    linear-gradient(135deg, rgba(255,255,255,.55) 50%, transparent 50%);
+  background-position:
+    calc(100% - 18px) 19px,
+    calc(100% - 12px) 19px;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+  padding-right: 34px;
+}
+
+.issue-form--update textarea {
+  min-height: 120px;         /* less giant */
+  border-radius: 12px;
+  padding: 12px;
 }
 
 /* Tablet/Desktop: 2-column top controls, details full width */
@@ -14,6 +71,7 @@
   .issue-form--update {
     grid-template-columns: 1fr 1fr;
   }
+
 
   /* Created by spans full width (feels less cramped) */
   .issue-form--update > .field:nth-child(3) {
@@ -118,7 +176,7 @@
 }
 
 /* iOS Safari: prevent zoom on focus */
-@media (max-width: 1024px) {
+@media (max-width: 1200px) {
   .issue-form--update input,
   .issue-form--update select,
   .issue-form--update textarea {
