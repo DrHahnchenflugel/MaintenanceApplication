@@ -222,7 +222,7 @@
     {# ─────────────────────────────
        Add update
        ───────────────────────────── #}
-    {% if issue.closed_at != None %}
+    {% if issue.closed_at == None %}
       <div class="card update-form update-slot">
         <h3 class="card-title">Add update</h3>
 
@@ -262,7 +262,7 @@
           </div>
 
           <div class="field issue-form-wide">
-            <label class="issue-label">{{ issue.closed_at != None}}</label>
+            <label class="issue-label">Details</label>
             <textarea
               name="body"
               rows="3"
