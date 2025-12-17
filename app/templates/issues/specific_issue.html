@@ -47,46 +47,48 @@
 
           {# Full issue info for modal (cloned into modal on click) #}
           <div id="issueModalFull" hidden>
+            {% set code = issue.status.code if issue.status else 'UNKNOWN' %}
+
             <div class="issue-modal">
-              <div class="issue-modal__header">
-                <h2 class="issue-modal__title">{{ issue.title }}</h2>
-                {% set code = issue.status.code if issue.status else 'UNKNOWN' %}
+              <div class="issue-modal__top">
+                <div class="issue-modal__title">{{ issue.title }}</div>
                 <span class="issue-status status-{{ code|lower|replace('_','-') }}">
                   {{ issue.status.label if issue.status else 'Unknown' }}
                 </span>
               </div>
 
-              <div class="issue-modal__meta">
-                <div>
-                  <span class="label">Reported by</span>
-                  <span class="value">{{ issue.reported_by or "SYSTEM" }}</span>
+              <div class="issue-modal__kv">
+                <div class="kv">
+                  <div class="k">Reported by</div>
+                  <div class="v">{{ issue.reported_by or "SYSTEM" }}</div>
                 </div>
 
-                <div>
-                  <span class="label">Opened</span>
+                <div class="kv">
+                  <div class="k">Opened</div>
                   {% set _, date = issue.created_at | format_dt %}
-                  <span class="value">{{ date }}</span>
+                  <div class="v">{{ date }}</div>
                 </div>
 
-                <div>
-                  <span class="label">Last update</span>
+                <div class="kv">
+                  <div class="k">Last update</div>
                   {% set _, date = issue.last_action_at | format_dt %}
-                  <span class="value">{{ date }}</span>
+                  <div class="v">{{ date }}</div>
                 </div>
 
-                <div>
-                  <span class="label">Closed</span>
+                <div class="kv">
+                  <div class="k">Closed</div>
                   {% if issue.closed_at %}
                     {% set _, date = issue.closed_at | format_dt %}
-                    <span class="value">{{ date }}</span>
+                    <div class="v">{{ date }}</div>
                   {% else %}
-                    <span class="value muted">–</span>
+                    <div class="v muted">–</div>
                   {% endif %}
                 </div>
               </div>
 
               <div class="issue-modal__desc">
-                {{ issue.description or "—" }}
+                <div class="k">Description</div>
+                <div class="v">{{ issue.description or "—" }}</div>
               </div>
             </div>
           </div>
