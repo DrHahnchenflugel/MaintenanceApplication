@@ -171,6 +171,11 @@
   overflow-wrap: anywhere;
 }
 
+.text-modal .issue-modal__title {
+  font-size: 26px;
+  font-weight: 800;
+  line-height: 1.25;
+}
 
 /* C: asset strip fixed at bottom */
 .issue-asset-strip {
