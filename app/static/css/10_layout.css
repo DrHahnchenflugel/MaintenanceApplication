@@ -83,6 +83,28 @@ body { overflow: hidden; }
   justify-self: end;
 }
 
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+
+  background:
+    linear-gradient(180deg, rgba(255,102,0,0.08), rgba(0,0,0,0.0) 70%),
+    var(--bg);
+  backdrop-filter: blur(10px);
+}
+
+.header::after {
+  content: "";
+  position: absolute;
+  left: 20px;
+  right: 20px;
+  bottom: 0;
+  height: 1px;
+  background: rgba(255,102,0,0.22);
+}
+
+
 /* ---- Footer ---- */
 .main > .footer {
   margin-top: auto;
