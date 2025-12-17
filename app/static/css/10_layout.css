@@ -13,8 +13,8 @@ body { overflow: hidden; }
 .layout {
   display: grid;
   grid-template-columns: 240px 1fr;
+  height: 100dvh;        /* lock to viewport */
   min-height: 100dvh;
-  height: auto;
 }
 
 /* ---- Main column ---- */
@@ -103,15 +103,18 @@ body { overflow: hidden; }
    Tablet + phone: sidebar becomes a drawer; body scrolls
    ========================================================= */
 @media (max-width: 1200px) {
-  /* Switch to page-style scrolling */
-  body { overflow: auto; }
-
   /* One-column layout; sidebar floats above */
   .layout { grid-template-columns: 1fr; }
 
-  /* Let the page scroll naturally on iOS */
-  .main { overflow: visible; }
-  .content { overflow: visible; }
+  /* Keep app-style scrolling on iPad: no page scroll */
+  body { overflow: hidden; }
+
+  .main { overflow: hidden; }
+  .content {
+    overflow: hidden;         /* page itself doesn't scroll */
+    padding-bottom: calc(20px + env(safe-area-inset-bottom));
+  }
+
 
   /* Show the hamburger */
   .nav-toggle {
