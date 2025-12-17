@@ -5,7 +5,7 @@
 
 .issue-form--update {
   display: grid;
-  gap: 12px;
+  gap: 16px;
   align-items: start;
 }
 
@@ -29,7 +29,7 @@ issue-form--update input,
 .issue-form-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   margin-top: 4px;
 }
 
@@ -66,6 +66,15 @@ issue-form--update input,
   padding: 12px;
 }
 
+.issue-form--update .field {
+  margin-bottom: 4px;        /* subtle separation */
+}
+
+.issue-form--update textarea {
+  min-height: 150px;         /* more writing room */
+}
+
+
 /* Tablet/Desktop: 2-column top controls, details full width */
 @media (min-width: 769px) {
   .issue-form--update {
@@ -85,7 +94,7 @@ issue-form--update input,
   .issue-form--update .issue-form-actions {
     grid-column: 1 / -1;
     display: flex;
-    gap: 12px;
+    gap: 16px;
     align-items: center;
     flex-wrap: wrap;
   }
