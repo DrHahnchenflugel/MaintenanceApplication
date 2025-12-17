@@ -50,45 +50,47 @@
             {% set code = issue.status.code if issue.status else 'UNKNOWN' %}
 
             <div class="issue-modal">
+
               <div class="issue-modal__top">
                 <div class="issue-modal__title">{{ issue.title }}</div>
-                <span class="issue-status status-{{ code|lower|replace('_','-') }}">
+
+                <span class="chip chip-status status-{{ code|lower|replace('_','-') }}">
                   {{ issue.status.label if issue.status else 'Unknown' }}
                 </span>
               </div>
 
-              <div class="issue-modal__kv">
-                <div class="kv">
-                  <div class="k">Reported by</div>
-                  <div class="v">{{ issue.reported_by or "SYSTEM" }}</div>
+              <div class="issue-modal__meta">
+                <div class="meta">
+                  <div class="meta__k">Reported by</div>
+                  <div class="meta__v">{{ issue.reported_by or "SYSTEM" }}</div>
                 </div>
 
-                <div class="kv">
-                  <div class="k">Opened</div>
+                <div class="meta">
+                  <div class="meta__k">Opened</div>
                   {% set _, date = issue.created_at | format_dt %}
-                  <div class="v">{{ date }}</div>
+                  <div class="meta__v">{{ date }}</div>
                 </div>
 
-                <div class="kv">
-                  <div class="k">Last update</div>
+                <div class="meta">
+                  <div class="meta__k">Last update</div>
                   {% set _, date = issue.last_action_at | format_dt %}
-                  <div class="v">{{ date }}</div>
+                  <div class="meta__v">{{ date }}</div>
                 </div>
 
-                <div class="kv">
-                  <div class="k">Closed</div>
+                <div class="meta">
+                  <div class="meta__k">Closed</div>
                   {% if issue.closed_at %}
                     {% set _, date = issue.closed_at | format_dt %}
-                    <div class="v">{{ date }}</div>
+                    <div class="meta__v">{{ date }}</div>
                   {% else %}
-                    <div class="v muted">–</div>
+                    <div class="meta__v muted">–</div>
                   {% endif %}
                 </div>
               </div>
 
               <div class="issue-modal__desc">
-                <div class="k">Description</div>
-                <div class="v">{{ issue.description or "—" }}</div>
+                <div class="issue-modal__descTitle">Description</div>
+                <div class="issue-modal__descBody">{{ issue.description or "—" }}</div>
               </div>
             </div>
           </div>
