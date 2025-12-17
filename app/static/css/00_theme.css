@@ -23,6 +23,9 @@
   --brand-focus: rgba(255,102,0,0.25);
   --brand-glow: rgba(255,102,0,0.18);
   --brand-glow-strong: rgba(255,102,0,0.28);
+  --brand-soft: rgba(255, 102, 0, 0.22);
+  --brand-mid: rgba(255, 102, 0, 0.45);
+  --brand-glow: rgba(255, 102, 0, 0.28);
 
   --ok: #6ee7b7;
   --warn: #fb923c;
@@ -139,6 +142,40 @@ textarea:focus-visible {
 .card-title {
   position: relative;
   padding-top: 2px;
+}
+
+/* Add to any card-like container */
+.card-accent {
+  position: relative;
+}
+
+/* Top accent bar (looks intentional) */
+.card-accent::before {
+  content: "";
+  position: absolute;
+  left: 12px;
+  right: 12px;
+  top: 10px;
+  height: 3px;
+  border-radius: 999px;
+
+  background: linear-gradient(
+    90deg,
+    rgba(255,102,0,0.0),
+    rgba(255,102,0,0.95),
+    rgba(255,102,0,0.0)
+  );
+
+  opacity: 0.9;
+  pointer-events: none;
+
+  /* soft glow so it doesn’t look like a hairline */
+  box-shadow: 0 6px 18px var(--brand-glow);
+}
+
+/* Optional: make the card border slightly warmer (subtle) */
+.card-accent {
+  border-color: rgba(255, 102, 0, 0.18);
 }
 
 /* =========================================================
