@@ -47,11 +47,48 @@
 
           {# Full issue info for modal (cloned into modal on click) #}
           <div id="issueModalFull" hidden>
-            <div class="issue-main-header">
-              <h2 class="issue-title">{{ issue.title }}</h2>
+            <div class="issue-modal">
+              <div class="issue-modal__header">
+                <h2 class="issue-modal__title">{{ issue.title }}</h2>
+                {% set code = issue.status.code if issue.status else 'UNKNOWN' %}
+                <span class="issue-status status-{{ code|lower|replace('_','-') }}">
+                  {{ issue.status.label if issue.status else 'Unknown' }}
+                </span>
+              </div>
+
+              <div class="issue-modal__meta">
+                <div>
+                  <span class="label">Reported by</span>
+                  <span class="value">{{ issue.reported_by or "SYSTEM" }}</span>
+                </div>
+
+                <div>
+                  <span class="label">Opened</span>
+                  {% set _, date = issue.created_at | format_dt %}
+                  <span class="value">{{ date }}</span>
+                </div>
+
+                <div>
+                  <span class="label">Last update</span>
+                  {% set _, date = issue.last_action_at | format_dt %}
+                  <span class="value">{{ date }}</span>
+                </div>
+
+                <div>
+                  <span class="label">Closed</span>
+                  {% if issue.closed_at %}
+                    {% set _, date = issue.closed_at | format_dt %}
+                    <span class="value">{{ date }}</span>
+                  {% else %}
+                    <span class="value muted">–</span>
+                  {% endif %}
+                </div>
+              </div>
+
+              <div class="issue-modal__desc">
+                {{ issue.description or "—" }}
+              </div>
             </div>
-            <div class="issue-label">Description</div>
-            {{ issue.description or "-" }}
           </div>
         </div>
 
