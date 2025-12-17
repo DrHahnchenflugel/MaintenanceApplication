@@ -368,17 +368,11 @@
 /* =========================================================
    Exceed orange accents on key cards (no HTML changes)
    ========================================================= */
-.issue-main,
-.issue-image,
-.status-card,
 .actions-card {
   position: relative; /* required for ::before */
 }
 
 /* Accent bar */
-.issue-main::before,
-.issue-image::before,
-.status-card::before,
 .actions-card::before {
   content: "";
   position: absolute;
@@ -399,9 +393,6 @@
 }
 
 /* Warm the border *slightly* so it matches the accent */
-.issue-main,
-.issue-image,
-.status-card,
 .actions-card {
   border-color: rgba(255,102,0,0.18);
 }
