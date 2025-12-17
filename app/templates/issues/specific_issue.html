@@ -19,7 +19,7 @@
     {# ─────────────────────────────
        A/B/C: Issue card
        ───────────────────────────── #}
-    <div class="card issue-main">
+    <div class="card issue-main card--featured">
       {% set code = issue.status.code if issue.status else 'UNKNOWN' %}
 
       {# A: title + status #}
@@ -284,7 +284,7 @@
     {# ─────────────────────────────
        Activity
        ───────────────────────────── #}
-    <div class="card actions-card activity">
+    <div class="card actions-card activity card--featured">
       <h3 class="card-title">Activity</h3>
 
       <div class="table table-scroll">
