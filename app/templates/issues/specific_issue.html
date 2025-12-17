@@ -121,9 +121,9 @@
               <label class="issue-label">Closed</label>
               {% if issue.closed_at %}
                 {% set _, date = issue.closed_at | format_dt %}
-                <div class="muted">{{ date }}</div>
+                <div class="pill"><div class="muted">{{ date }}</div></div>
               {% else %}
-                <div class="muted">-</div>
+                <div class="pill"><div class="muted">-</div></div>
               {% endif %}
             </div>
           </div>
