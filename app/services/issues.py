@@ -1,6 +1,7 @@
 import os
 from werkzeug.utils import secure_filename
 from flask import current_app
+import app.db.helpers as helpers
 from app.db import issues as issue_db
 
 def list_issues(page: int, page_size: int, filters: dict):
@@ -267,7 +268,7 @@ def add_issue_action(issue_id: str, data: dict):
 
         issue_db.update_issue_row(
             issue_id,
-            {"status_id": new_status_id},
+            {"status_id": new_status_id, "closed_at": None if new_status_id != issue_db.get_issue_status_id_by_code("CLOSED") else helpers.get_current_utc_timestamp()},
         )
 
     return {"issue_id": issue_id}
