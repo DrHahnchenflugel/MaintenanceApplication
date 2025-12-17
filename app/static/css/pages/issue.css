@@ -290,7 +290,7 @@
 @media (max-width: 1200px) {
   .issue-layout {
     grid-template-columns: 1.35fr 1.45fr 1.2fr;
-    grid-template-rows: 44vh 44vh;
+    grid-template-rows: 40h 40vh;
     align-items: stretch;
 
     grid-template-areas:
@@ -319,9 +319,9 @@
 
   /* Status bigger */
   .status-card {
-    height: 44vh;
-    min-height: 300px;
-    max-height: 44vh;
+    height: 40vh;
+    min-height: 260px;
+    max-height: 40vh;
   }
 
   .status-card .table-scroll {
@@ -334,9 +334,9 @@
   /* Update + Activity same height */
   .update-slot,
   .actions-card {
-    height: 52vh;
-    min-height: 420px;
-    max-height: 52vh;
+    height: 48vh;
+    min-height: 380px;
+    max-height: 46vh;
     overflow: hidden;
   }
 
