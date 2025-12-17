@@ -265,6 +265,8 @@ def add_issue_action(issue_id: str, data: dict):
             to_status_id=new_status_id,
             changed_by=created_by,
         )
+        print(new_status_id != issue_db.get_issue_status_id_by_code("CLOSED"))
+        print(None if new_status_id != issue_db.get_issue_status_id_by_code("CLOSED") else helpers.get_current_utc_timestamp())
 
         issue_db.update_issue_row(
             issue_id,
