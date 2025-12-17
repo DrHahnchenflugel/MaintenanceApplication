@@ -47,7 +47,9 @@
 
           {# Full issue info for modal (cloned into modal on click) #}
           <div id="issueModalFull" hidden>
-            <h1 class="issue-title">{{ issue.title }}</h1>
+            <div class="issue-main-header">
+              <h2 class="issue-title">{{ issue.title }}</h2>
+            </div>
             <div class="issue-label">Description</div>
             {{ issue.description or "-" }}
           </div>
