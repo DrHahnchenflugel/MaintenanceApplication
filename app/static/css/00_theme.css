@@ -10,17 +10,20 @@
   --bg: #0f1115;
   --panel: #171a21;
   --panel-lighter: #272b36;
-
   --line: #323745;
 
   --text: #e7ebf1;
   --muted: #aab1bd;
 
-  /* ---- Brand ---- */
+  /* ---- Brand (Exceed) ---- */
   --brand: #ff6600;
-  --brand-soft: rgba(255,102,0,0.18);
-  --brand-border: rgba(255,102,0,0.45);
-  --brand-focus: rgba(255,102,0,0.25);
+
+  /* single-source-of-truth brand ramps */
+  --brand-soft: rgba(255, 102, 0, 0.16);
+  --brand-mid: rgba(255, 102, 0, 0.32);
+  --brand-border: rgba(255, 102, 0, 0.22);
+  --brand-focus: rgba(255, 102, 0, 0.22);
+  --brand-glow: rgba(255, 102, 0, 0.22);
 
   /* ---- Semantic ---- */
   --ok: #6ee7b7;
@@ -28,7 +31,14 @@
   --bad: #f87171;
   --blue: #2596be;
 
-  /* ---- Status tokens ---- */
+  /* Panel tints */
+  --panel-ok: #42806c;
+  --panel-warn: #c2410c;
+  --panel-bad: #884649;
+
+  /* =========================================================
+    Issue status tokens (reusable across pages)
+    ========================================================= */
   --status-open-bg: rgba(37,150,190,0.18);
   --status-open-border: rgba(37,150,190,0.45);
   --status-open-text: #cfefff;
@@ -41,13 +51,17 @@
   --status-closed-border: rgba(110,231,183,0.45);
   --status-closed-text: #d8fff0;
 
+  --status-blocked-bg: rgba(248,113,113,0.18);
+  --status-blocked-border: rgba(248,113,113,0.45);
+  --status-blocked-text: #ffd6d6;
+
   --status-unknown-bg: rgba(255,255,255,0.05);
   --status-unknown-border: rgba(255,255,255,0.14);
   --status-unknown-text: rgba(255,255,255,0.85);
 }
 
 /* =========================================================
-   Global base
+   Global reset & base rules
    ========================================================= */
 
 * { box-sizing: border-box; }
@@ -56,71 +70,186 @@ html, body { height: 100%; }
 
 body {
   margin: 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    Segoe UI,
+    Roboto,
+    Ubuntu,
+    Cantarell,
+    "Helvetica Neue",
+    Arial,
+    sans-serif;
+
   background: var(--bg);
   color: var(--text);
-  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Arial, sans-serif;
+
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+
+  background:
+    radial-gradient(900px 420px at 18% 6%, rgba(255,102,0,0.08), transparent 60%),
+    radial-gradient(800px 380px at 85% 22%, rgba(255,102,0,0.05), transparent 55%),
+    linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.0) 140px),
+    var(--bg);
 }
 
 /* ---- Links ---- */
 a { color: inherit; text-decoration: none; }
 
+a:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+}
+
+/* ---- Images ---- */
+img { max-width: 100%; height: auto; display: block; }
+
+/* ---- Text helpers ---- */
+.muted { color: var(--muted); }
+.no-scroll { overflow: hidden; }
+
+/* Global focus ring (buttons, inputs, links) */
 a:focus-visible,
 button:focus-visible,
-input:focus-visible,
 select:focus-visible,
+input:focus-visible,
 textarea:focus-visible {
   outline: none;
   box-shadow: 0 0 0 3px var(--brand-focus);
   border-color: var(--brand-border);
 }
 
-/* ---- Images ---- */
-img {
-  max-width: 100%;
-  display: block;
-}
-
-/* ---- Utilities ---- */
-.muted { color: var(--muted); }
-.no-scroll { overflow: hidden; }
+/* Secondary actions lean brand on hover */
+.btn.btn-secondary:hover { color: var(--brand); }
 
 /* =========================================================
-   Scrollbars
+   Brand wash (apply to any card with class="card card--brand")
    ========================================================= */
-
-*::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+.card--brand {
+  position: relative;
+  overflow: hidden; /* contain the wash */
+  border-color: var(--brand-border);
 }
 
+.card--brand::before{
+  content:"";
+  position:absolute;
+  inset:-1px;
+  border-radius: inherit;
+  pointer-events:none;
+
+  /* soft top-left wash (intentional, not a hairline) */
+  background:
+    radial-gradient(
+      520px 220px at 10% 0%,
+      rgba(255,102,0,0.18),
+      rgba(255,102,0,0.08) 35%,
+      rgba(255,102,0,0.00) 70%
+    );
+  opacity: 0.9;
+}
+
+/* Brand-accented card (use on important cards only) */
+.card--accent {
+  position: relative;
+  border-color: rgba(255,255,255,0.10);
+}
+
+.card--accent::before {
+  content: "";
+  position: absolute;
+  top: 12px;
+  bottom: 12px;
+  left: 0;
+  width: 4px;
+  border-radius: 12px;
+  background: rgba(255,102,0,0.9);
+  box-shadow: 0 10px 26px rgba(255,102,0,0.18);
+  opacity: 0.95;
+}
+
+/* tiny warm tint only inside the card (barely) */
+.card--accent {
+  background:
+    linear-gradient(90deg, rgba(255,102,0,0.06), rgba(0,0,0,0) 80%),
+    var(--panel);
+}
+
+
+/* Optional: “featured” lift (for one card max) */
+.card--featured{
+  position: relative;
+  overflow: hidden;
+}
+
+.card--featured::before{
+  content:"";
+  position:absolute;
+  inset:-1px;
+  border-radius: inherit;
+  pointer-events:none;
+  box-shadow:
+    0 0 0 1px rgba(255,102,0,0.16),
+    0 14px 40px var(--brand-glow);
+  opacity: 0.9;
+}
+
+.card--featured::after{
+  content:"";
+  position:absolute;
+  top:10px;
+  left:10px;
+  width:18px;
+  height:18px;
+  border-top: 2px solid rgba(255,102,0,0.75);
+  border-left: 2px solid rgba(255,102,0,0.45);
+  border-radius: 8px 0 0 0;
+  pointer-events:none;
+  opacity: 0.85;
+}
+
+/* =========================================================
+   Selection & scrollbars
+   ========================================================= */
+::selection {
+  background: rgba(255, 102, 0, 0.35);
+  color: var(--text);
+}
+
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: transparent; }
 *::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.12);
+  background-color: rgba(255,255,255,0.12);
   border-radius: 10px;
   border: 2px solid transparent;
   background-clip: content-box;
 }
-
-*::-webkit-scrollbar-thumb:hover {
-  background: rgba(255,255,255,0.22);
-}
+*::-webkit-scrollbar-thumb:hover { background-color: rgba(255,255,255,0.2); }
 
 /* =========================================================
-   Reusable status badges
+   Reusable status badges (global)
    ========================================================= */
-
 .issue-status,
 .chip-status {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  padding: 6px 12px;
-  border-radius: 999px;
+
   font-size: 13px;
   font-weight: 650;
   line-height: 1;
+
+  padding: 6px 12px;
+  border-radius: 999px;
+
+  white-space: nowrap;
   border: 1px solid rgba(255,255,255,0.12);
   background: rgba(255,255,255,0.04);
+  color: var(--text);
+
+  box-shadow: 0 10px 26px rgba(0,0,0,0.28);
 }
 
 .issue-status::before,
@@ -130,28 +259,39 @@ img {
   height: 7px;
   border-radius: 999px;
   background: currentColor;
-  opacity: 0.6;
+  opacity: 0.65;
 }
 
-.status-open {
+.issue-status.status-open,
+.chip-status.status-open {
   background: var(--status-open-bg);
   border-color: var(--status-open-border);
   color: var(--status-open-text);
 }
 
-.status-in-progress {
+.issue-status.status-in-progress,
+.chip-status.status-in-progress {
   background: var(--status-in-progress-bg);
   border-color: var(--status-in-progress-border);
   color: var(--status-in-progress-text);
 }
 
-.status-closed {
+.issue-status.status-closed,
+.chip-status.status-closed {
   background: var(--status-closed-bg);
   border-color: var(--status-closed-border);
   color: var(--status-closed-text);
 }
 
-.status-unknown {
+.issue-status.status-blocked,
+.chip-status.status-blocked {
+  background: var(--status-blocked-bg);
+  border-color: var(--status-blocked-border);
+  color: var(--status-blocked-text);
+}
+
+.issue-status.status-unknown,
+.chip-status.status-unknown {
   background: var(--status-unknown-bg);
   border-color: var(--status-unknown-border);
   color: var(--status-unknown-text);
