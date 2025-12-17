@@ -297,12 +297,29 @@
   }
 
   .issue-desc-preview {
-    -webkit-line-clamp: 4;
+    -webkit-line-clamp: 2;
   }
 
   .issue-meta {
     overflow: hidden;
   }
+
+  .issue-row{
+  flex-wrap: nowrap;         /* stop wrapping */
+  gap: 10px;
+}
+
+.issue-row .field{
+  min-width: 0;              /* allow shrink */
+  flex: 1 1 0;
+}
+
+.issue-row .pill{
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;       /* keep pill to one line */
+}
 }
 
 
