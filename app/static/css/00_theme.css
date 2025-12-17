@@ -92,12 +92,6 @@ body {
 
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
-
-  background:
-    radial-gradient(900px 420px at 18% 6%, rgba(255,102,0,0.04), transparent 60%),
-    radial-gradient(800px 380px at 85% 22%, rgba(255,102,0,0.03), transparent 55%),
-    linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.0) 140px),
-    var(--bg);
 }
 
 /* ---- Links ---- */
