@@ -21,6 +21,8 @@
   --brand-soft: rgba(255,102,0,0.18);
   --brand-border: rgba(255,102,0,0.45);
   --brand-focus: rgba(255,102,0,0.25);
+  --brand-glow: rgba(255,102,0,0.18);
+  --brand-glow-strong: rgba(255,102,0,0.28);
 
   --ok: #6ee7b7;
   --warn: #fb923c;
@@ -137,24 +139,6 @@ textarea:focus-visible {
 .card-title {
   position: relative;
   padding-top: 2px;
-}
-
-.card--accent {
-  position: relative;
-}
-
-
-
-.card--accent::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-
-  box-shadow:
-    inset 0 2px 0 rgba(255,102,0,0.45),
-    inset 0 12px 24px rgba(255,102,0,0.08);
 }
 
 /* =========================================================
@@ -291,4 +275,44 @@ textarea:focus-visible {
   background: currentColor;
   opacity: 0.65;
 }
+
+/* ===========================
+   Brand highlight (good)
+   =========================== */
+/* Apply to any .card you want to “feature” */
+.card--featured{
+  position: relative;
+  border-color: rgba(255,255,255,0.10); /* keep normal */
+}
+
+/* Soft aura + gentle lift */
+.card--featured::before{
+  content:"";
+  position:absolute;
+  inset:-1px;
+  border-radius: inherit;
+  pointer-events:none;
+
+  /* this is the important part: glow OUTSIDE the card, not a border */
+  box-shadow:
+    0 0 0 1px rgba(255,102,0,0.18),
+    0 14px 40px var(--brand-glow);
+  opacity: 0.9;
+}
+
+/* Small corner accent so it feels intentional */
+.card--featured::after{
+  content:"";
+  position:absolute;
+  top:10px;
+  left:10px;
+  width:18px;
+  height:18px;
+  border-top: 2px solid rgba(255,102,0,0.8);
+  border-left: 2px solid rgba(255,102,0,0.55);
+  border-radius: 8px 0 0 0;
+  pointer-events:none;
+  opacity: 0.85;
+}
+
 
