@@ -1,378 +1,107 @@
 /* =========================================================
    issue.css
-   Desktop: A(title) + B(scroll desc) + C(asset) inside issue card
-   iPad: A,B,C / D,E,E layout
+   Issue detail layout
    ========================================================= */
 
-/* ---- Titles/status ---- */
 .issue-title {
   font-size: 22px;
   font-weight: 700;
-  line-height: 1.25;
   margin: 0;
 }
 
-.issue-main-header .issue-status { font-weight: 700; }
-
-.issue-meta {
-  font-size: 12px;
-  opacity: 0.65;
-}
-
-/* ---- Grid areas ---- */
-.issue-main { grid-area: issue-main; }
-.issue-image { grid-area: issue-image; }
-.status-col { grid-area: status; }
-.update-slot { grid-area: update; }
-.actions-card { grid-area: actions; }
-
-/* =========================================================
-   DESKTOP (default)
-   ========================================================= */
 .issue-layout {
   display: grid;
   gap: 16px;
-
   grid-template-columns: 2fr 2fr 1.4fr;
   grid-template-rows: 40vh auto;
-
   grid-template-areas:
     "issue-main issue-image status"
     "actions    actions     update";
-
-  align-items: stretch;
-  min-height: 0;
 }
 
-/* ---- Issue card becomes A/B/C stack ---- */
+/* ---- Issue main ---- */
 .issue-main {
+  grid-area: issue-main;
   display: flex;
   flex-direction: column;
-  min-height: 0;
   overflow: hidden;
 }
 
-/* A: header */
 .issue-main-header {
-  flex: 0 0 auto;
   display: flex;
-  align-items: flex-start;
   gap: 12px;
+  align-items: flex-start;
 }
 
-.issue-main-header h2 {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-/* B: scrollable body */
 .issue-main-body {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
   margin-top: 12px;
-  padding-right: 2px;
+  overflow-y: auto;
 }
 
-/* Truncated description preview -> opens modal */
 .issue-desc-preview {
-  width: 100%;
-  text-align: left;
-  background: transparent;
-  border: 0;
-  color: var(--text);
-  padding: 0;
-  margin-top: 6px;
-
-  line-height: 1.45;
-  opacity: 0.92;
   cursor: pointer;
-
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 4;
-  overflow: hidden;
-
-  overflow-wrap: anywhere;
-  word-break: break-word;
+  opacity: 0.9;
 }
 
 .issue-desc-preview:hover {
   opacity: 1;
-  text-decoration: underline;
+  background: var(--brand-soft);
 }
 
-/* ===============================
-   Issue modal (compact)
-   =============================== */
-.issue-modal {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.issue-modal__title {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 700;
-  line-height: 1.25;
-}
-
-.text-modal .issue-modal__title {
-  font-size: 26px;
-  font-weight: 800;
-  line-height: 1.25;
-}
-
-.issue-modal__meta {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  row-gap: 8px;
-  column-gap: 16px;
-  font-size: 13px;
-}
-
-.issue-modal__desc {
-  margin-top: 6px;
-  line-height: 1.5;
-  opacity: 0.95;
-  overflow-wrap: anywhere;
-}
-
-/* C: asset strip fixed at bottom */
-.issue-asset-strip {
-  flex: 0 0 auto;
-  margin-top: 12px;
-  padding-top: 12px;
-  border-top: 1px solid rgba(255,255,255,0.08);
-
-  display: grid;
-  grid-template-columns: 1.2fr 1fr;
-  gap: 12px;
-  align-items: start;
-}
-
-.issue-asset-left {
-  display: flex;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.issue-asset-right .mmv {
-  font-weight: 650;
-  line-height: 1.35;
-  overflow-wrap: anywhere;
-  word-break: break-word;
-}
-
-/* ---- Photo card ---- */
+/* ---- Photo ---- */
 .issue-image {
+  grid-area: issue-image;
   display: flex;
   flex-direction: column;
-  min-height: 0;
 }
 
 .issue-photo-frame {
-  flex: 1 1 auto;
-  min-height: 0;
-  max-height: 32vh;
   margin-top: 12px;
+  max-height: 32vh;
 }
 
-.photo-thumb-btn {
-  width: 100%;
-  height: 100%;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  cursor: zoom-in;
-}
-
-.photo-thumb {
-  width: 100%;
-  height: 100%;
-  display: block;
-  object-fit: contain;
-  border-radius: 8px;
-}
-
-.issue-photo-empty {
-  height: 100%;
-  display: grid;
-  place-items: center;
-  opacity: 0.55;
-}
-
-/* ---- Status column ---- */
+/* ---- Status ---- */
 .status-col {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
+  grid-area: status;
 }
 
 .status-card {
   display: flex;
   flex-direction: column;
-  min-height: 0;
   height: 100%;
-  overflow: hidden;
 }
 
-.status-card .table-scroll {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
-}
-
-/* ---- Activity scroll panel (desktop) ---- */
+/* ---- Activity ---- */
 .actions-card {
+  grid-area: actions;
   display: flex;
   flex-direction: column;
-  min-height: 0;
-  overflow: hidden;
   height: 62vh;
-  max-height: 62vh;
 }
 
-.actions-card .table-scroll {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow-y: auto;
-}
-
-/* Prevent long text nuking width */
-.table-row > div {
-  overflow-wrap: anywhere;
-  word-break: break-word;
-}
-
-/* =========================================================
-   Add update card should allow form to fill it
-   ========================================================= */
+/* ---- Update ---- */
 .update-slot {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-
-.update-slot .issue-form--update {
-  flex: 1 1 auto;
-  min-height: 0;
+  grid-area: update;
 }
 
 /* =========================================================
-   FIX: iPad “black line” (horizontal scroll indicator)
-   Only on this page: don’t allow sideways scroll in tables.
+   Tablet
    ========================================================= */
-.issue-layout .table-scroll {
-  overflow-x: hidden;
-}
 
-/* =========================================================
-   Brand accents (NO hairlines): soft wash on key cards
-   If you want fewer, delete some selectors here.
-   ========================================================= */
-c.issue-main,
-.issue-image,
-.status-card,
-.actions-card {
-  border-color: rgba(255,255,255,0.10);
-}
-
-/* Brand notch on card titles (clean, repeatable) */
-.issue-layout .card-title,
-.issue-layout .issue-main-header {
-  position: relative;
-}
-
-.issue-layout .card-title::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  bottom: -8px;
-  width: 34px;
-  height: 3px;
-  border-radius: 999px;
-  background: rgba(255,102,0,0.85);
-  box-shadow: 0 6px 18px rgba(255,102,0,0.22);
-  opacity: 0.9;
-}
-
-/* Put a tiny notch on the issue header too */
-.issue-main-header::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: -6px;
-  width: 46px;
-  height: 3px;
-  border-radius: 999px;
-  background: rgba(255,102,0,0.75);
-  opacity: 0.85;
-}
-
-/* =========================================================
-   iPad/tablet (A,B,C / D,E,E)
-   ========================================================= */
 @media (max-width: 1200px) {
   .issue-layout {
-    grid-template-columns: 1.35fr 1.45fr 1.2fr;
+    grid-template-columns: 1.3fr 1.4fr 1.2fr;
     grid-template-rows: 42vh 46vh;
-    align-items: stretch;
-
     grid-template-areas:
       "issue-main issue-image status"
       "update    actions     actions";
   }
-
-  .issue-main,
-  .issue-image,
-  .status-card {
-    height: 100%;
-    min-height: 0;
-    overflow: hidden;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .issue-image { justify-content: flex-start; }
-  .issue-photo-frame { max-height: 32vh; }
-
-  .update-slot,
-  .actions-card {
-    height: 100%;
-    min-height: 0;
-    max-height: none;
-    overflow: hidden;
-  }
-
-  /* Kill scrolling in issue summary */
-  .issue-main-body { overflow: hidden; }
-  .issue-desc-preview { -webkit-line-clamp: 2; }
-  .issue-meta { overflow: hidden; }
-
-  .issue-row{
-    flex-wrap: nowrap;
-    gap: 10px;
-  }
-
-  .issue-row .field{
-    min-width: 0;
-    flex: 1 1 0;
-  }
-
-  .issue-row .pill{
-    max-width: 100%;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
 }
 
 /* =========================================================
-   Phone stack
+   Phone
    ========================================================= */
+
 @media (max-width: 768px) {
   .issue-layout {
     grid-template-columns: 1fr;
@@ -383,6 +112,4 @@ c.issue-main,
       "update"
       "actions";
   }
-
-  .issue-image { min-height: 320px; }
 }
