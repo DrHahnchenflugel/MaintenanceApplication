@@ -115,7 +115,7 @@
     modal.setAttribute("aria-hidden", "false");
     document.body.classList.add("no-scroll");
   }
-  
+
   window.openTextModal = openTextModal;
   window.closeTextModal = closeTextModal;
   window.openTextModalFromEl = openTextModalFromEl;
@@ -207,10 +207,17 @@
 
     initClampToggles();
     initSidebarDrawer();
+
+    const footer = document.querySelector(".footer");
+    if (footer) {
+      const hasText = footer.textContent.trim().length > 0;
+      if (hasText) footer.classList.add("has-content");
+    }
   });
 
   // Run again after images/fonts settle (helps clamp correctness)
   window.addEventListener("load", () => {
     initClampToggles();
   });
+  
 })();
