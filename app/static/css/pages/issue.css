@@ -291,12 +291,12 @@
   position: absolute;
   left: 0;
   bottom: -8px;
-  width: 34px;
-  height: 3px;
+  width: 56px;
+  height: 2px;
   border-radius: 999px;
-  background: rgba(255,102,0,0.85);
-  box-shadow: 0 6px 18px rgba(255,102,0,0.22);
-  opacity: 0.9;
+  background: linear-gradient(90deg, var(--brand-mid), transparent);
+  box-shadow: none;
+  opacity: 1;
 }
 
 /* Put a tiny notch on the issue header too */
@@ -305,11 +305,11 @@
   position: absolute;
   left: 0;
   top: -6px;
-  width: 46px;
-  height: 3px;
+  width: 70px;
+  height: 2px;
   border-radius: 999px;
-  background: rgba(255,102,0,0.75);
-  opacity: 0.85;
+  background: linear-gradient(90deg, var(--brand-soft), transparent);
+  opacity: 1;
 }
 
 /* =========================================================
