@@ -222,7 +222,7 @@
     {# ─────────────────────────────
        Add update
        ───────────────────────────── #}
-    {% if issue.status_code != "CLOSED" %}
+    {% if issue.closed_at != None %}
       <div class="card update-form update-slot">
         <h3 class="card-title">Add update</h3>
 
