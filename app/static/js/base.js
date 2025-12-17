@@ -100,9 +100,22 @@
   function openTextModalFromEl(elId, title) {
     const el = document.getElementById(elId);
     if (!el) return;
-    openTextModal(title, el.textContent || "");
-  }
 
+    const modal = document.getElementById("textModal");
+    const t = document.getElementById("textModalTitle");
+    const b = document.getElementById("textModalBody");
+    if (!modal || !t || !b) return;
+
+    t.textContent = title || "Details";
+
+    // IMPORTANT: render HTML, not text
+    b.innerHTML = el.innerHTML;
+
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("no-scroll");
+  }
+  
   window.openTextModal = openTextModal;
   window.closeTextModal = closeTextModal;
   window.openTextModalFromEl = openTextModalFromEl;
