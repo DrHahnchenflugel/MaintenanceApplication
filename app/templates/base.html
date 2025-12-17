@@ -4,15 +4,17 @@
     <meta charset="UTF-8">
     <title>{% block title %} Maintenance {% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
+
     <link rel="stylesheet" href="{{ url_for('static', filename='css/00_theme.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/10_layout.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/20_components.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/25_forms.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/30_tables.css') }}">
     <script defer src="{{ url_for('static', filename='js/base.js') }}"></script>
+
     {% block page_css %}{% endblock %}
     {% block head_extra %}{% endblock %}
   </head>
+
   <body>
     <div class="layout">
       {% include "_partials/_sidebar.html" %}
@@ -20,9 +22,6 @@
       <div class="main">
         <header class="header">
           <div class="top">
-            <button class="nav-toggle" id="navToggle" type="button" aria-label="Open navigation">
-              ☰
-            </button>
             <span id="clock" class="badge badge--xs badge--mono">00:00 AM</span>
             <span class="badge badge--xs">THO</span>
           </div>
@@ -48,8 +47,25 @@
       </div>
     </div>
 
+    {# Image modal #}
     <div id="imgModal" class="img-modal" onclick="closeImgModal()">
       <img id="imgModalContent" class="img-modal-content" alt="Expanded issue photo">
+    </div>
+
+    {# Text modal (description, etc.) #}
+    <div id="textModal" class="text-modal" role="dialog" aria-modal="true" aria-hidden="true">
+      <div class="text-modal__overlay" onclick="closeTextModal()"></div>
+
+      <div class="text-modal__panel" role="document">
+        <div class="text-modal__header">
+          <div id="textModalTitle" class="text-modal__title">Details</div>
+          <button type="button" class="text-modal__close" onclick="closeTextModal()" aria-label="Close">
+            ×
+          </button>
+        </div>
+
+        <div id="textModalBody" class="text-modal__body"></div>
+      </div>
     </div>
   </body>
 </html>

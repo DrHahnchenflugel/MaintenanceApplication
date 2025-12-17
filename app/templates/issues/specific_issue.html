@@ -34,9 +34,19 @@
       <div class="issue-main-body">
         <div class="field issue-block">
           <label class="issue-label">Description</label>
-          <div class="issue-description">
+
+          {# preview: clamped + clickable #}
+          <button
+            type="button"
+            class="issue-desc-preview"
+            onclick="openTextModalFromEl('issueDescFull', 'Description')"
+            aria-label="Open full description"
+          >
             {{ issue.description or "—" }}
-          </div>
+          </button>
+
+          {# full text lives here safely (no attribute escaping issues) #}
+          <div id="issueDescFull" hidden>{{ issue.description or "—" }}</div>
         </div>
 
         <div class="issue-meta">

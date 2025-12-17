@@ -40,15 +40,72 @@
     m.classList.remove("open");
     img.src = "";
 
-    // Only remove no-scroll if sidebar drawer isn't open
+    // Only remove no-scroll if sidebar drawer OR text modal isn't open
     const sidebar = document.getElementById("sidebar");
     const drawerOpen = sidebar && sidebar.classList.contains("is-open");
-    if (!drawerOpen) document.body.classList.remove("no-scroll");
+
+    const textModal = document.getElementById("textModal");
+    const textOpen = textModal && textModal.classList.contains("open");
+
+    if (!drawerOpen && !textOpen) document.body.classList.remove("no-scroll");
   }
 
   // Make them available to HTML onclick=""
   window.openImgModal = openImgModal;
   window.closeImgModal = closeImgModal;
+
+  // ---- Text modal (generic) ----
+  function openTextModal(title, text) {
+    const modal = document.getElementById("textModal");
+    const t = document.getElementById("textModalTitle");
+    const b = document.getElementById("textModalBody");
+    if (!modal || !t || !b) return;
+
+    t.textContent = title || "Details";
+
+    // Safe text -> preserve line breaks
+    const safe = (text || "").toString();
+    b.innerHTML = safe.replace(/&/g, "&amp;")
+                      .replace(/</g, "&lt;")
+                      .replace(/>/g, "&gt;")
+                      .replace(/"/g, "&quot;")
+                      .replace(/'/g, "&#039;")
+                      .replace(/\n/g, "<br>");
+
+    modal.classList.add("open");
+    modal.setAttribute("aria-hidden", "false");
+    document.body.classList.add("no-scroll");
+  }
+
+  function closeTextModal() {
+    const modal = document.getElementById("textModal");
+    const b = document.getElementById("textModalBody");
+    if (!modal || !b) return;
+
+    modal.classList.remove("open");
+    modal.setAttribute("aria-hidden", "true");
+    b.innerHTML = "";
+
+    // Only remove no-scroll if sidebar drawer OR image modal isn't open
+    const sidebar = document.getElementById("sidebar");
+    const drawerOpen = sidebar && sidebar.classList.contains("is-open");
+
+    const imgModal = document.getElementById("imgModal");
+    const imgOpen = imgModal && imgModal.classList.contains("open");
+
+    if (!drawerOpen && !imgOpen) document.body.classList.remove("no-scroll");
+  }
+
+  // Helper: read full text from a hidden element by id
+  function openTextModalFromEl(elId, title) {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    openTextModal(title, el.textContent || "");
+  }
+
+  window.openTextModal = openTextModal;
+  window.closeTextModal = closeTextModal;
+  window.openTextModalFromEl = openTextModalFromEl;
 
   // ---- Clamp toggles ----
   function initClampToggles() {
@@ -88,10 +145,14 @@
       sidebar.classList.remove("is-open");
       scrim.hidden = true;
 
-      // Only remove no-scroll if image modal isn't open
+      // Only remove no-scroll if image modal AND text modal aren't open
       const imgModal = document.getElementById("imgModal");
-      const modalOpen = imgModal && imgModal.classList.contains("open");
-      if (!modalOpen) document.body.classList.remove("no-scroll");
+      const imgOpen = imgModal && imgModal.classList.contains("open");
+
+      const textModal = document.getElementById("textModal");
+      const textOpen = textModal && textModal.classList.contains("open");
+
+      if (!imgOpen && !textOpen) document.body.classList.remove("no-scroll");
     }
 
     btn.addEventListener("click", openNav);
@@ -102,7 +163,14 @@
   document.addEventListener("keydown", (e) => {
     if (e.key !== "Escape") return;
 
-    // Close image modal first if open
+    // Close text modal first if open (top-most)
+    const textModal = document.getElementById("textModal");
+    if (textModal && textModal.classList.contains("open")) {
+      closeTextModal();
+      return;
+    }
+
+    // Then close image modal if open
     const imgModal = document.getElementById("imgModal");
     if (imgModal && imgModal.classList.contains("open")) {
       closeImgModal();
