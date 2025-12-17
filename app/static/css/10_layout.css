@@ -88,21 +88,17 @@ body { overflow: hidden; }
   top: 0;
   z-index: 20;
 
+  /* dark brand tint, not orange glow */
   background:
-    linear-gradient(180deg, rgba(255,102,0,0.08), rgba(0,0,0,0.0) 70%),
+    linear-gradient(180deg, var(--brand-deep), rgba(0,0,0,0) 78%),
     var(--bg);
+
+  border-bottom: 1px solid rgba(255,255,255,0.08);
   backdrop-filter: blur(10px);
 }
 
-.header::after {
-  content: "";
-  position: absolute;
-  left: 20px;
-  right: 20px;
-  bottom: 0;
-  height: 1px;
-  background: rgba(255,102,0,0.22);
-}
+/* kill the orange hairline */
+.header::after { display: none; }
 
 
 /* ---- Footer ---- */

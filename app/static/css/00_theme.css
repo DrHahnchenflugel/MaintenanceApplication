@@ -25,6 +25,11 @@
   --brand-focus: rgba(255, 102, 0, 0.18);
   --brand-glow: rgba(255, 102, 0, 0.12);
 
+  /* Dark “burnt” brand for header tint (not neon) */
+  --brand-deep: #2a160b;      /* base header tint */
+  --brand-deeper: #120b07;    /* edge / fade */
+  --brand-hairline: rgba(255,102,0,0.12); /* only if you want a tiny hint */
+
 
   /* ---- Semantic ---- */
   --ok: #6ee7b7;
@@ -152,25 +157,13 @@ textarea:focus-visible {
 }
 
 /* Brand-accented card (use on important cards only) */
-.card--accent {
+.card--accent{
   position: relative;
-  border-color: rgba(255,255,255,0.10);
+  border-color: rgba(255,255,255,0.14);
+  background: var(--panel);
 }
 
-.card--accent::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  pointer-events: none;
-
-  /* subtle left edge + top-left wash */
-  background:
-    linear-gradient(90deg, rgba(255,102,0,0.20), transparent 16px),
-    radial-gradient(420px 200px at 0% 0%, rgba(255,102,0,0.10), transparent 60%);
-  opacity: 1;
-}
-
+.card--accent::before{ display: none; }
 
 /* tiny warm tint only inside the card (barely) */
 /*
