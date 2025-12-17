@@ -246,3 +246,32 @@
   overflow-wrap: anywhere;
   word-break: break-word;
 }
+
+/* =========================================================
+   Image modal
+   ========================================================= */
+
+.img-modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  z-index: 10000;
+  background: rgba(0,0,0,0.75);
+}
+
+.img-modal.open {
+  display: grid;
+  place-items: center;
+}
+
+.img-modal-content {
+  max-width: min(92vw, 1100px);
+  max-height: 92vh;
+  border-radius: 14px;
+  box-shadow: 0 20px 80px rgba(0,0,0,0.55);
+}
+
+/* If src is empty, hide it so alt text never appears */
+.img-modal-content[src=""] {
+  display: none;
+}
