@@ -12,15 +12,10 @@
   margin: 0;
 }
 
-.issue-status {
-  font-size: 13px;
-  font-weight: 600;
-  padding: 6px 12px;
-  border-radius: 999px;
-  border: 1px solid rgba(255,255,255,0.12);
-  white-space: nowrap;
-  flex: 0 0 auto;
+.issue-main-header .issue-status {
+  font-weight: 700;
 }
+
 
 .issue-meta {
   font-size: 12px;
