@@ -248,13 +248,6 @@
     max-height: none;
   }
 
-  /* On tablet, don’t trap scrolling inside issue/status/activity */
-  .issue-main-body,
-  .status-card .table-scroll,
-  .actions-card .table-scroll {
-    overflow: visible;
-  }
-
   .status-card {
     height: auto;
   }
@@ -310,26 +303,23 @@
     overflow-x: hidden;
   }
 
-  /* IMPORTANT: if you had overflow: visible on tablet, override it */
-  .issue-main-body {
-    overflow-y: auto;    /* keep issue description scrollable if needed */
-  }
-
-  /* Disable scrolling inside the title card */
-  .issue-main-scroll {
-    overflow: hidden;
-  }
-
-  /* Clamp description text instead of scrolling */
-  .issue-description {
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 5; /* adjust */
-    line-clamp: 5;
-    overflow: hidden;
-  }
-
   /* Prevent meta section from forcing height */
+  .issue-meta {
+    overflow: hidden;
+  }
+
+  .issue-main-body {
+    overflow: hidden;     /* kill the internal scroll */
+    padding-right: 0;     /* optional: avoids fake scrollbar gutter feel */
+  }
+
+  /* Your description is already a clamped button; keep it clamped */
+  .issue-desc-preview {
+    -webkit-line-clamp: 4; /* tweak */
+    line-clamp: 4;
+  }
+
+  /* If meta gets too tall, cut it off too (no scrolling) */
   .issue-meta {
     overflow: hidden;
   }
