@@ -173,11 +173,6 @@ textarea:focus-visible {
   box-shadow: 0 6px 18px var(--brand-glow);
 }
 
-/* Optional: make the card border slightly warmer (subtle) */
-.card-accent {
-  border-color: rgba(255, 102, 0, 0.18);
-}
-
 /* =========================================================
    Selection & scrollbars (subtle, optional)
    ========================================================= */
