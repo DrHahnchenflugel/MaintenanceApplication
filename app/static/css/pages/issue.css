@@ -93,35 +93,34 @@
 }
 
 /* Truncated description preview -> opens modal */
-/* Modal: issue details layout (tight) */
-.issue-modal {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;              /* was 14px */
+.issue-desc-preview {
+  width: 100%;
+  text-align: left;
+
+  background: transparent;
+  border: 0;
+  color: var(--text);
+
+  padding: 0;
+  margin-top: 6px;
+
+  line-height: 1.45;
+  opacity: 0.92;
+  cursor: pointer;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;  /* preview lines */
+  overflow: hidden;
+
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
-/* kill default heading spacing inside modal */
-.issue-modal h2,
-.issue-modal h3 {
-  margin: 0;
+.issue-desc-preview:hover {
+  opacity: 1;
+  text-decoration: underline;
 }
-
-/* tighten field spacing */
-.issue-modal .field {
-  margin: 0;
-}
-
-/* tighter labels in modal */
-.issue-modal .issue-label {
-  margin-bottom: 4px;    /* was 6px in forms; modal wants tighter */
-}
-
-/* rows: less gap + allow wrap if needed */
-.issue-modal .row.issue-row {
-  gap: 10px;             /* was 16px */
-  margin: 0;
-}
-
 
 /* C: asset strip fixed at bottom */
 .issue-asset-strip {
