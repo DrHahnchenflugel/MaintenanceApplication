@@ -143,20 +143,18 @@ textarea:focus-visible {
   position: relative;
 }
 
+
+
 .card--accent::before {
   content: "";
   position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 6px;
-  border-radius: 12px 12px 0 0;
-  background: linear-gradient(
-    90deg,
-    #ff6600,
-    rgba(255,102,0,0.4),
-    transparent 85%
-  );
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+
+  box-shadow:
+    inset 0 2px 0 rgba(255,102,0,0.45),
+    inset 0 12px 24px rgba(255,102,0,0.08);
 }
 
 /* =========================================================
