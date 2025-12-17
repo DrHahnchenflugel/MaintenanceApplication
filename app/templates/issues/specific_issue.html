@@ -42,11 +42,14 @@
             onclick="openTextModalFromEl('issueModalFull', 'Issue')"
             aria-label="Open full issue details"
           >
-            {{ issue.description or "—" }}
+            {{ issue.description or "-" }}
           </button>
 
           {# Full issue info for modal (cloned into modal on click) #}
           <div id="issueModalFull" hidden>
+            <h1 class="issue-title">{{ issue.title }}</h1>
+            <div class="issue-label">Description</div>
+            {{ issue.description or "-" }}
           </div>
         </div>
 
