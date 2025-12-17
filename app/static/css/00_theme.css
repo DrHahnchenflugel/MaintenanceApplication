@@ -10,23 +10,22 @@
   --bg: #0f1115;
   --panel: #171a21;
   --panel-lighter: #272b36;
-
   --line: #323745;
 
   --text: #e7ebf1;
   --muted: #aab1bd;
 
-  /* ---- Brand & semantic ---- */
+  /* ---- Brand (Exceed) ---- */
   --brand: #ff6600;
-  --brand-soft: rgba(255,102,0,0.18);
-  --brand-border: rgba(255,102,0,0.45);
-  --brand-focus: rgba(255,102,0,0.25);
-  --brand-glow: rgba(255,102,0,0.18);
-  --brand-glow-strong: rgba(255,102,0,0.28);
-  --brand-soft: rgba(255, 102, 0, 0.22);
-  --brand-mid: rgba(255, 102, 0, 0.45);
-  --brand-glow: rgba(255, 102, 0, 0.28);
 
+  /* single-source-of-truth brand ramps */
+  --brand-soft: rgba(255, 102, 0, 0.16);
+  --brand-mid: rgba(255, 102, 0, 0.32);
+  --brand-border: rgba(255, 102, 0, 0.22);
+  --brand-focus: rgba(255, 102, 0, 0.22);
+  --brand-glow: rgba(255, 102, 0, 0.22);
+
+  /* ---- Semantic ---- */
   --ok: #6ee7b7;
   --warn: #fb923c;
   --bad: #f87171;
@@ -40,7 +39,6 @@
   /* =========================================================
     Issue status tokens (reusable across pages)
     ========================================================= */
-
   --status-open-bg: rgba(37,150,190,0.18);
   --status-open-border: rgba(37,150,190,0.45);
   --status-open-text: #cfefff;
@@ -53,7 +51,6 @@
   --status-closed-border: rgba(110,231,183,0.45);
   --status-closed-text: #d8fff0;
 
-  /* Optional / future */
   --status-blocked-bg: rgba(248,113,113,0.18);
   --status-blocked-border: rgba(248,113,113,0.45);
   --status-blocked-text: #ffd6d6;
@@ -67,14 +64,9 @@
    Global reset & base rules
    ========================================================= */
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
-html,
-body {
-  height: 100%;
-}
+html, body { height: 100%; }
 
 body {
   margin: 0;
@@ -97,10 +89,7 @@ body {
 }
 
 /* ---- Links ---- */
-a {
-  color: inherit;
-  text-decoration: none;
-}
+a { color: inherit; text-decoration: none; }
 
 a:focus-visible {
   outline: 2px solid var(--brand);
@@ -108,20 +97,11 @@ a:focus-visible {
 }
 
 /* ---- Images ---- */
-img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-}
+img { max-width: 100%; height: auto; display: block; }
 
 /* ---- Text helpers ---- */
-.muted {
-  color: var(--muted);
-}
-
-.no-scroll {
-  overflow: hidden;
-}
+.muted { color: var(--muted); }
+.no-scroll { overflow: hidden; }
 
 /* Global focus ring (buttons, inputs, links) */
 a:focus-visible,
@@ -135,170 +115,111 @@ textarea:focus-visible {
 }
 
 /* Secondary actions lean brand on hover */
-.btn.btn-secondary:hover {
-  color: var(--brand);
-}
+.btn.btn-secondary:hover { color: var(--brand); }
 
-.card-title {
+/* =========================================================
+   Brand wash (apply to any card with class="card card--brand")
+   ========================================================= */
+.card--brand {
   position: relative;
-  padding-top: 2px;
+  overflow: hidden; /* contain the wash */
+  border-color: var(--brand-border);
 }
 
-/* Add to any card-like container */
-.card-accent {
-  position: relative;
-}
+.card--brand::before{
+  content:"";
+  position:absolute;
+  inset:-1px;
+  border-radius: inherit;
+  pointer-events:none;
 
-/* Top accent bar (looks intentional) */
-.card-accent::before {
-  content: "";
-  position: absolute;
-  left: 12px;
-  right: 12px;
-  top: 10px;
-  height: 3px;
-  border-radius: 999px;
-
-  background: linear-gradient(
-    90deg,
-    rgba(255,102,0,0.0),
-    rgba(255,102,0,0.95),
-    rgba(255,102,0,0.0)
-  );
-
+  /* soft top-left wash (intentional, not a hairline) */
+  background:
+    radial-gradient(
+      520px 220px at 10% 0%,
+      rgba(255,102,0,0.18),
+      rgba(255,102,0,0.08) 35%,
+      rgba(255,102,0,0.00) 70%
+    );
   opacity: 0.9;
-  pointer-events: none;
+}
 
-  /* soft glow so it doesn’t look like a hairline */
-  box-shadow: 0 6px 18px var(--brand-glow);
+/* Optional: “featured” lift (for one card max) */
+.card--featured{
+  position: relative;
+  overflow: hidden;
+}
+
+.card--featured::before{
+  content:"";
+  position:absolute;
+  inset:-1px;
+  border-radius: inherit;
+  pointer-events:none;
+  box-shadow:
+    0 0 0 1px rgba(255,102,0,0.16),
+    0 14px 40px var(--brand-glow);
+  opacity: 0.9;
+}
+
+.card--featured::after{
+  content:"";
+  position:absolute;
+  top:10px;
+  left:10px;
+  width:18px;
+  height:18px;
+  border-top: 2px solid rgba(255,102,0,0.75);
+  border-left: 2px solid rgba(255,102,0,0.45);
+  border-radius: 8px 0 0 0;
+  pointer-events:none;
+  opacity: 0.85;
 }
 
 /* =========================================================
-   Selection & scrollbars (subtle, optional)
+   Selection & scrollbars
    ========================================================= */
-
 ::selection {
   background: rgba(255, 102, 0, 0.35);
   color: var(--text);
 }
 
-/* WebKit scrollbar styling (safe, minimal) */
-*::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
-}
-
-*::-webkit-scrollbar-track {
-  background: transparent;
-}
-
+*::-webkit-scrollbar { width: 10px; height: 10px; }
+*::-webkit-scrollbar-track { background: transparent; }
 *::-webkit-scrollbar-thumb {
   background-color: rgba(255,255,255,0.12);
   border-radius: 10px;
   border: 2px solid transparent;
   background-clip: content-box;
 }
-
-*::-webkit-scrollbar-thumb:hover {
-  background-color: rgba(255,255,255,0.2);
-}
-
-.issue-desc-preview {
-  border-radius: 8px;
-  padding: 6px 8px;
-  margin-left: -8px;
-  margin-right: -8px;
-}
-
-.issue-desc-preview:hover {
-  background: var(--brand-soft);
-  opacity: 1;
-  text-decoration: none;
-}
-
+*::-webkit-scrollbar-thumb:hover { background-color: rgba(255,255,255,0.2); }
 
 /* =========================================================
    Reusable status badges (global)
    ========================================================= */
-.issue-status {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-
-  font-size: 13px;
-  font-weight: 650;
-  line-height: 1;
-
-  padding: 6px 12px;
-  border-radius: 999px;
-
-  white-space: nowrap;
-  border: 1px solid rgba(255,255,255,0.12);
-  background: rgba(255,255,255,0.04);
-  color: var(--text);
-
-  /* subtle “finished” look */
-  box-shadow: 0 10px 26px rgba(0,0,0,0.28);
-}
-
-/* Optional: tiny dot indicator */
-.issue-status::before {
-  content: "";
-  width: 7px;
-  height: 7px;
-  border-radius: 999px;
-  background: currentColor;
-  opacity: 0.65;
-}
-
-/* Variants (match your existing classes) */
-.issue-status.status-open {
-  background: var(--status-open-bg);
-  border-color: var(--status-open-border);
-  color: var(--status-open-text);
-}
-
-.issue-status.status-in-progress {
-  background: var(--status-in-progress-bg);
-  border-color: var(--status-in-progress-border);
-  color: var(--status-in-progress-text);
-}
-
-.issue-status.status-closed {
-  background: var(--status-closed-bg);
-  border-color: var(--status-closed-border);
-  color: var(--status-closed-text);
-}
-
-.issue-status.status-blocked {
-  background: var(--status-blocked-bg);
-  border-color: var(--status-blocked-border);
-  color: var(--status-blocked-text);
-}
-
-.issue-status.status-unknown {
-  background: var(--status-unknown-bg);
-  border-color: var(--status-unknown-border);
-  color: var(--status-unknown-text);
-}
-
+.issue-status,
 .chip-status {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+
   font-size: 13px;
   font-weight: 650;
   line-height: 1;
+
   padding: 6px 12px;
   border-radius: 999px;
+
   white-space: nowrap;
   border: 1px solid rgba(255,255,255,0.12);
   background: rgba(255,255,255,0.04);
   color: var(--text);
+
   box-shadow: 0 10px 26px rgba(0,0,0,0.28);
 }
+
+.issue-status::before,
 .chip-status::before {
   content: "";
   width: 7px;
@@ -308,43 +229,37 @@ textarea:focus-visible {
   opacity: 0.65;
 }
 
-/* ===========================
-   Brand highlight (good)
-   =========================== */
-/* Apply to any .card you want to “feature” */
-.card--featured{
-  position: relative;
-  border-color: rgba(255,255,255,0.10); /* keep normal */
+.issue-status.status-open,
+.chip-status.status-open {
+  background: var(--status-open-bg);
+  border-color: var(--status-open-border);
+  color: var(--status-open-text);
 }
 
-/* Soft aura + gentle lift */
-.card--featured::before{
-  content:"";
-  position:absolute;
-  inset:-1px;
-  border-radius: inherit;
-  pointer-events:none;
-
-  /* this is the important part: glow OUTSIDE the card, not a border */
-  box-shadow:
-    0 0 0 1px rgba(255,102,0,0.18),
-    0 14px 40px var(--brand-glow);
-  opacity: 0.9;
+.issue-status.status-in-progress,
+.chip-status.status-in-progress {
+  background: var(--status-in-progress-bg);
+  border-color: var(--status-in-progress-border);
+  color: var(--status-in-progress-text);
 }
 
-/* Small corner accent so it feels intentional */
-.card--featured::after{
-  content:"";
-  position:absolute;
-  top:10px;
-  left:10px;
-  width:18px;
-  height:18px;
-  border-top: 2px solid rgba(255,102,0,0.8);
-  border-left: 2px solid rgba(255,102,0,0.55);
-  border-radius: 8px 0 0 0;
-  pointer-events:none;
-  opacity: 0.85;
+.issue-status.status-closed,
+.chip-status.status-closed {
+  background: var(--status-closed-bg);
+  border-color: var(--status-closed-border);
+  color: var(--status-closed-text);
 }
 
+.issue-status.status-blocked,
+.chip-status.status-blocked {
+  background: var(--status-blocked-bg);
+  border-color: var(--status-blocked-border);
+  color: var(--status-blocked-text);
+}
 
+.issue-status.status-unknown,
+.chip-status.status-unknown {
+  background: var(--status-unknown-bg);
+  border-color: var(--status-unknown-border);
+  color: var(--status-unknown-text);
+}
