@@ -314,6 +314,25 @@
   .issue-main-body {
     overflow-y: auto;    /* keep issue description scrollable if needed */
   }
+
+  /* Disable scrolling inside the title card */
+  .issue-main-scroll {
+    overflow: hidden;
+  }
+
+  /* Clamp description text instead of scrolling */
+  .issue-description {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 5; /* adjust */
+    line-clamp: 5;
+    overflow: hidden;
+  }
+
+  /* Prevent meta section from forcing height */
+  .issue-meta {
+    overflow: hidden;
+  }
 }
 
 /* =========================================================
