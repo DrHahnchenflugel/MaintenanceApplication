@@ -101,19 +101,27 @@
            href="{{ url_for('app.view_issue', issue_id=issue.id) }}">
 
           <div class="issue-asset">
-            #{{ issue.asset.asset_tag }}
+            {{ issue.asset.asset_tag }}
           </div>
 
           <div class="issue-cell-title">
             <div class="issue-title">{{ issue.title }}</div>
             <div class="issue-sub">
               {% if issue.reported_by %}Reported by {{ issue.reported_by }}{% else %}-{% endif %}
-              {% if issue.last_action_at %} · Last {{ issue.last_action_at }}{% endif %}
+              {% if issue.last_action_at %} | Last 
+                {% set time, date = issue.created_at | format_dt %}
+                {{ date }}<br>
+                <span class="time">{{ time }}</span>
+              {% endif %}
             </div>
           </div>
 
           <div>
-            {{ issue.created_at }}
+            {% set time, date = issue.created_at | format_dt %}
+            <div>
+              {{ date }}<br>
+              <span class="time">{{ time }}</span>
+            </div>
           </div>
 
           {% set code = issue.status.code %}
