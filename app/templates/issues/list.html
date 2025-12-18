@@ -2,39 +2,43 @@
 {% block title %}Maintenance – Issues{% endblock %}
 {% block page_title %}Issues{% endblock %}
 
+{% block page_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/list_issues.css') }}">
+{% endblock %}
+
 {% block content %}
 
-  <!-- Filter/search bar -->
-  <form method="get" class="card" style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
-    <label class="field" style="display:flex;align-items:center;gap:8px;margin:0;">
-      <span class="muted"><strong>Status</strong></span>
-      <span class="card">
-        <select name="status" onchange="this.form.submit()">
+  <form method="get" class="issues-toolbar">
+    <div class="issues-toolbar__row">
+
+      <label class="issues-field">
+        <span class="issues-label">Status</span>
+        <select class="issues-select" name="status" onchange="this.form.submit()">
           <option value="" {{ 'selected' if not cur_status }}>All</option>
           {% for st in status_options %}
-            <option value="{{ st.code }}"
-                    {{ 'selected' if cur_status == st.code else '' }}>
+            <option value="{{ st.code }}" {{ 'selected' if cur_status == st.code else '' }}>
               {{ st.label }}
             </option>
           {% endfor %}
         </select>
-      </span>
-    </label>
+      </label>
 
-    <label class="field" style="display:flex;align-items:center;gap:8px;margin:0;flex:1;">
-      <span class="muted"><strong>Search</strong></span>
-      <input type="text" name="q" value="{{ search }}" placeholder="Title or description"
-             style="flex:1;min-width:180px;">
-    </label>
+      <label class="issues-field issues-field--grow">
+        <span class="issues-label">Search</span>
+        <input class="issues-input" type="text" name="q" value="{{ search }}"
+               placeholder="Title or description">
+      </label>
 
-    <noscript>
-      <button class="btn">Apply</button>
-    </noscript>
+      <div class="issues-actions">
+        <button class="btn issues-apply" type="submit">Apply</button>
+      </div>
+
+    </div>
   </form>
 
   {% if issues %}
-    <div class="table table--issues" style="margin-top:16px;">
-      <div class="thead--four">
+    <div class="table">
+      <div class="table-head table-head--4">
         <div>Asset</div>
         <div>Title</div>
         <div>Opened</div>
@@ -42,39 +46,43 @@
       </div>
 
       {% for issue in issues %}
-        <a class="trow--four"
+        <a class="table-row table-row--4"
            href="{{ url_for('app.view_issue', issue_id=issue.id) }}">
-          <div>
+
+          <div class="issue-asset">
             #{{ issue.asset.asset_tag }}
             {% if issue.asset.site_id %}
               <span class="muted">({{ issue.asset.site_id }})</span>
-              {# later you can render a human-friendly site name instead of the UUID #}
             {% endif %}
           </div>
 
-          <div>
-            {{ issue.title }}
+          <div class="issue-cell-title">
+            <div class="issue-title">{{ issue.title }}</div>
             {% if issue.reported_by %}
-              <span class="muted">— {{ issue.reported_by }}</span>
+              <div class="issue-sub">Reported by {{ issue.reported_by }}</div>
             {% endif %}
           </div>
 
           <div>
             {{ issue.created_at }}
             {% if issue.last_action_at %}
-              <span class="muted">(last: {{ issue.last_action_at }})</span>
+              <div class="time">(last: {{ issue.last_action_at }})</div>
             {% endif %}
           </div>
 
           {% set code = issue.status.code %}
-          <div class="badge badge--outline-{{
-                'ok'   if code == 'OPEN'
-           else 'warn' if code == 'IN_PROGRESS'
-           else 'bad'  if code == 'BLOCKED'
-           else 'blue'
-          }}">
-            {{ issue.status.label }}
+          <div>
+            <span class="issue-status {{
+              'status-open' if code == 'OPEN'
+              else 'status-in-progress' if code == 'IN_PROGRESS'
+              else 'status-blocked' if code == 'BLOCKED'
+              else 'status-closed' if code == 'CLOSED'
+              else 'status-unknown'
+            }}">
+              {{ issue.status.label }}
+            </span>
           </div>
+
         </a>
       {% endfor %}
     </div>

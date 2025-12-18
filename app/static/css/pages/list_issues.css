@@ -1,0 +1,138 @@
+/* list_issues.css
+   Issues list page: toolbar + issues "table" (actually a grid list)
+*/
+
+.issues-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+
+  padding: 12px 14px;
+  margin-bottom: 14px;
+
+  background: linear-gradient(180deg, rgba(15,17,21,0.92), rgba(15,17,21,0.72));
+  backdrop-filter: blur(10px);
+
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.issues-toolbar__row{
+  display: flex;
+  align-items: end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.issues-field{
+  display: grid;
+  gap: 6px;
+  min-width: 170px;
+}
+
+.issues-field--grow{
+  flex: 1 1 360px;
+  min-width: 220px;
+}
+
+.issues-label{
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: .02em;
+  color: var(--muted);
+}
+
+.issues-input,
+.issues-select{
+  height: 40px;
+  padding: 0 12px;
+
+  background: rgba(255,255,255,0.045);
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 12px;
+
+  color: var(--text);
+}
+
+.issues-select{
+  appearance: none;
+  padding-right: 40px;
+  cursor: pointer;
+
+  background-image:
+    linear-gradient(45deg, transparent 50%, rgba(255,255,255,.65) 50%),
+    linear-gradient(135deg, rgba(255,255,255,.65) 50%, transparent 50%);
+  background-position:
+    calc(100% - 20px) 18px,
+    calc(100% - 14px) 18px;
+  background-size: 6px 6px, 6px 6px;
+  background-repeat: no-repeat;
+}
+
+.issues-actions{
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.issues-apply{
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 12px;
+}
+
+/* Use your table system (30_tables.css) but add 4-col layout */
+.table-head--4,
+.table-row--4{
+  grid-template-columns: 170px minmax(240px, 1fr) 220px 150px;
+}
+
+.table-row{
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.table-row:active{ transform: translateY(1px); }
+
+/* Make title column clamp a bit */
+.issue-cell-title{
+  min-width: 0;
+}
+
+.issue-title{
+  font-weight: 800;
+  line-height: 1.25;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.issue-sub{
+  margin-top: 2px;
+  font-size: 12px;
+  color: rgba(231,235,241,0.70);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.issue-asset{
+  font-weight: 800;
+}
+
+.issue-asset .muted{
+  font-weight: 650;
+}
+
+/* Tablet/phone: allow horizontal scroll instead of crushing */
+@media (max-width: 1024px){
+  .table-head--4,
+  .table-row--4{
+    min-width: 780px;
+  }
+}
+
+@media (max-width: 768px){
+  .issues-input,
+  .issues-select{ height: 38px; border-radius: 12px; }
+}
