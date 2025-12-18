@@ -11,6 +11,7 @@
   --panel: #171a21;
   --panel-lighter: #272b36;
   --line: #323745;
+  --line-strong: rgba(255,255,255,0.12);
 
   --text: #e7ebf1;
   --muted: #aab1bd;
@@ -46,6 +47,12 @@
   --panel-ok: #42806c;
   --panel-warn: #c2410c;
   --panel-bad: #884649;
+  --panel: #171a21;
+  --panel-2: #1b1f28;          /* slightly lifted */
+
+  --shadow-1: 0 10px 24px rgba(0,0,0,0.35);
+  --shadow-2: 0 16px 38px rgba(0,0,0,0.45);
+
 
   /* =========================================================
     Issue status tokens (reusable across pages)

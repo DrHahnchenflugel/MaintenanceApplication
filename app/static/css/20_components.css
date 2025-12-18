@@ -5,10 +5,15 @@
 }
 
 .card {
-    background: var(--panel);
+    background: linear-gradient(180deg, var(--panel-2), var(--panel));
     border: 1px solid var(--line);
     border-radius: 12px;
     padding: 16px;
+    box-shadow: var(--shadow-1);
+}
+
+.card:hover{
+  border-color: var(--line-strong);
 }
 
 /* Generic container used elsewhere */
