@@ -832,7 +832,7 @@ def delete_accepted_attachment_content_type(content_type: str):
 
 def list_category_rows():
     sql = text("""
-        SELECT id, name, label
+        SELECT id::text AS id, name, label
         FROM category
         ORDER BY label ASC, name ASC
     """)
@@ -842,7 +842,7 @@ def list_category_rows():
 
 def list_make_rows(*, category_id: str):
     sql = text("""
-        SELECT id, name, label
+        SELECT id::text AS id, name, label
         FROM make
         WHERE category_id = :category_id
         ORDER BY label ASC, name ASC
@@ -853,7 +853,7 @@ def list_make_rows(*, category_id: str):
 
 def list_model_rows(*, make_id: str):
     sql = text("""
-        SELECT id, name, label
+        SELECT id::text AS id, name, label
         FROM model
         WHERE make_id = :make_id
         ORDER BY label ASC, name ASC
@@ -863,6 +863,16 @@ def list_model_rows(*, make_id: str):
     return [dict(r) for r in rows]
 
 def list_variant_rows(*, model_id: str):
+    sql = text("""
+        SELECT id::text AS id, name, label
+        FROM variant
+        WHERE model_id = :model_id
+        ORDER BY label ASC, name ASC
+    """)
+    with get_connection() as conn:
+        rows = conn.execute(sql, {"model_id": model_id}).mappings().all()
+    return [dict(r) for r in rows]
+
     sql = text("""
         SELECT id, name, label
         FROM variant

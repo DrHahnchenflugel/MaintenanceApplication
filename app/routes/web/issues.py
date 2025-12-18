@@ -25,6 +25,18 @@ def issues_list():
     """
 
     category_id = parse_uuid_arg("category_id")
+    categories = issue_service.list_categories()
+
+    if not category_id:
+        robot = next(
+            (c for c in categories
+            if (c.get("label") or "").strip().lower() == "robot"
+            or (c.get("name") or "").strip().lower() == "robot"),
+            None
+        )
+        if robot:
+            category_id = robot["id"]
+
     make_id     = parse_uuid_arg("make_id")
     model_id    = parse_uuid_arg("model_id")
     variant_id  = parse_uuid_arg("variant_id")
@@ -37,7 +49,6 @@ def issues_list():
     elif not model_id:
         variant_id = None
 
-    categories = issue_service.list_categories()
     makes      = issue_service.list_makes(category_id) if category_id else []
     models     = issue_service.list_models(make_id) if make_id else []
     variants   = issue_service.list_variants(model_id) if model_id else []
@@ -55,7 +66,7 @@ def issues_list():
         variant_id = None
 
     # Read filters from query string
-    status_code = (request.args.get("status") or "").upper() or None
+    status_code = (request.args.get("status") or "").upper() or "IN_PROGRESS"
     search = request.args.get("q") or None
 
     # Get all statuses so we can render the dropdown and map codes -> ids
