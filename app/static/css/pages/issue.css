@@ -1,10 +1,7 @@
-/* =========================================================
-   issue.css
-   Desktop: A(title) + B(scroll desc) + C(asset) inside issue card
-   iPad: A,B,C / D,E,E layout
-   ========================================================= */
+/* issue.css
+   Issue page layout rules only.
+*/
 
-/* ---- Titles/status ---- */
 .issue-title {
   font-size: 22px;
   font-weight: 700;
@@ -19,7 +16,6 @@
   opacity: 0.65;
 }
 
-/* ---- Grid areas ---- */
 .issue-main { grid-area: issue-main; }
 .issue-image { grid-area: issue-image; }
 .status-col { grid-area: status; }
@@ -27,8 +23,9 @@
 .actions-card { grid-area: actions; }
 
 /* =========================================================
-   DESKTOP (default)
+   Desktop (default)
    ========================================================= */
+
 .issue-layout {
   display: grid;
   gap: 16px;
@@ -44,7 +41,7 @@
   min-height: 0;
 }
 
-/* ---- Issue card becomes A/B/C stack ---- */
+/* Issue card is A/B/C stack */
 .issue-main {
   display: flex;
   flex-direction: column;
@@ -103,9 +100,7 @@
   text-decoration: underline;
 }
 
-/* ===============================
-   Issue modal (compact)
-   =============================== */
+/* Modal content (inside the shared .text-modal) */
 .issue-modal {
   display: flex;
   flex-direction: column;
@@ -166,7 +161,7 @@
   word-break: break-word;
 }
 
-/* ---- Photo card ---- */
+/* Photo card */
 .issue-image {
   display: flex;
   flex-direction: column;
@@ -204,7 +199,7 @@
   opacity: 0.55;
 }
 
-/* ---- Status column ---- */
+/* Status column */
 .status-col {
   display: flex;
   flex-direction: column;
@@ -225,7 +220,7 @@
   overflow-y: auto;
 }
 
-/* ---- Activity scroll panel (desktop) ---- */
+/* Activity scroll panel (desktop) */
 .actions-card {
   display: flex;
   flex-direction: column;
@@ -247,9 +242,7 @@
   word-break: break-word;
 }
 
-/* =========================================================
-   Add update card should allow form to fill it
-   ========================================================= */
+/* Add update card should allow form to fill it */
 .update-slot {
   display: flex;
   flex-direction: column;
@@ -261,39 +254,17 @@
   min-height: 0;
 }
 
-/* =========================================================
-   FIX: iPad “black line” (horizontal scroll indicator)
-   Only on this page: don’t allow sideways scroll in tables.
-   ========================================================= */
-.issue-layout .table-scroll {
-  overflow-x: hidden;
-}
+/* On this page only: don’t allow sideways scroll in tables */
+.issue-layout .table-scroll { overflow-x: hidden; }
 
 /* =========================================================
-   Brand accents (NO hairlines): soft wash on key cards
-   If you want fewer, delete some selectors here.
+   Tablet (A,B,C / D,E,E)
    ========================================================= */
-.issue-main,
-.issue-image,
-.status-card,
-.actions-card {
-  border-color: rgba(255,255,255,0.10);
-}
 
-/* Brand notch on card titles (clean, repeatable) */
-.issue-layout .card-title,
-.issue-layout .issue-main-header {
-  position: relative;
-}
-
-/* =========================================================
-   iPad/tablet (A,B,C / D,E,E)
-   ========================================================= */
 @media (max-width: 1200px) {
   .issue-layout {
     grid-template-columns: 1.35fr 1.45fr 1.2fr;
     grid-template-rows: 42vh 46vh;
-    align-items: stretch;
 
     grid-template-areas:
       "issue-main issue-image status"
@@ -321,22 +292,22 @@
     overflow: hidden;
   }
 
-  /* Kill scrolling in issue summary */
+  /* Summary should not scroll on tablet */
   .issue-main-body { overflow: hidden; }
   .issue-desc-preview { -webkit-line-clamp: 2; }
   .issue-meta { overflow: hidden; }
 
-  .issue-row{
+  .issue-row {
     flex-wrap: nowrap;
     gap: 10px;
   }
 
-  .issue-row .field{
+  .issue-row .field {
     min-width: 0;
     flex: 1 1 0;
   }
 
-  .issue-row .pill{
+  .issue-row .pill {
     max-width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -347,6 +318,7 @@
 /* =========================================================
    Phone stack
    ========================================================= */
+
 @media (max-width: 768px) {
   .issue-layout {
     grid-template-columns: 1fr;

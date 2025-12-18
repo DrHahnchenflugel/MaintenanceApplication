@@ -1,8 +1,13 @@
 /* 30_tables.css
-   Grid-based tables with optional internal scrolling
+   Grid-based tables with optional internal scrolling.
+   Naming:
+   - .table           outer card
+   - .table-scroll    optional scroller wrapper
+   - .table-head      header row
+   - .table-row       data row
+   - .table-*-*       column layout modifiers
 */
 
-/* ---- Table container ---- */
 .table {
   background: var(--panel);
   border: 1px solid var(--line);
@@ -10,7 +15,6 @@
   overflow: hidden;
 }
 
-/* ---- Header + rows share structure ---- */
 .table-head,
 .table-row {
   display: grid;
@@ -19,34 +23,26 @@
   border-bottom: 1px solid var(--line);
 }
 
-/* ---- Header row ---- */
 .table-head {
   font-weight: 800;
   background: var(--panel);
 }
 
-/* ---- Data rows ---- */
 .table-row {
   color: inherit;
   align-items: start;
 }
 
-.table-row:hover {
-  background: var(--panel-lighter);
-}
+.table-row:hover { background: var(--panel-lighter); }
 
-/* ---- Column layouts ---- */
+/* Column layouts */
 .table-head--2,
-.table-row--2 {
-  grid-template-columns: 1fr 1fr;
-}
+.table-row--2 { grid-template-columns: 1fr 1fr; }
 
 .table-head--3,
-.table-row--3 {
-  grid-template-columns: 1fr 1fr 2fr;
-}
+.table-row--3 { grid-template-columns: 1fr 1fr 2fr; }
 
-/* ---- Scroll wrapper ---- */
+/* Scroll wrapper */
 .table-scroll {
   overflow-y: auto;
   overflow-x: hidden;
@@ -61,32 +57,24 @@
 }
 
 /* =========================================================
-   Tablet / phone behavior
+   Tablet / phone
    ========================================================= */
 
-/* Allow horizontal scroll instead of squishing columns */
+/* Allow horizontal scroll instead of crushing columns */
 @media (max-width: 1024px) {
   .table-scroll {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
 
-  /* Prevent grid columns from collapsing too much */
   .table-head--2,
-  .table-row--2 {
-    min-width: 420px;
-  }
+  .table-row--2 { min-width: 420px; }
 
   .table-head--3,
-  .table-row--3 {
-    min-width: 560px;
-  }
+  .table-row--3 { min-width: 560px; }
 }
 
-/* Phone: slightly tighter padding */
 @media (max-width: 768px) {
   .table-head,
-  .table-row {
-    padding: 8px 12px;
-  }
+  .table-row { padding: 8px 12px; }
 }

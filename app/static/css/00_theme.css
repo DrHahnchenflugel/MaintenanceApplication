@@ -1,62 +1,55 @@
-/* =========================================================
-   00_theme.css
-   Design tokens + global resets
-   ========================================================= */
+/* 00_theme.css
+   Design tokens + global base styles.
+   Keep this file boring: variables, resets, typography, global helpers.
+*/
 
 :root {
   color-scheme: dark;
 
-  /* ---- Base colors ---- */
+  /* Base surfaces */
   --bg: #0f1115;
   --panel: #171a21;
+  --panel-2: #1b1f28;          /* slightly lifted */
   --panel-lighter: #272b36;
+
+  /* Borders / dividers */
   --line: #323745;
   --line-strong: rgba(255,255,255,0.12);
 
+  /* Text */
   --text: #e7ebf1;
   --muted: #aab1bd;
 
-  /* ---- Brand (Exceed) ---- */
+  /* Brand (Exceed) */
   --brand: #ff6600;
+  --brand-soft: rgba(255,102,0,0.08);
+  --brand-mid: rgba(255,102,0,0.14);
+  --brand-border: rgba(255,102,0,0.14);
+  --brand-focus: rgba(255,102,0,0.18);
+  --brand-glow: rgba(255,102,0,0.12);
 
-  /* calmer brand usage (dark UI friendly) */
-  --brand-soft: rgba(255, 102, 0, 0.08);
-  --brand-mid: rgba(255, 102, 0, 0.14);
-  --brand-border: rgba(255, 102, 0, 0.14);
-  --brand-focus: rgba(255, 102, 0, 0.18);
-  --brand-glow: rgba(255, 102, 0, 0.12);
-
-  /* Dark “burnt” brand for header tint (not neon) */
-  --brand-deep: #2a160b;      /* base header tint */
-  --brand-deeper: #120b07;    /* edge / fade */
-  --brand-hairline: rgba(255,102,0,0.12); /* only if you want a tiny hint */
-
-  /* header-only orange ramp */
+  /* Header-only warm ramp (use in layout/header) */
   --header-orange-1: #2b140a; /* darkest */
   --header-orange-2: #3a1a0b; /* mid */
   --header-orange-3: #4a200c; /* lightest */
   --header-border: rgba(255,255,255,0.10);
 
-  /* ---- Semantic ---- */
+  /* Semantic */
   --ok: #6ee7b7;
   --warn: #fb923c;
   --bad: #f87171;
   --blue: #2596be;
 
-  /* Panel tints */
+  /* Semantic panel tints */
   --panel-ok: #42806c;
   --panel-warn: #c2410c;
   --panel-bad: #884649;
-  --panel: #171a21;
-  --panel-2: #1b1f28;          /* slightly lifted */
 
+  /* Shadows */
   --shadow-1: 0 10px 24px rgba(0,0,0,0.35);
   --shadow-2: 0 16px 38px rgba(0,0,0,0.45);
 
-
-  /* =========================================================
-    Issue status tokens (reusable across pages)
-    ========================================================= */
+  /* Issue status tokens (reusable across pages) */
   --status-open-bg: rgba(37,150,190,0.18);
   --status-open-border: rgba(37,150,190,0.45);
   --status-open-text: #cfefff;
@@ -79,12 +72,13 @@
 }
 
 /* =========================================================
-   Global reset & base rules
+   Global base rules
    ========================================================= */
 
 * { box-sizing: border-box; }
 
-html, body { height: 100%; }
+html,
+body { height: 100%; }
 
 body {
   margin: 0;
@@ -106,22 +100,17 @@ body {
   text-rendering: optimizeLegibility;
 }
 
-/* ---- Links ---- */
+/* Links */
 a { color: inherit; text-decoration: none; }
 
-a:focus-visible {
-  outline: 2px solid var(--brand);
-  outline-offset: 2px;
-}
-
-/* ---- Images ---- */
+/* Images */
 img { max-width: 100%; height: auto; display: block; }
 
-/* ---- Text helpers ---- */
+/* Helpers */
 .muted { color: var(--muted); }
 .no-scroll { overflow: hidden; }
 
-/* Global focus ring (buttons, inputs, links) */
+/* Focus ring (buttons, inputs, links) */
 a:focus-visible,
 button:focus-visible,
 select:focus-visible,
@@ -132,76 +121,13 @@ textarea:focus-visible {
   border-color: var(--brand-border);
 }
 
-/* Secondary actions lean brand on hover */
-.btn.btn-secondary:hover { color: var(--brand); }
-
-/* =========================================================
-   Brand wash (apply to any card with class="card card--brand")
-   ========================================================= */
-.card--brand {
-  position: relative;
-  overflow: hidden; /* contain the wash */
-  border-color: var(--brand-border);
-}
-
-/* Brand-accented card (use on important cards only) */
-.card--accent{
-  position: relative;
-  border-color: rgba(255,255,255,0.14);
-  background: var(--panel);
-}
-
-.card--accent::before{ display: none; }
-
-/* tiny warm tint only inside the card (barely) */
-/*
-.card--accent {
-  background:
-    linear-gradient(90deg, rgba(255,102,0,0.06), rgba(0,0,0,0) 80%),
-    var(--panel);
-}
-*/
-
-/* Optional: “featured” lift (for one card max) */
-.card--featured{
-  position: relative;
-  overflow: hidden;
-}
-
-.card--featured::before{
-  content:"";
-  position:absolute;
-  inset:-1px;
-  border-radius: inherit;
-  pointer-events:none;
-  box-shadow:
-    0 0 0 1px rgba(255,102,0,0.16),
-    0 14px 40px var(--brand-glow);
-  opacity: 0.9;
-}
-
-.card--featured::after{
-  content:"";
-  position:absolute;
-  top:10px;
-  left:10px;
-  width:18px;
-  height:18px;
-  border-top: 2px solid rgba(255,102,0,0.75);
-  border-left: 2px solid rgba(255,102,0,0.45);
-  border-radius: 8px 0 0 0;
-  pointer-events:none;
-  opacity: 0.85;
-}
-
-/* =========================================================
-   Selection & scrollbars
-   ========================================================= */
+/* Text selection */
 ::selection {
-  background: rgba(255, 102, 0, 0.35);
+  background: rgba(255,102,0,0.35);
   color: var(--text);
 }
 
+/* Scrollbars (WebKit) */
 *::-webkit-scrollbar { width: 10px; height: 10px; }
 *::-webkit-scrollbar-track { background: transparent; }
 *::-webkit-scrollbar-thumb {
@@ -210,11 +136,12 @@ textarea:focus-visible {
   border: 2px solid transparent;
   background-clip: content-box;
 }
-*::-webkit-scrollbar-thumb:hover { background-color: rgba(255,255,255,0.2); }
+*::-webkit-scrollbar-thumb:hover { background-color: rgba(255,255,255,0.20); }
 
 /* =========================================================
-   Reusable status badges (global)
+   Reusable status chips (global)
    ========================================================= */
+
 .issue-status,
 .chip-status {
   display: inline-flex;

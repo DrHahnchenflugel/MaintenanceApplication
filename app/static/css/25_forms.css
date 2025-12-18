@@ -1,11 +1,7 @@
-/* =========================================================
-   25_forms.css
-   Scoped form styling — ONLY for .issue-form--update
-   ========================================================= */
-
-/* -------------------------
-   Base layout
-   ------------------------- */
+/* 25_forms.css
+   Form styling scoped to .issue-form--update only.
+   If a form isn't inside .issue-form--update, it shouldn't be affected by this file.
+*/
 
 .issue-form--update {
   height: 100%;
@@ -18,14 +14,13 @@
   align-content: start;
 }
 
-/* Ensure fields don’t overflow grid */
-.issue-form--update .field {
-  min-width: 0;
-}
+/* Ensure fields don’t overflow the grid */
+.issue-form--update .field { min-width: 0; }
 
-/* -------------------------
+/* =========================================================
    Desktop / large tablet
-   ------------------------- */
+   ========================================================= */
+
 @media (min-width: 769px) {
   .issue-form--update {
     grid-template-columns: 1fr 1fr;
@@ -33,26 +28,22 @@
     row-gap: 16px;
   }
 
-  /* Created by = full width */
-  .issue-form--update > .field:nth-child(3) {
-    grid-column: 1 / -1;
-  }
+  /* Created by (3rd field) spans full width */
+  .issue-form--update > .field:nth-child(3) { grid-column: 1 / -1; }
 
-  /* Details textarea full width */
-  .issue-form--update .issue-form-wide {
-    grid-column: 1 / -1;
-  }
+  /* Details textarea spans full width */
+  .issue-form--update .issue-form-wide { grid-column: 1 / -1; }
 
-  /* Actions row sticks to bottom */
+  /* Actions row sticks to the bottom of the card */
   .issue-form--update .issue-form-actions {
     grid-column: 1 / -1;
     margin-top: auto;
   }
 }
 
-/* -------------------------
+/* =========================================================
    Labels
-   ------------------------- */
+   ========================================================= */
 
 .issue-form--update .issue-label {
   display: block;
@@ -64,9 +55,9 @@
   color: var(--muted);
 }
 
-/* -------------------------
+/* =========================================================
    Inputs / selects / textarea
-   ------------------------- */
+   ========================================================= */
 
 .issue-form--update input,
 .issue-form--update select,
@@ -91,23 +82,19 @@
   height: 48px;
 }
 
-/* Textarea grows but not insane */
+/* Textarea grows but stays within the card */
 .issue-form--update textarea {
   min-height: 160px;
   resize: none;
   line-height: 1.4;
 }
 
-/* Placeholder */
 .issue-form--update input::placeholder,
 .issue-form--update textarea::placeholder {
   color: rgba(255,255,255,0.35);
 }
 
-/* -------------------------
-   Select dropdown styling
-   ------------------------- */
-
+/* Custom select arrow */
 .issue-form--update select {
   appearance: none;
   cursor: pointer;
@@ -123,10 +110,7 @@
   background-repeat: no-repeat;
 }
 
-/* -------------------------
-   Hover / focus
-   ------------------------- */
-
+/* Hover / focus */
 .issue-form--update input:hover,
 .issue-form--update select:hover,
 .issue-form--update textarea:hover {
@@ -140,9 +124,9 @@
   box-shadow: 0 0 0 3px rgba(255,102,0,0.18);
 }
 
-/* -------------------------
-   Action buttons
-   ------------------------- */
+/* =========================================================
+   Action buttons row
+   ========================================================= */
 
 .issue-form-actions {
   display: flex;
@@ -166,21 +150,20 @@
 }
 
 /* =========================================================
-   Tablet (iPad): fit content + ensure buttons visible
+   Tablet (iPad): tighten controls so actions stay visible
    ========================================================= */
+
 @media (max-width: 1200px) {
   .issue-form--update {
     gap: 10px;
-    align-content: stretch; /* allow textarea + actions to share height */
+    align-content: stretch; /* textarea + actions share height */
   }
 
-  /* Slightly tighter label spacing */
   .issue-form--update .issue-label {
     font-size: 11px;
     margin-bottom: 4px;
   }
 
-  /* Compact controls */
   .issue-form--update input,
   .issue-form--update select {
     height: 38px;
@@ -188,16 +171,13 @@
     border-radius: 12px;
   }
 
-  /* THIS is the key: textarea can grow, but cannot hog the card */
   .issue-form--update textarea {
     min-height: 72px;
-    max-height: 120px;   /* keeps buttons visible */
-    resize: none;
+    max-height: 120px;
     padding: 10px 12px;
     border-radius: 12px;
   }
 
-  /* Put actions back in view and make them feel intentional */
   .issue-form-actions {
     margin-top: 2px;
     padding-top: 0;
@@ -210,7 +190,6 @@
     border-radius: 12px;
   }
 
-  /* Fix select arrow alignment for shorter height */
   .issue-form--update select {
     background-position:
       calc(100% - 22px) 17px,
@@ -218,10 +197,7 @@
   }
 }
 
-
-/* =========================================================
-   Phone: prevent zoom + keep usable
-   ========================================================= */
+/* Phone: prevent zoom on focus */
 @media (max-width: 768px) {
   .issue-form--update input,
   .issue-form--update select,

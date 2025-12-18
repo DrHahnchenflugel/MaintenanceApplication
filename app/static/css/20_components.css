@@ -1,74 +1,125 @@
+/* 20_components.css
+   Reusable UI building blocks: cards, buttons, badges, sidebar/nav, modals.
+   Keep page-specific rules out of here.
+*/
+
+/* =========================================================
+   Layout helpers
+   ========================================================= */
+
 .row {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
 }
+
+.container { display: flex; }
+
+.time {
+  opacity: 0.7;
+  font-size: 12px;
+  margin-top: 2px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* =========================================================
+   Card
+   ========================================================= */
 
 .card {
-    background: linear-gradient(180deg, var(--panel-2), var(--panel));
-    border: 1px solid var(--line);
-    border-radius: 12px;
-    padding: 16px;
-    box-shadow: var(--shadow-1);
+  background: linear-gradient(180deg, var(--panel-2), var(--panel));
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: var(--shadow-1);
 }
 
-.card:hover{
-  border-color: var(--line-strong);
+.card:hover { border-color: var(--line-strong); }
+
+.card-title {
+  margin: 0 0 8px 0;
+  line-height: 1.25;
 }
 
-/* Generic container used elsewhere */
-.container {
-    display: flex;
+/* Bare headings used as titles inside cards */
+.card > h2,
+.card > h3,
+.card > h4 {
+  margin-top: 0;
+  margin-bottom: 8px;
 }
 
-/* Badges */
+/* =========================================================
+   Badge / pill
+   ========================================================= */
+
 .badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: .35em;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .35em;
 
-    height: 1.6rem;
-    padding: 0 .75rem;
-    border-radius: 999px;
+  height: 1.6rem;
+  padding: 0 .75rem;
+  border-radius: 999px;
 
-    font-size: .9rem;
-    font-weight: 700;
-    line-height: 1;
-    white-space: nowrap;
+  font-size: .9rem;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
 
-    color: var(--text);
-    background: rgba(255,255,255,.02);
-    border: 1px solid var(--line);
+  color: var(--text);
+  background: rgba(255,255,255,.02);
+  border: 1px solid var(--line);
 
-    flex: 0 0 auto;
-    justify-self: start;
+  flex: 0 0 auto;
+  justify-self: start;
 }
 
-.badge--xs { height: 1.25rem; padding: 0 .5rem; font-size: .75rem; }
+.badge--xs {
+  height: 1.25rem;
+  padding: 0 .5rem;
+  font-size: .75rem;
+}
 
-/* Buttons */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  margin: 0;
+  border: 1px solid rgba(255,255,255,0.10);
+}
+
+.pill-active { background: rgba(80, 200, 140, 0.10); }
+
+/* =========================================================
+   Buttons
+   ========================================================= */
+
 .btn {
-    background: var(--panel);
-    color: var(--text);
-    padding: 10px 14px;
-    border: none;
-    border-radius: 10px;
-    font-weight: 700;
-    cursor: pointer;
+  background: var(--panel);
+  color: var(--text);
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 700;
+  cursor: pointer;
 }
 
 .btn--ok {
-    background: var(--panel-ok);
-    color: white;
-    border: 3px solid var(--ok);
-    text-shadow:
-        -1px -1px 0 black,
-         1px -1px 0 black,
-        -1px  1px 0 black,
-         1px  1px 0 black;
+  background: var(--panel-ok);
+  color: white;
+  border: 3px solid var(--ok);
+  text-shadow:
+    -1px -1px 0 black,
+     1px -1px 0 black,
+    -1px  1px 0 black,
+     1px  1px 0 black;
 }
 
+/* Secondary actions: text-only, subtle */
 .btn.btn-secondary {
   background: none;
   border: none;
@@ -80,7 +131,10 @@
   text-decoration: underline;
 }
 
-/* Clamp */
+/* =========================================================
+   Clamp (multi-line ellipsis)
+   ========================================================= */
+
 .clamp {
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -108,43 +162,42 @@
 
 .clamp-btn:hover { opacity: 1; text-decoration: underline; }
 
-.time {
-  opacity: 0.7;
-  font-size: 12px;
-  margin-top: 2px;
-  font-variant-numeric: tabular-nums;
-}
 /* =========================================================
-    Sidebar
+   Sidebar + nav (visual styling only)
+   Placement/scrolling lives in 10_layout.css
    ========================================================= */
 
-.sidebar{
+.sidebar {
   padding: 16px 14px;
   background:
     radial-gradient(800px 300px at 30% 0%, rgba(255,255,255,0.03), transparent 60%),
     linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0)),
     var(--panel);
+  border-right: 1px solid var(--line);
 }
 
-.sidebar-brand{
+.sidebar-brand {
   display: grid;
   gap: 10px;
 
   padding: 12px;
   border-radius: 14px;
 
+  text-align: center;
+
   background: rgba(255,255,255,0.03);
   border: 1px solid rgba(255,255,255,0.07);
 }
 
-.sidebar-brand .full-logo{
+.sidebar-brand .full-logo {
   width: 100%;
   max-width: 180px;
   margin: 0 auto;
   opacity: 0.95;
 }
 
-.sidebar-title{
+.sidebar-title {
+  width: 100%;
   font-size: 14px;
   font-weight: 800;
   letter-spacing: 0.02em;
@@ -152,20 +205,20 @@
   opacity: 0.92;
 }
 
-.sidebar-divider{
+.sidebar-divider {
   border: 0;
   height: 1px;
   background: rgba(255,255,255,0.08);
   margin: 12px 6px 10px;
 }
 
-.nav{
+.nav {
   display: grid;
   gap: 6px;
   margin-top: 6px;
 }
 
-.nav a{
+.nav a {
   display: flex;
   align-items: center;
 
@@ -184,19 +237,18 @@
   transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
 }
 
-.nav a:hover{
+.nav a:hover {
   background: rgba(255,255,255,0.04);
   color: var(--text);
 }
 
-.nav a.is-active{
+.nav a.is-active {
   background: var(--brand-mid);
   border-color: rgba(255,102,0,0.28);
   color: var(--text);
 }
 
-/* slim active accent (makes it feel intentional) */
-.nav a.is-active::before{
+.nav a.is-active::before {
   content: "";
   width: 4px;
   height: 18px;
@@ -205,42 +257,11 @@
   margin-right: 10px;
 }
 
-/* Pills */
-.pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 10px;
-  border-radius: 999px;
-  font-size: 12px;
-  margin: 0;
-  border: 1px solid rgba(255,255,255,0.10);
-}
-
-.pill-active { background: rgba(80, 200, 140, 0.10); }
-
-
 /* =========================================================
-   NEW: Card title spacing (no gap above, small gap below)
+   Modals (shared)
    ========================================================= */
 
-.card-title {
-  margin: 0 0 8px 0;
-  line-height: 1.25;
-}
-
-/* Safety: bare headings used as titles inside cards */
-.card > h2,
-.card > h3,
-.card > h4 {
-  margin-top: 0;
-  margin-bottom: 8px;
-}
-
-
-/* =========================================================
-   NEW: Text modal (for description pop-up)
-   ========================================================= */
-
+/* Text modal */
 .text-modal {
   position: fixed;
   inset: 0;
@@ -248,9 +269,7 @@
   z-index: 10000;
 }
 
-.text-modal.open {
-  display: block;
-}
+.text-modal.open { display: block; }
 
 .text-modal__overlay {
   position: absolute;
@@ -263,10 +282,12 @@
   width: min(900px, calc(100vw - 32px));
   max-height: calc(100vh - 32px);
   margin: 16px auto;
+
   background: var(--panel);
   border: 1px solid var(--line);
   border-radius: 16px;
   overflow: hidden;
+
   box-shadow: 0 20px 80px rgba(0,0,0,0.5);
 }
 
@@ -275,6 +296,7 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
+
   padding: 14px 16px;
   border-bottom: 1px solid var(--line);
 }
@@ -287,32 +309,31 @@
 .text-modal__close {
   width: 38px;
   height: 38px;
+
   border-radius: 10px;
   border: 1px solid rgba(255,255,255,0.10);
+
   background: rgba(255,255,255,0.03);
   color: var(--text);
+
   font-size: 22px;
   line-height: 1;
   cursor: pointer;
 }
 
-.text-modal__close:hover {
-  background: rgba(255,255,255,0.06);
-}
+.text-modal__close:hover { background: rgba(255,255,255,0.06); }
 
 .text-modal__body {
   padding: 16px;
   overflow: auto;
   max-height: calc(100vh - 32px - 54px);
   line-height: 1.55;
+
   overflow-wrap: anywhere;
   word-break: break-word;
 }
 
-/* =========================================================
-   Image modal
-   ========================================================= */
-
+/* Image modal */
 .img-modal {
   position: fixed;
   inset: 0;
@@ -333,7 +354,5 @@
   box-shadow: 0 20px 80px rgba(0,0,0,0.55);
 }
 
-/* If src is empty, hide it so alt text never appears */
-.img-modal-content[src=""] {
-  display: none;
-}
+/* Hide if src is empty so alt text doesn't show */
+.img-modal-content[src=""] { display: none; }
