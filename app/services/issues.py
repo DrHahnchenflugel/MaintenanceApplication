@@ -57,6 +57,23 @@ def list_issues(page: int, page_size: int, filters: dict):
                 "id": r["asset_id"],
                 "asset_tag": r["asset_tag"],
                 "site_id": r["site_id"],
+                "make":{
+                    "id":r["make_id"],
+                    "name":r["make_name"],
+                    "label":r["make_label"],
+                },
+
+                "model":{
+                    "id":r["model_id"],
+                    "name":r["model_name"],
+                    "label":r["model_label"],
+                },
+
+                "variant":{
+                    "id":r["variant_id"],
+                    "name":r["variant_name"],
+                    "label":r["variant_label"],
+                },
             },
             "reported_by": r["reported_by"],  # string or None
             "created_at": r["created_at"],
