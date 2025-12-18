@@ -13,9 +13,15 @@ echo "[-] Docker compose build --pull"
 docker compose build --pull
 echo "[v] Docker compose build --pull SUCCESS"
 
+echo "[-] Pruning unused images + build cache"
+docker image prune -f
+docker builder prune -f
+echo "[v] Prune done"
+
 echo "[-] Docker compose up -d"
 docker compose up -d
 echo "[v] Docker compose up -d SUCCESS"
 
 echo "[v] STATUS"
 docker compose ps
+ 
