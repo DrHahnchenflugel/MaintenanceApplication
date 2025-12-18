@@ -47,6 +47,15 @@ body { overflow: hidden; }
   overflow-y: auto;
 }
 
+.sidebar-brand{
+  justify-items: center;   /* centers children in the grid */
+  text-align: center;      /* centers the text */
+}
+
+.sidebar-title{
+  width: 100%;
+}
+
 /* ---- Header ---- */
 .header {
   display: grid;
@@ -171,6 +180,8 @@ body { overflow: hidden; }
 
     box-shadow: 0 20px 80px rgba(0,0,0,.55);
   }
+
+  
 }
 
 /* When modal/drawer open, prevent background scroll */
