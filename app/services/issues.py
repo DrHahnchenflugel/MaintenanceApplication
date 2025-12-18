@@ -498,3 +498,34 @@ def list_models(make_id: str):
 def list_variants(model_id: str):
     rows = issue_db.list_variant_rows(model_id=model_id)
     return [{"id": r["id"], "label": r["label"], "name": r.get("name")} for r in rows]
+
+def get_asset(asset_id: str):
+    r = issue_db.get_asset_row(asset_id)
+    if r is None:
+        return None
+    return {
+        "id": r["id"],
+        "asset_tag": r["asset_tag"],
+        "site_id": r.get("site_id"),
+        "site_shorthand": r.get("site_shorthand"),
+        "make": r.get("make_label") or r.get("make_name"),
+        "model": r.get("model_label") or r.get("model_name"),
+        "variant": r.get("variant_label") or r.get("variant_name"),
+    }
+
+def get_asset_by_tag(asset_tag: str):
+    tag = (asset_tag or "").strip()
+    if not tag:
+        return None
+    r = issue_db.get_asset_row_by_tag(tag)
+    if r is None:
+        return None
+    return {
+        "id": r["id"],
+        "asset_tag": r["asset_tag"],
+        "site_id": r.get("site_id"),
+        "site_shorthand": r.get("site_shorthand"),
+        "make": r.get("make_label") or r.get("make_name"),
+        "model": r.get("model_label") or r.get("model_name"),
+        "variant": r.get("variant_label") or r.get("variant_name"),
+    }

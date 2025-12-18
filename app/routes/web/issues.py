@@ -1,5 +1,5 @@
 from flask import render_template, request, redirect, url_for, abort
-from . import bp  # this is your "app" blueprint (Blueprint("app", ...))
+from . import bp
 
 from app.services import issues as issue_service
 from uuid import UUID
@@ -189,5 +189,112 @@ def add_issue_action(issue_id):
     if result is None:
         # Issue not found in service
         abort(404)
+
+    return redirect(url_for("app.view_issue", issue_id=issue_id))
+
+@bp.route("/a/<asset_tag>/new-issue")
+@bp.route("/a/<asset_tag>/new-issue/")
+def new_issue_from_asset_tag(asset_tag: str):
+    """
+    QR convenience route.
+    Resolve asset_tag -> asset_id, then redirect to canonical form.
+    """
+    asset = issue_service.get_asset_by_tag(asset_tag)
+    if asset is None:
+        abort(404, description="Asset not found")
+
+    return redirect(url_for("app.new_issue_form", asset_id=asset["id"]))
+
+
+@bp.route("/issues/new")
+@bp.route("/issues/new/")
+def new_issue_form():
+    """
+    Render the New Issue page.
+    Optional query:
+      - asset_id (UUID): pre-select the asset (QR path redirects here)
+    """
+    asset_id = parse_uuid_arg("asset_id")
+    asset = None
+    form_error = None
+
+    if asset_id:
+        asset = issue_service.get_asset(asset_id)
+        if asset is None:
+            abort(404, description="Asset not found")
+
+    return render_template(
+        "issues/new_issue.html",
+        asset=asset,
+        form_error=form_error,
+    )
+
+
+@bp.route("/issues", methods=["POST"])
+def create_issue_web():
+    """
+    Handle New Issue form submit (multipart/form-data).
+    Creates the issue, then uploads optional photo as attachment.
+    """
+
+    asset_id = parse_uuid_form("asset_id")
+    title = (request.form.get("title") or "").strip()
+    description = (request.form.get("description") or "").strip()
+
+    # optional file input name="photo"
+    photo = request.files.get("photo")
+
+    # Required field validation
+    if not asset_id:
+        asset = None
+        return render_template(
+            "issues/new_issue.html",
+            asset=asset,
+            form_error="Asset is required. If you scanned the wrong QR, use 'Not your robot?'",
+        ), 400
+
+    asset = issue_service.get_asset(asset_id)
+    if asset is None:
+        abort(404, description="Asset not found")
+
+    if not title:
+        return render_template(
+            "issues/new_issue.html",
+            asset=asset,
+            form_error="Issue Title is required.",
+        ), 400
+
+    if len(title) > 50:
+        return render_template(
+            "issues/new_issue.html",
+            asset=asset,
+            form_error="Issue Title must be 50 characters or less.",
+        ), 400
+
+    if not description:
+        return render_template(
+            "issues/new_issue.html",
+            asset=asset,
+            form_error="Issue Description is required.",
+        ), 400
+
+    payload = {
+        "asset_id": asset_id,
+        "title": title,
+        "description": description,
+        "reported_by": (request.form.get("reported_by") or None),
+        # leave status_id empty to default OPEN in service
+    }
+
+    try:
+        created = issue_service.create_issue(payload)
+    except ValueError as e:
+        return render_template(
+            "issues/new_issue.html",
+            asset=asset,
+            form_error=str(e),
+        ), 400
+
+    issue_id = created["id"]
 
     return redirect(url_for("app.view_issue", issue_id=issue_id))

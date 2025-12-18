@@ -1,0 +1,126 @@
+{# new_issue.html #}
+{% extends "base.html" %}
+
+{% block title %}Maintenance – New Issue{% endblock %}
+{% block page_title %}New Issue{% endblock %}
+
+{% block page_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/new_issue.css') }}">
+{% endblock %}
+
+{% block content %}
+
+  {# Optional server-side error box #}
+  {% if form_error %}
+    <div class="card new-issue-error">
+      <strong>Error:</strong> {{ form_error }}
+    </div>
+  {% endif %}
+
+  <div class="new-issue-layout">
+
+    {# Asset lock / selector #}
+    <section class="card new-issue-asset">
+      <div class="new-issue-asset__top">
+        <div class="new-issue-asset__title">
+          <h2 class="new-issue-h2">Asset</h2>
+          {% if asset %}
+            <p class="new-issue-asset__tag">
+              <strong>{{ asset.asset_tag }}</strong>
+              <span class="muted">
+                {% if asset.site_shorthand %} · {{ asset.site_shorthand }}{% endif %}
+                {% if asset.make and asset.model %} · {{ asset.make }} {{ asset.model }}{% endif %}
+              </span>
+            </p>
+          {% else %}
+            <p class="muted" style="margin:0;">No asset selected (required)</p>
+          {% endif %}
+        </div>
+
+        <button type="button" class="btn btn-secondary new-issue-link" id="toggleAssetPicker">
+          Not your robot?
+        </button>
+      </div>
+
+      <div class="new-issue-asset__picker" id="assetPicker" hidden>
+        {# Basic placeholder UI; wire JS later #}
+        <label class="new-issue-label" for="assetSearch">Search</label>
+        <input class="new-issue-input" id="assetSearch" type="search" placeholder="Search asset tag (RB-042)" autocomplete="off">
+        <div class="new-issue-results" aria-live="polite">
+          <div class="new-issue-results__empty muted">Type to search…</div>
+        </div>
+      </div>
+    </section>
+
+    {# Form #}
+    <form class="card new-issue-form"
+          method="post"
+          enctype="multipart/form-data"
+          action="{{ url_for('app.issues_create') }}">
+
+      <input type="hidden" name="asset_id" id="assetId" value="{{ asset.id if asset else '' }}">
+
+      <div class="new-issue-grid">
+
+        <div class="new-issue-field">
+          <label class="new-issue-label" for="title">Issue Title</label>
+          <input class="new-issue-input"
+                 id="title"
+                 name="title"
+                 maxlength="50"
+                 required
+                 placeholder="Short + specific (max 50 chars)">
+          <div class="new-issue-hint muted">Max 50 characters.</div>
+        </div>
+
+        <div class="new-issue-field new-issue-wide">
+          <label class="new-issue-label" for="description">Issue Description</label>
+          <textarea class="new-issue-textarea"
+                    id="description"
+                    name="description"
+                    required
+                    rows="6"
+                    placeholder="What happened? What did you try?"></textarea>
+        </div>
+
+        <div class="new-issue-field new-issue-wide">
+          <label class="new-issue-label" for="photo">Photo (optional)</label>
+          <div class="new-issue-photo">
+            <input class="new-issue-file"
+                   id="photo"
+                   name="photo"
+                   type="file"
+                   accept="image/*"
+                   capture="environment">
+            <div class="new-issue-hint muted">One photo is enough. Don’t overthink it.</div>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="new-issue-actions">
+        <button class="btn btn--ok new-issue-submit" type="submit">Submit</button>
+        <a class="btn btn-secondary" href="{{ url_for('app.issues_list') }}">Cancel</a>
+      </div>
+
+    </form>
+
+  </div>
+
+  <script>
+    // Basic toggle only (search wiring later)
+    (function(){
+      const btn = document.getElementById('toggleAssetPicker');
+      const panel = document.getElementById('assetPicker');
+      if (!btn || !panel) return;
+      btn.addEventListener('click', () => {
+        panel.hidden = !panel.hidden;
+        if (!panel.hidden) {
+          const input = panel.querySelector('input');
+          if (input) input.focus();
+        }
+      });
+    })();
+  </script>
+
+{% endblock %}

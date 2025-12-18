@@ -162,7 +162,7 @@ def create_issue():
     description = data.get("description")
 
     if not asset_id or not title or not description:
-        abort(400, description="Missing required fields: asset_id, created_by, title, description")
+        abort(400, description="Missing required fields: asset_id, title, description")
 
     payload = {
         "asset_id": asset_id,

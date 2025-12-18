@@ -887,3 +887,4 @@ def list_variant_rows(*, model_id: str):
     with get_connection() as conn:
         rows = conn.execute(sql, {"model_id": model_id}).mappings().all()
     return [dict(r) for r in rows]
+
