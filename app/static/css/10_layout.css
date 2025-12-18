@@ -83,18 +83,31 @@ body { overflow: hidden; }
   justify-self: end;
 }
 
-.header {
+.header{
   position: sticky;
   top: 0;
   z-index: 20;
 
-  border-bottom: 1px solid rgba(255,255,255,0.08);
+  background:
+    radial-gradient(900px 320px at 20% 20%, rgba(255,102,0,0.20), transparent 60%),
+    linear-gradient(180deg, var(--header-orange-3), var(--header-orange-1));
+
+  border-bottom: 1px solid var(--header-border);
+
+  /* keep it feeling modern */
   backdrop-filter: blur(10px);
 }
 
-/* kill the orange hairline */
-.header::after { display: none; }
+.header,
+.header *{
+  color: var(--text);
+}
 
+.header .muted{
+  color: rgba(231,235,241,0.72);
+}
+
+.header::after{ display:none; } /* kill any orange underline/glow */
 
 /* ---- Footer ---- */
 .main > .footer {

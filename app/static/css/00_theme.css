@@ -30,6 +30,11 @@
   --brand-deeper: #120b07;    /* edge / fade */
   --brand-hairline: rgba(255,102,0,0.12); /* only if you want a tiny hint */
 
+  /* header-only orange ramp */
+  --header-orange-1: #2b140a; /* darkest */
+  --header-orange-2: #3a1a0b; /* mid */
+  --header-orange-3: #4a200c; /* lightest */
+  --header-border: rgba(255,255,255,0.10);
 
   /* ---- Semantic ---- */
   --ok: #6ee7b7;
