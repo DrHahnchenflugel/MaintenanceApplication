@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+echo "[-] Disk usage:"
+df -h / | sed -n '1,2p'
+
 # Resolve repo root even if called by sym link or from another dir
 REPO_ROOT="$(cd -- "$(dirname "${BASH_SOURCE[0]}")"/.. && pwd)"
 cd "$REPO_ROOT"
