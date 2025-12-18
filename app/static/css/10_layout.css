@@ -47,9 +47,6 @@ body { overflow: hidden; }
   overflow-y: auto;
 }
 
-/* Scrim exists in DOM but hidden on desktop */
-.sidebar-scrim { display: none; }
-
 /* ---- Header ---- */
 .header {
   display: grid;
@@ -143,8 +140,6 @@ body { overflow: hidden; }
   padding: 28px 20px;
 }
 
-/* ---- Nav toggle b`utton (hidden on desktop) ---- */
-.nav-toggle { display: none; }
 
 /* =========================================================
    Tablet + phone: sidebar becomes a drawer; body scrolls
@@ -159,22 +154,6 @@ body { overflow: hidden; }
   /* Let the page scroll naturally on iOS */
   .main { overflow: visible; }
   .content { overflow: visible; }
-
-  /* Show the hamburger */
-  .nav-toggle {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    width: 38px;
-    height: 32px;
-    border-radius: 10px;
-
-    border: 1px solid var(--line);
-    background: rgba(255,255,255,.03);
-    color: var(--text);
-    cursor: pointer;
-  }
 
   /* Drawer sidebar */
   .sidebar {
@@ -191,19 +170,6 @@ body { overflow: hidden; }
     transition: transform .2s ease;
 
     box-shadow: 0 20px 80px rgba(0,0,0,.55);
-  }
-
-  .sidebar.is-open {
-    transform: translateX(0);
-  }
-
-  /* Scrim behind drawer */
-  .sidebar-scrim {
-    display: block;
-    position: fixed;
-    inset: 0;
-    z-index: 40;
-    background: rgba(0,0,0,.55);
   }
 }
 
