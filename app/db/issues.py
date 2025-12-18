@@ -888,3 +888,84 @@ def list_variant_rows(*, model_id: str):
         rows = conn.execute(sql, {"model_id": model_id}).mappings().all()
     return [dict(r) for r in rows]
 
+def get_asset_row(asset_id: str):
+    sql = text("""
+        SELECT
+            asset.id,
+            asset.asset_tag,
+            asset.site_id,
+
+            site.shorthand AS site_shorthand,
+            site.fullname  AS site_fullname,
+
+            variant.id    AS variant_id,
+            variant.name  AS variant_name,
+            variant.label AS variant_label,
+
+            model.id    AS model_id,
+            model.name  AS model_name,
+            model.label AS model_label,
+
+            make.id    AS make_id,
+            make.name  AS make_name,
+            make.label AS make_label
+
+        FROM asset
+        JOIN site ON asset.site_id = site.id
+
+        LEFT JOIN variant ON asset.variant_id = variant.id
+        LEFT JOIN model   ON variant.model_id = model.id
+        LEFT JOIN make    ON model.make_id = make.id
+
+        WHERE asset.id = :asset_id
+        LIMIT 1
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(sql, {"asset_id": asset_id}).mappings().first()
+
+    if row is None:
+        return None
+
+    return dict(row)
+
+def get_asset_row_by_tag(asset_tag: str):
+    sql = text("""
+        SELECT
+            asset.id,
+            asset.asset_tag,
+            asset.site_id,
+
+            site.shorthand AS site_shorthand,
+            site.fullname  AS site_fullname,
+
+            variant.id    AS variant_id,
+            variant.name  AS variant_name,
+            variant.label AS variant_label,
+
+            model.id    AS model_id,
+            model.name  AS model_name,
+            model.label AS model_label,
+
+            make.id    AS make_id,
+            make.name  AS make_name,
+            make.label AS make_label
+
+        FROM asset
+        JOIN site ON asset.site_id = site.id
+
+        LEFT JOIN variant ON asset.variant_id = variant.id
+        LEFT JOIN model   ON variant.model_id = model.id
+        LEFT JOIN make    ON model.make_id = make.id
+
+        WHERE asset.asset_tag = :asset_tag
+        LIMIT 1
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(sql, {"asset_tag": asset_tag}).mappings().first()
+
+    if row is None:
+        return None
+
+    return dict(row)

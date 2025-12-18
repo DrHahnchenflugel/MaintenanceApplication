@@ -56,7 +56,7 @@
     <form class="card new-issue-form"
           method="post"
           enctype="multipart/form-data"
-          action="{{ url_for('app.issues_create') }}">
+          action="{{ url_for('app.create_issue_web') }}">
 
       <input type="hidden" name="asset_id" id="assetId" value="{{ asset.id if asset else '' }}">
 

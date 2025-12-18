@@ -506,11 +506,12 @@ def get_asset(asset_id: str):
     return {
         "id": r["id"],
         "asset_tag": r["asset_tag"],
-        "site_id": r.get("site_id"),
+        "site_id": r["site_id"],
         "site_shorthand": r.get("site_shorthand"),
-        "make": r.get("make_label") or r.get("make_name"),
-        "model": r.get("model_label") or r.get("model_name"),
-        "variant": r.get("variant_label") or r.get("variant_name"),
+        "site_fullname": r.get("site_fullname"),
+        "make_label": r.get("make_label"),
+        "model_label": r.get("model_label"),
+        "variant_label": r.get("variant_label"),
     }
 
 def get_asset_by_tag(asset_tag: str):
@@ -523,9 +524,26 @@ def get_asset_by_tag(asset_tag: str):
     return {
         "id": r["id"],
         "asset_tag": r["asset_tag"],
+        "site_id": r["site_id"],
+        "site_shorthand": r.get("site_shorthand"),
+        "site_fullname": r.get("site_fullname"),
+        "make_label": r.get("make_label"),
+        "model_label": r.get("model_label"),
+        "variant_label": r.get("variant_label"),
+    }
+
+    tag = (asset_tag or "").strip()
+    if not tag:
+        return None
+    r = issue_db.get_asset_row_by_tag(tag)
+    if r is None:
+        return None
+    return {
+        "id": r["id"],
+        "asset_tag": r["asset_tag"],
         "site_id": r.get("site_id"),
         "site_shorthand": r.get("site_shorthand"),
-        "make": r.get("make_label") or r.get("make_name"),
-        "model": r.get("model_label") or r.get("model_name"),
-        "variant": r.get("variant_label") or r.get("variant_name"),
+        "make_label": r.get("make_label"),
+        "model_label": r.get("model_label"),
+        "variant_label": r.get("variant_label"),
     }
