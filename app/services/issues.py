@@ -6,7 +6,7 @@ from app.db import issues as issue_db
 
 def list_issues(page: int, page_size: int, filters: dict):
     offset = (page - 1) * page_size
-    closed_mode = "open"
+    closed_mode = "all"
 
     closed = filters.get("closed")
     if isinstance(closed, str):

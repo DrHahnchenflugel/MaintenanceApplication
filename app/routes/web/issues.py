@@ -79,6 +79,15 @@ def issues_list():
     status_options = issue_service.list_issue_statuses()
     status_by_code = {s["code"]: s for s in status_options}
 
+    # default: open-only unless user asks otherwise
+    closed_mode = "open"
+
+    if status_code == "CLOSED":
+        closed_mode = "all"   # allow closed_at IS NOT NULL rows through
+    elif status_code is None:
+        # "All" status should show both open and closed
+        closed_mode = "all"
+
     # Build filters for the service layer
     filters = {
         "site_id": None,
@@ -87,7 +96,6 @@ def issues_list():
         "reported_by": None,
         "created_from": None,
         "created_to": None,
-        "closed": None,
         "search": search,
         "category_id": category_id,
         "make_id": make_id,

@@ -1,5 +1,6 @@
 from sqlalchemy import text
 from app.db.connection import get_connection
+from app.db.lookups import list_issue_status_rows
 
 def get_action_type_id_by_code(code: str):
     """
@@ -39,7 +40,6 @@ def list_issue_rows(
     reported_by=None,
     created_from=None,
     created_to=None,
-    closed_mode="open",   # "open" | "closed" | "all"
     search=None,
     category_id=None,
     make_id=None,
@@ -71,24 +71,23 @@ def list_issue_rows(
         where.append("asset.site_id = :site_id")
     if asset_id:
         where.append("issue.asset_id = :asset_id")
-    if status_id:
-        where.append("issue.status_id = :status_id")
     if reported_by:
         where.append("issue.reported_by = :reported_by")
     if created_from:
         where.append("issue.created_at >= :created_from")
     if created_to:
         where.append("issue.created_at <= :created_to")
-
-    # closed mode
-    if closed_mode == "open":
-        where.append("issue.closed_at IS NULL")
-    elif closed_mode == "closed":
-        where.append("issue.closed_at IS NOT NULL")
-    elif closed_mode == "all":
-        pass
-    else:
-        raise ValueError("closed_mode must be 'open', 'closed', or 'all'")
+    
+    # status_id filter with special handling for -1 (any status)
+    status_rows = list_issue_status_rows()
+    status_codes = {row["code"]: row["id"] for row in status_rows}
+    if status_id:
+        if status_id in status_codes.values():
+            where.append("issue.status_id = :status_id")
+        elif status_id == -1:
+            where.append("issue.status_id IS NOT NULL")
+        else:
+            raise ValueError("Invalid status_id")
 
     # search
     if search:

@@ -60,11 +60,9 @@ def list_issues():
         "site_id": parse_uuid_arg("site_id"),
         "asset_id": parse_uuid_arg("asset_id"),
         "status_id": parse_uuid_arg("status_id"),
-        # reported_by is now a plain optional string
         "reported_by": request.args.get("reported_by"),
         "created_from": request.args.get("created_from"),
         "created_to": request.args.get("created_to"),
-        "closed": request.args.get("closed"),
         "search": request.args.get("search"),
     }
 

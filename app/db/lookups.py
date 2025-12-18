@@ -31,3 +31,19 @@ def list_category_rows():
         rows = conn.execute(sql).mappings().all()
 
     return [dict(r) for r in rows]
+
+def list_issue_status_rows():
+    sql = text("""
+        SELECT
+            id,
+            code,
+            label,
+            display_order
+        FROM issue_status
+        ORDER BY display_order ASC
+    """)
+
+    with get_connection() as conn:
+        rows = conn.execute(sql).mappings().all()
+
+    return [dict(r) for r in rows]
