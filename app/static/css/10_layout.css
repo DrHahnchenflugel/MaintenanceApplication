@@ -222,7 +222,7 @@ body { overflow: hidden; }
   display: block;
   height: 2px;
   width: 100%;
-  background: var(--brand);
+  background: var(--text);
   border-radius: 2px;
   margin: 6px 0;
 }
