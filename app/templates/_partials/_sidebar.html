@@ -8,9 +8,12 @@
 
     <nav class="nav">
         <a href="#" {% if request.endpoint == 'app.dashboard' %}class="is-active"{% endif %}>Dashboard</a>
-        <a href="#" {% if request.endpoint == 'app.issues_active' %}class="is-active"{% endif %}>Active Issues</a>
-        <a href="#" {% if request.endpoint == 'app.issues_past' %}class="is-active"{% endif %}>Past Issues</a>
-        <a href="#" {% if request.endpoint == 'app.issues_blocked' %}class="is-active"{% endif %}>Blocked Issues</a>
+        <a href="{{ url_for('app.issues', status='IN_PROGRESS') }}"
+            {% if request.endpoint == 'app.issues_active' %}class="is-active"{% endif %}>Active Issues</a>
+        <a href="{{ url_for('app.issues', status='CLOSED') }}"
+            {% if request.endpoint == 'app.issues_past' %}class="is-active"{% endif %}>Past Issues</a>
+        <a href="{{ url_for('app.issues', status='BLOCKED') }}"
+            {% if request.endpoint == 'app.issues_blocked' %}class="is-active"{% endif %}>Blocked Issues</a>
         <a href="#" {% if request.endpoint == 'app.inventory' %}class="is-active"{% endif %}>Inventory</a>
         <a href="#" {% if request.endpoint == 'app.settings' %}class="is-active"{% endif %}>Settings</a>
     </nav>
