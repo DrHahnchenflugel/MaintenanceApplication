@@ -201,10 +201,6 @@ def add_issue_action(issue_id):
         abort(404)
 
     return redirect(url_for("app.view_issue", issue_id=issue_id))
-
-@bp.route("/a/<asset_tag>/new-issue")
-@bp.route("/a/<asset_tag>/new-issue/")
-def new_issue_from_asset_tag(asset_tag: str):
     asset = issue_service.get_asset_by_tag(asset_tag)
     if asset is None:
         abort(404, description="Asset not found")
