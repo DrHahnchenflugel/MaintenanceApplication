@@ -97,7 +97,6 @@ def list_issue_rows(
             issue.title ILIKE :q
             OR issue.description ILIKE :q
             OR asset.asset_tag ILIKE :q
-            OR asset.name ILIKE :q
         )
         """)
         params["q"] = f"%{search}%"
