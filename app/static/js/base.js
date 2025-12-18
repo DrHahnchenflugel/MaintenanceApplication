@@ -221,3 +221,37 @@
   });
   
 })();
+
+(function () {
+  const sidebar = document.getElementById("sidebar");
+  const toggle = document.getElementById("sidebarToggle");
+  const overlay = document.getElementById("sidebarOverlay");
+
+  if (!sidebar || !toggle || !overlay) return;
+
+  function setOpen(isOpen) {
+    document.body.classList.toggle("sidebar-open", isOpen);
+    toggle.setAttribute("aria-expanded", isOpen ? "true" : "false");
+    overlay.hidden = !isOpen;
+  }
+
+  toggle.addEventListener("click", () => {
+    const isOpen = document.body.classList.contains("sidebar-open");
+    setOpen(!isOpen);
+  });
+
+  overlay.addEventListener("click", () => setOpen(false));
+
+  // Optional: Esc closes
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") setOpen(false);
+  });
+
+  // Optional: close after clicking a nav link (nice on iPad)
+  sidebar.addEventListener("click", (e) => {
+    const a = e.target.closest("a");
+    if (!a) return;
+    // Only close in drawer mode (tablet). Desktop doesn't need this.
+    if (window.matchMedia("(max-width: 1024px)").matches) setOpen(false);
+  });
+})();

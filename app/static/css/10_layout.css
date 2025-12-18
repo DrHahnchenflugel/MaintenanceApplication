@@ -200,3 +200,75 @@ body { overflow: hidden; }
 .no-scroll {
   overflow: hidden;
 }
+
+/* ===== Sidebar drawer mode (tablet) ===== */
+
+.sidebar-toggle {
+  display: none; /* only show on tablet */
+  width: 40px;
+  height: 40px;
+  padding: 8px;
+  background: rgba(0,0,0,0.15);
+  border: 1px solid rgba(255,255,255,0.10);
+  border-radius: 12px;
+  cursor: pointer;
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  z-index: 1100;
+}
+
+.sidebar-toggle span {
+  display: block;
+  height: 2px;
+  width: 100%;
+  background: var(--brand);
+  border-radius: 2px;
+  margin: 6px 0;
+}
+
+.sidebar-overlay {
+  display: none;
+}
+
+/* Tablet + iPad */
+@media (max-width: 1024px) {
+  /* keep your header title centered etc. but make room for the button */
+  .header {
+    position: relative;
+    padding-left: 56px; /* prevents title from sitting under the burger */
+  }
+
+  .sidebar-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* turn sidebar into a slide-in drawer */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100dvh;
+    width: 260px;
+    transform: translateX(-105%);
+    transition: transform 0.25s ease;
+    z-index: 1001;
+  }
+
+  body.sidebar-open .sidebar {
+    transform: translateX(0);
+  }
+
+  .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.45);
+    z-index: 1000;
+  }
+
+  body.sidebar-open .sidebar-overlay {
+    display: block;
+  }
+}
