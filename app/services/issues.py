@@ -29,7 +29,6 @@ def list_issues(page: int, page_size: int, filters: dict):
         reported_by=filters.get("reported_by"),
         created_from=filters.get("created_from"),
         created_to=filters.get("created_to"),
-        closed_mode=closed_mode,
         search=search,
 
         category_id=filters.get("category_id"),
