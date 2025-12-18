@@ -92,9 +92,16 @@ def list_issue_rows(
 
     # search
     if search:
-        where.append("(issue.title ILIKE :q OR issue.description ILIKE :q)")
+        where.append("""
+        (
+            issue.title ILIKE :q
+            OR issue.description ILIKE :q
+            OR asset.asset_tag ILIKE :q
+            OR asset.name ILIKE :q
+        )
+        """)
         params["q"] = f"%{search}%"
-
+    
     # cascading hierarchy filters (category > make > model > variant)
     # note: category is reached via make.category_id
     if category_id:
