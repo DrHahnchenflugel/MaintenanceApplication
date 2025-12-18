@@ -106,7 +106,7 @@ body { overflow: hidden; }
   z-index: 20;
 
   background:
-    linear-gradient(90deg, rgba(255,102,0,0.16), rgba(0,0,0,0.0) 70%),
+    linear-gradient(90deg, rgba(255,102,0,0.16), rgba(0,0,0,0.0) 85%),
     var(--bg);
 
   border-bottom: 1px solid rgba(255,255,255,0.10);
