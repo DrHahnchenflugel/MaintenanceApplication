@@ -24,10 +24,11 @@ def issues_list():
       - q:      optional search text (title/description)
     """
 
+    raw_category = request.args.get("category_id", None)  # None = not present
     category_id = parse_uuid_arg("category_id")
     categories = issue_service.list_categories()
 
-    if not category_id:
+    if raw_category is None:
         robot = next(
             (c for c in categories
             if (c.get("label") or "").strip().lower() == "robot"
@@ -66,7 +67,12 @@ def issues_list():
         variant_id = None
 
     # Read filters from query string
-    status_code = (request.args.get("status") or "").upper() or "IN_PROGRESS"
+    raw_status = request.args.get("status", None)  # None = missing
+    status_code = (request.args.get("status") or "").strip().upper() or None
+
+    if raw_status is None:
+        status_code = "IN_PROGRESS"
+
     search = request.args.get("q") or None
 
     # Get all statuses so we can render the dropdown and map codes -> ids
