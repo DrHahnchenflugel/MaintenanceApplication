@@ -2,7 +2,17 @@ from flask import render_template, request, redirect, url_for, abort
 from . import bp  # this is your "app" blueprint (Blueprint("app", ...))
 
 from app.services import issues as issue_service
+from uuid import UUID
 
+def parse_uuid_arg(name: str):
+    v = (request.args.get(name) or "").strip()
+    if not v:
+        return None
+    try:
+        UUID(v)
+    except ValueError:
+        abort(400, description=f"Invalid {name}, must be UUID")
+    return v
 
 @bp.route("/issues")
 @bp.route("/issues/")
@@ -13,6 +23,36 @@ def issues_list():
       - status: optional status code (OPEN, IN_PROGRESS, BLOCKED, CLOSED)
       - q:      optional search text (title/description)
     """
+
+    category_id = parse_uuid_arg("category_id")
+    make_id     = parse_uuid_arg("make_id")
+    model_id    = parse_uuid_arg("model_id")
+    variant_id  = parse_uuid_arg("variant_id")
+
+    # Cascading reset
+    if not category_id:
+        make_id = model_id = variant_id = None
+    elif not make_id:
+        model_id = variant_id = None
+    elif not model_id:
+        variant_id = None
+
+    categories = issue_service.list_categories()
+    makes      = issue_service.list_makes(category_id) if category_id else []
+    models     = issue_service.list_models(make_id) if make_id else []
+    variants   = issue_service.list_variants(model_id) if model_id else []
+
+    if make_id and make_id not in {m["id"] for m in makes}:
+        make_id = model_id = variant_id = None
+        models = []
+        variants = []
+
+    if model_id and model_id not in {m["id"] for m in models}:
+        model_id = variant_id = None
+        variants = []
+
+    if variant_id and variant_id not in {v["id"] for v in variants}:
+        variant_id = None
 
     # Read filters from query string
     status_code = (request.args.get("status") or "").upper() or None
@@ -30,8 +70,12 @@ def issues_list():
         "reported_by": None,
         "created_from": None,
         "created_to": None,
-        "closed": None,      # let list_issues treat None as "open by default"
+        "closed": None,
         "search": search,
+        "category_id": category_id,
+        "make_id": make_id,
+        "model_id": model_id,
+        "variant_id": variant_id,
     }
 
     if status_code and status_code in status_by_code:
@@ -46,6 +90,16 @@ def issues_list():
         status_options=status_options,
         cur_status=status_code,
         search=search or "",
+
+        categories=categories,
+        makes=makes,
+        models=models,
+        variants=variants,
+
+        cur_category_id=category_id,
+        cur_make_id=make_id,
+        cur_model_id=model_id,
+        cur_variant_id=variant_id,
     )
 
 @bp.route("/issues/<issue_id>")

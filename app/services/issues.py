@@ -31,10 +31,17 @@ def list_issues(page: int, page_size: int, filters: dict):
         created_to=filters.get("created_to"),
         closed_mode=closed_mode,
         search=search,
+
+        category_id=filters.get("category_id"),
+        make_id=filters.get("make_id"),
+        model_id=filters.get("model_id"),
+        variant_id=filters.get("variant_id"),
+
         sort=[("created_at", "desc")],
         limit=page_size,
         offset=offset,
     )
+
 
     items = []
     for r in rows:
@@ -459,3 +466,19 @@ def delete_accepted_attachment_content_type(content_type: str):
     ok = issue_db.delete_accepted_attachment_content_type(content_type)
     if not ok:
         raise ValueError("Content type not found")
+
+def list_categories():
+    rows = issue_db.list_category_rows()
+    return [{"id": r["id"], "label": r["label"], "name": r.get("name")} for r in rows]
+
+def list_makes(category_id: str):
+    rows = issue_db.list_make_rows(category_id=category_id)
+    return [{"id": r["id"], "label": r["label"], "name": r.get("name")} for r in rows]
+
+def list_models(make_id: str):
+    rows = issue_db.list_model_rows(make_id=make_id)
+    return [{"id": r["id"], "label": r["label"], "name": r.get("name")} for r in rows]
+
+def list_variants(model_id: str):
+    rows = issue_db.list_variant_rows(model_id=model_id)
+    return [{"id": r["id"], "label": r["label"], "name": r.get("name")} for r in rows]

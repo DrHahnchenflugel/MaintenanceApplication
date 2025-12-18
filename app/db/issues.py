@@ -32,23 +32,107 @@ def get_issue_status_id_by_code(code: str):
     return row["id"]
 
 def list_issue_rows(
+    *,
     site_id=None,
     asset_id=None,
     status_id=None,
     reported_by=None,
     created_from=None,
     created_to=None,
-    closed_mode: str = "open",   # "open", "closed", "all"
+    closed_mode="open",   # "open" | "closed" | "all"
     search=None,
-    sort=None,
-    limit=None,
-    offset=None,
+    category_id=None,
+    make_id=None,
+    model_id=None,
+    variant_id=None,
+    sort=None,            # e.g. [("created_at","desc")]
+    limit=200,
+    offset=0,
 ):
-    """
-    List issues with optional filters, sorting, and pagination.
-    """
+    where = []
+    params = {
+        "site_id": site_id,
+        "asset_id": asset_id,
+        "status_id": status_id,
+        "reported_by": reported_by,
+        "created_from": created_from,
+        "created_to": created_to,
+        "search": search,
+        "category_id": category_id,
+        "make_id": make_id,
+        "model_id": model_id,
+        "variant_id": variant_id,
+        "limit": limit,
+        "offset": offset,
+    }
 
-    base_select = """
+    # base filters
+    if site_id:
+        where.append("asset.site_id = :site_id")
+    if asset_id:
+        where.append("issue.asset_id = :asset_id")
+    if status_id:
+        where.append("issue.status_id = :status_id")
+    if reported_by:
+        where.append("issue.reported_by = :reported_by")
+    if created_from:
+        where.append("issue.created_at >= :created_from")
+    if created_to:
+        where.append("issue.created_at <= :created_to")
+
+    # closed mode
+    if closed_mode == "open":
+        where.append("issue.closed_at IS NULL")
+    elif closed_mode == "closed":
+        where.append("issue.closed_at IS NOT NULL")
+    elif closed_mode == "all":
+        pass
+    else:
+        raise ValueError("closed_mode must be 'open', 'closed', or 'all'")
+
+    # search
+    if search:
+        where.append("(issue.title ILIKE :q OR issue.description ILIKE :q)")
+        params["q"] = f"%{search}%"
+
+    # cascading hierarchy filters (category > make > model > variant)
+    # note: category is reached via make.category_id
+    if category_id:
+        where.append("make.category_id = :category_id")
+    if make_id:
+        where.append("make.id = :make_id")
+    if model_id:
+        where.append("model.id = :model_id")
+    if variant_id:
+        where.append("variant.id = :variant_id")
+
+    where_sql = ""
+    if where:
+        where_sql = "WHERE " + " AND ".join(where)
+
+    # strict sort whitelist
+    allowed_sort = {
+        "created_at": "issue.created_at",
+        "updated_at": "issue.updated_at",
+        "closed_at": "issue.closed_at",
+        "asset_tag": "asset.asset_tag",
+        "status": "issue_status.display_order",
+        "last_action_at": "last_action.last_action_at",
+    }
+
+    order_sql = "ORDER BY issue.created_at DESC"
+    if sort:
+        parts = []
+        for key, direction in sort:
+            col = allowed_sort.get(key)
+            if not col:
+                continue
+            dir_sql = "DESC" if str(direction).lower() == "desc" else "ASC"
+            parts.append(f"{col} {dir_sql}")
+        if parts:
+            order_sql = "ORDER BY " + ", ".join(parts)
+
+    sql = text(f"""
         SELECT
             issue.id,
             issue.asset_id,
@@ -63,22 +147,46 @@ def list_issue_rows(
             asset.asset_tag,
             asset.site_id,
 
-            issue_status.code AS status_code,
+            variant.id AS variant_id,
+            variant.name AS variant_name,
+            variant.label AS variant_label,
+
+            model.id AS model_id,
+            model.name AS model_name,
+            model.label AS model_label,
+
+            make.id AS make_id,
+            make.name AS make_name,
+            make.label AS make_label,
+            make.category_id AS category_id,
+
+            issue_status.code  AS status_code,
             issue_status.label AS status_label,
 
             last_action.last_action_at,
             last_action.last_action_type_code,
-            last_action.last_action_type_label
+            last_action.last_action_type_label,
+
+            site.shorthand AS site_shorthand,
+            site.fullname AS site_fullname
+
         FROM issue
         JOIN issue_status
           ON issue.status_id = issue_status.id
         JOIN asset
           ON issue.asset_id = asset.id
+        JOIN site
+          ON asset.site_id = site.id
+
+        LEFT JOIN variant ON asset.variant_id = variant.id
+        LEFT JOIN model   ON variant.model_id = model.id
+        LEFT JOIN make    ON model.make_id = make.id
+
         LEFT JOIN LATERAL (
             SELECT
-                ia.created_at     AS last_action_at,
-                at.code           AS last_action_type_code,
-                at.label          AS last_action_type_label
+                ia.created_at AS last_action_at,
+                at.code       AS last_action_type_code,
+                at.label      AS last_action_type_label
             FROM issue_action ia
             JOIN action_type at
               ON ia.action_type_id = at.id
@@ -86,115 +194,29 @@ def list_issue_rows(
             ORDER BY ia.created_at DESC
             LIMIT 1
         ) AS last_action ON TRUE
-    """
 
-    where_clauses = []
-    params = {}
-
-    # Closed filter
-    if closed_mode == "open":
-        where_clauses.append("issue.closed_at IS NULL")
-    elif closed_mode == "closed":
-        where_clauses.append("issue.closed_at IS NOT NULL")
-    elif closed_mode == "all":
-        pass
-    else:
-        where_clauses.append("issue.closed_at IS NULL")
-
-    # Direct filters
-    if asset_id is not None:
-        where_clauses.append("issue.asset_id = :asset_id")
-        params["asset_id"] = asset_id
-
-    if status_id is not None:
-        where_clauses.append("issue.status_id = :status_id")
-        params["status_id"] = status_id
-
-    if reported_by is not None:
-        where_clauses.append("issue.reported_by = :reported_by")
-        params["reported_by"] = reported_by
-
-    if created_from is not None:
-        where_clauses.append("issue.created_at >= :created_from")
-        params["created_from"] = created_from
-
-    if created_to is not None:
-        where_clauses.append("issue.created_at <= :created_to")
-        params["created_to"] = created_to
-
-    if site_id is not None:
-        where_clauses.append("asset.site_id = :site_id")
-        params["site_id"] = site_id
-
-    if search is not None and search != "":
-        where_clauses.append(
-            "(issue.title ILIKE :search OR issue.description ILIKE :search)"
-        )
-        params["search"] = f"%{search}%"
-
-    where_sql = ""
-    if where_clauses:
-        where_sql = "WHERE " + " AND ".join(where_clauses)
-
-    sort_field_map = {
-        "id": "issue.id",
-        "created_at": "issue.created_at",
-        "updated_at": "issue.updated_at",
-        "title": "issue.title",
-        "status_id": "issue.status_id",
-        "site_id": "asset.site_id",
-    }
-
-    order_by_sql = "ORDER BY issue.created_at DESC"
-
-    if sort:
-        order_parts = []
-        for field_name, direction in sort:
-            col = sort_field_map.get(field_name)
-            if not col:
-                continue
-
-            dir_sql = "ASC"
-            if isinstance(direction, str) and direction.lower() == "desc":
-                dir_sql = "DESC"
-
-            order_parts.append(f"{col} {dir_sql}")
-
-        if order_parts:
-            order_by_sql = "ORDER BY " + ", ".join(order_parts)
-
-    limit_offset_sql = ""
-    if limit is not None:
-        limit_offset_sql += " LIMIT :limit"
-        params["limit"] = limit
-
-    if offset is not None:
-        limit_offset_sql += " OFFSET :offset"
-        params["offset"] = offset
-
-    select_sql = text(f"""
-        {base_select}
         {where_sql}
-        {order_by_sql}
-        {limit_offset_sql}
+        {order_sql}
+        LIMIT :limit OFFSET :offset
     """)
 
     count_sql = text(f"""
-        SELECT COUNT(*) AS total
+        SELECT COUNT(*)::int AS total
         FROM issue
         JOIN asset
           ON issue.asset_id = asset.id
+        LEFT JOIN variant ON asset.variant_id = variant.id
+        LEFT JOIN model   ON variant.model_id = model.id
+        LEFT JOIN make    ON model.make_id = make.id
         {where_sql}
     """)
 
     with get_connection() as conn:
+        rows = conn.execute(sql, params).mappings().all()
         total_row = conn.execute(count_sql, params).mappings().first()
-        total = int(total_row["total"]) if total_row is not None else 0
 
-        result = conn.execute(select_sql, params).mappings().all()
-
-    rows = [dict(row) for row in result]
-    return rows, total
+    total = 0 if total_row is None else int(total_row["total"])
+    return [dict(r) for r in rows], total
 
 def get_issue_row(issue_id):
     """
