@@ -110,7 +110,7 @@ def issues_list():
     result = issue_service.list_issues(page=1, page_size=200, filters=filters)
 
     return render_template(
-        "issues/list.html",
+        "issues/list_issues.html",
         issues=result["items"],
         status_options=status_options,
         cur_status=status_code,
