@@ -151,7 +151,9 @@
 {% endif %}
 
 <div class="fab-container">
-  {% include "partials/_primary_action_button.html" with {"label": "New Issue","href": url_for("app.issue_new"),"icon": "+"} %}
+  {% with label="New Issue", href=url_for("app.issue_new"), icon="+" %}
+    {% include "partials/_primary_action_button.html" %}
+  {% endwith %}
 </div>
 
 
