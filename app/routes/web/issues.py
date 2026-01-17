@@ -209,7 +209,7 @@ def add_issue_action(issue_id):
 @bp.route("/issues/new")
 @bp.route("/issues/new/")
 def new_issue_form():
-    asset_id = parse_uuid_arg("asset_id")  # you already have this helper
+    asset_id = parse_uuid_arg("asset_id")
     asset = issue_service.get_asset(asset_id) if asset_id else None
     if asset_id and asset is None:
         abort(404, description="Asset not found")
