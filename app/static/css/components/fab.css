@@ -1,0 +1,31 @@
+/* =========================================================
+   Floating action button (FAB)
+   ========================================================= */
+
+.fab-container{
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+
+  z-index: 1000; /* higher than tables, cards, headers */
+
+  /* prevent weird text selection */
+  user-select: none;
+}
+
+.fab-container .btn-primary-action{
+  padding: 14px 18px;
+  font-size: 15px;
+  border-radius: 14px;
+}
+
+@media (max-width: 900px){
+  .fab-container{
+    right: 16px;
+    bottom: 16px;
+  }
+}
+
+body.modal-open .fab-container{
+  display: none;
+}

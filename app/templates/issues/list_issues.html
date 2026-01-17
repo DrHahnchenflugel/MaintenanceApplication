@@ -150,4 +150,13 @@
   <p style="margin-top:16px;">No issues match this filter.</p>
 {% endif %}
 
+<div class="fab-container">
+  {% include "partials/_primary_action_button.html" with {
+    "label": "New Issue",
+    "href": url_for("app.issue_new"),
+    "icon": "+"
+  } %}
+</div>
+
+
 {% endblock %}
