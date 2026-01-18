@@ -524,24 +524,22 @@ def update_issue_row(issue_id, fields: dict):
         dict of the updated row, or None if issue_id not found.
     """
 
-    if not fields:
-        # Nothing to update – just return current row
-        return get_issue_row(issue_id)
-
     set_clauses = []
     params = {"id": issue_id}
 
-    idx = 0
-    for col, value in fields.items():
-        param_name = f"v_{idx}"
-        set_clauses.append(f"{col} = :{param_name}")
-        params[param_name] = value
-        idx += 1
+    if fields:
+        idx = 0
+        for col, value in fields.items():
+            param_name = f"v_{idx}"
+            set_clauses.append(f"{col} = :{param_name}")
+            params[param_name] = value
+            idx += 1
 
     # Always bump updated_at
     set_clauses.append("updated_at = NOW()")
 
-    set_sql = ", ".join(set_clauses)
+    if fields:
+        set_sql = ", ".join(set_clauses)
 
     sql = text(f"""
         UPDATE issue
