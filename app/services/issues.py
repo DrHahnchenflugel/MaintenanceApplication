@@ -237,7 +237,7 @@ def create_issue(data: dict):
         issue_id=issue_id,
         action_type_id=created_type_id,
         body=initial_body,
-        created_by=created_by,  # string
+        reported_by=reported_by,
     )
 
     return {"id": issue_id}
