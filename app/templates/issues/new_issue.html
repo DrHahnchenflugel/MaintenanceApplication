@@ -133,10 +133,9 @@
           enctype="multipart/form-data"
           action="{{ url_for('app.create_issue_web') }}">
 
-      <input type="hidden"
-      name="asset_id"
-      id="assetId"
-      value="{{ request.form.get('asset_id', asset.id if asset else '') }}">
+      <input type="hidden" name="asset_id" id="assetId"
+       value="{{ request.form.get('asset_id', asset_id or '') }}">
+
       
       <div class="new-issue-grid">
 

@@ -222,7 +222,7 @@ def new_issue_form():
     if asset_id and asset is None:
         abort(404, description="Asset not found")
 
-    return render_template("issues/new_issue.html", asset=asset, form_error=None)
+    return render_template("issues/new_issue.html", asset=asset, asset_id=asset_id, form_error=None)
 
 @bp.route("/issues", methods=["POST"])
 @bp.route("/issues", methods=["POST"])
