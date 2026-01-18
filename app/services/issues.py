@@ -3,7 +3,7 @@ from werkzeug.utils import secure_filename
 from flask import current_app
 import app.db.helpers as helpers
 from app.db import issues as issue_db
-import datetime as dt
+from datetime import datetime as dt
 
 def list_issues(page: int, page_size: int, filters: dict):
     offset = (page - 1) * page_size
