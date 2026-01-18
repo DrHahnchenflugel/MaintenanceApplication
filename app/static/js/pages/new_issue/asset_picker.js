@@ -1,27 +1,32 @@
 /* static/js/pages/new_issue/asset_picker.js
-   Asset picker for New Issue page
+   Asset picker for New Issue page.
 
-   Expects these elements in the DOM:
+   HTML requirements:
    - button#toggleAssetPicker
-   - div#assetPicker (optionally: data-assets-url="/api/v2/assets")
+   - div#assetPicker (with data-* urls; see below)
+   - input#assetId (hidden)
    - input#assetSearch
    - div#apResults
    - button#apApply
    - button#apClear
    - select#apSite (optional)
-   - select#apStatus
+   - select#apStatus (optional; if not server-rendered, will load from API)
    - select#apCategory (optional)
-   - select#apMake (optional)
-   - select#apModel (optional)
-   - select#apVariant (optional)
-   - input#assetId (hidden)
+   - select#apMake
+   - select#apModel
+   - select#apVariant
+
+   data attributes on #assetPicker:
+   - data-assets-url              (default: /maintenance/api/v2/assets)
+   - data-asset-statuses-url      (default: /maintenance/api/v2/asset-statuses)
+   - data-makes-url               (default: /maintenance/api/v2/assets/makes)
+   - data-models-url              (default: /maintenance/api/v2/assets/models)
+   - data-variants-url            (default: /maintenance/api/v2/assets/variants)
 */
 
 (function () {
   const panel = document.getElementById("assetPicker");
   const toggleBtn = document.getElementById("toggleAssetPicker");
-
-  // If this page doesn't have the picker, bail out safely.
   if (!panel || !toggleBtn) return;
 
   const el = {
@@ -43,15 +48,18 @@
     assetId: document.getElementById("assetId"),
   };
 
-  // Optional: where to display selected asset summary
   const headerTag = document.querySelector(".new-issue-asset__tag");
   const headerFallback = document.querySelector(".new-issue-asset__title .muted");
 
-  // Endpoint defaults
-  const ASSETS_URL = panel.dataset.assetsUrl || "/api/v2/assets";
-  const STATUSES_URL = panel.dataset.assetStatusesUrl || "/api/v2/asset-statuses";
+  const URLS = {
+    assets: panel.dataset.assetsUrl || "/maintenance/api/v2/assets",
+    statuses: panel.dataset.assetStatusesUrl || "/maintenance/api/v2/asset-statuses",
+    makes: panel.dataset.makesUrl || "/maintenance/api/v2/assets/makes",
+    models: panel.dataset.modelsUrl || "/maintenance/api/v2/assets/models",
+    variants: panel.dataset.variantsUrl || "/maintenance/api/v2/assets/variants",
+  };
 
-  // Cache for status labels (if assets don’t include expanded status fields)
+  // status_id(UUID) -> label (fallback if assets don't include status fields)
   const statusLabelById = new Map();
 
   // -----------------------------
@@ -77,9 +85,22 @@
     el.results.innerHTML = `<div class="asset-picker__empty muted">${escapeHtml(msg)}</div>`;
   }
 
-  function setLoading(msg = "Searching…") {
+  function setLoading(msg = "Loading…") {
     if (!el.results) return;
     el.results.innerHTML = `<div class="asset-picker__empty muted">${escapeHtml(msg)}</div>`;
+  }
+
+  function resetSelect(selectEl, disabled = false) {
+    if (!selectEl) return;
+    selectEl.innerHTML = `<option value="">All</option>`;
+    selectEl.value = "";
+    selectEl.disabled = !!disabled;
+  }
+
+  async function fetchJson(url) {
+    const res = await fetch(url, { headers: { Accept: "application/json" } });
+    if (!res.ok) throw new Error(`HTTP ${res.status} for ${url}`);
+    return res.json();
   }
 
   // -----------------------------
@@ -88,30 +109,24 @@
   el.toggleBtn.addEventListener("click", () => {
     el.panel.hidden = !el.panel.hidden;
     if (!el.panel.hidden) {
-      // Move focus to search input
       if (el.input) el.input.focus();
     }
   });
 
   // -----------------------------
-  // Populate asset statuses (UUID values)
+  // Load Statuses (if dropdown not server-rendered)
   // -----------------------------
   async function loadAssetStatuses() {
     if (!el.status) return;
 
-    // If options already exist server-side, we can still build the map,
-    // but we won't overwrite your HTML.
-    const alreadyHasOptions = el.status.options && el.status.options.length > 1;
+    // If already populated server-side, still build map if possible via API,
+    // but don't overwrite existing options.
+    const alreadyHasOptions = (el.status.options?.length || 0) > 1;
 
     try {
-      const res = await fetch(STATUSES_URL, { headers: { Accept: "application/json" } });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const statuses = await res.json(); // expects [{id, code, label, display_order}, ...]
-
-      // Build map
+      const statuses = await fetchJson(URLS.statuses);
       statuses.forEach((s) => statusLabelById.set(String(s.id), String(s.label)));
 
-      // If you’re rendering server-side, don’t overwrite.
       if (alreadyHasOptions) return;
 
       const opts = statuses
@@ -122,91 +137,133 @@
 
       el.status.innerHTML = `<option value="">All</option>${opts}`;
     } catch (e) {
-      // Not fatal. Picker still works.
       console.error("Failed to load asset statuses:", e);
     }
   }
 
   // -----------------------------
-  // Cascading enable/disable for Model/Variant (simple UX)
-  // You can later wire real model/variant lookups.
+  // Cascading lookups: Makes -> Models -> Variants
   // -----------------------------
-  function resetSelect(selectEl) {
-    if (!selectEl) return;
-    selectEl.innerHTML = `<option value="">All</option>`;
-    selectEl.value = "";
+  async function loadMakesForCategory(categoryId) {
+    if (!el.make) return;
+
+    resetSelect(el.make, true);
+    resetSelect(el.model, true);
+    resetSelect(el.variant, true);
+
+    if (!categoryId) return; // keep make disabled until category chosen
+
+    try {
+      const url = `${URLS.makes}?category_id=${encodeURIComponent(categoryId)}`;
+      const items = await fetchJson(url);
+
+      el.make.innerHTML =
+        `<option value="">All</option>` +
+        items.map((x) => `<option value="${escapeHtml(x.id)}">${escapeHtml(x.label)}</option>`).join("");
+
+      el.make.disabled = false;
+    } catch (e) {
+      console.error("Failed to load makes:", e);
+      resetSelect(el.make, true);
+    }
   }
 
-  function setDisabled(selectEl, disabled) {
-    if (!selectEl) return;
-    selectEl.disabled = !!disabled;
-    if (disabled) selectEl.value = "";
+  async function loadModelsForMake(makeId) {
+    if (!el.model) return;
+
+    resetSelect(el.model, true);
+    resetSelect(el.variant, true);
+
+    if (!makeId) return;
+
+    try {
+      const url = `${URLS.models}?make_id=${encodeURIComponent(makeId)}`;
+      const items = await fetchJson(url);
+
+      el.model.innerHTML =
+        `<option value="">All</option>` +
+        items.map((x) => `<option value="${escapeHtml(x.id)}">${escapeHtml(x.label)}</option>`).join("");
+
+      el.model.disabled = false;
+    } catch (e) {
+      console.error("Failed to load models:", e);
+      resetSelect(el.model, true);
+    }
   }
 
-  if (el.make) {
-    el.make.addEventListener("change", () => {
-      // In your schema: model depends on make
-      resetSelect(el.model);
-      resetSelect(el.variant);
-      setDisabled(el.model, !el.make.value);
-      setDisabled(el.variant, true);
-    });
+  async function loadVariantsForModel(modelId) {
+    if (!el.variant) return;
+
+    resetSelect(el.variant, true);
+
+    if (!modelId) return;
+
+    try {
+      const url = `${URLS.variants}?model_id=${encodeURIComponent(modelId)}`;
+      const items = await fetchJson(url);
+
+      el.variant.innerHTML =
+        `<option value="">All</option>` +
+        items.map((x) => `<option value="${escapeHtml(x.id)}">${escapeHtml(x.label)}</option>`).join("");
+
+      el.variant.disabled = false;
+    } catch (e) {
+      console.error("Failed to load variants:", e);
+      resetSelect(el.variant, true);
+    }
   }
 
-  if (el.model) {
-    el.model.addEventListener("change", () => {
-      // variant depends on model
-      resetSelect(el.variant);
-      setDisabled(el.variant, !el.model.value);
-    });
-  }
+  el.category?.addEventListener("change", () => {
+    loadMakesForCategory(el.category.value);
+  });
+
+  el.make?.addEventListener("change", () => {
+    loadModelsForMake(el.make.value);
+  });
+
+  el.model?.addEventListener("change", () => {
+    loadVariantsForModel(el.model.value);
+  });
 
   // -----------------------------
-  // Build query params for /api/v2/assets
+  // Build query params for /assets search
   // -----------------------------
-  function buildParams() {
+  function buildAssetSearchParams() {
     const p = new URLSearchParams();
 
-    // UUID FKs
+    // FK filters
     if (el.site?.value) p.set("site_id", el.site.value);
-    if (el.category?.value) p.set("category_id", el.category.value);
     if (el.status?.value) p.set("status_id", el.status.value);
+    if (el.category?.value) p.set("category_id", el.category.value);
     if (el.make?.value) p.set("make_id", el.make.value);
     if (el.model?.value) p.set("model_id", el.model.value);
     if (el.variant?.value) p.set("variant_id", el.variant.value);
 
-    // String search: your API supports asset_tag
+    // string search (your API supports asset_tag)
     const tag = (el.input?.value || "").trim();
     if (tag) p.set("asset_tag", tag);
 
-    // Reasonable defaults for picker
+    // picker defaults
     p.set("page", "1");
     p.set("page_size", "25");
     p.set("retired", "active");
 
-    // Ask for extra fields if your service layer supports include expansions
-    // If your backend ignores unknown includes, fine.
+    // optional expansions (safe if ignored)
     p.set("include", "site,make,model,variant,status");
-
-    // Optional: sort
     p.set("sort", "asset_tag");
 
     return p;
   }
 
   // -----------------------------
-  // Render results
+  // Results rendering
   // -----------------------------
   function deriveStatusLabel(asset) {
-    // Prefer expanded fields if present
     if (asset.status_label) return String(asset.status_label);
     if (asset.status_code) return String(asset.status_code);
 
-    // Fall back to lookup mapping by status_id
     const sid = asset.status_id ? String(asset.status_id) : "";
-    if (sid && statusLabelById.has(sid)) return statusLabelById.get(sid);
-
-    return "";
+    return sid && statusLabelById.has(sid) ? statusLabelById.get(sid) : "";
   }
 
   function deriveSite(asset) {
@@ -243,7 +300,9 @@
       const variant = escapeHtml(deriveVariant(a));
       const status = escapeHtml(deriveStatusLabel(a));
 
-      const line1 = [site, [make, model].filter(Boolean).join(" "), variant].filter(Boolean).join(" · ");
+      const line1 = [site, [make, model].filter(Boolean).join(" "), variant]
+        .filter(Boolean)
+        .join(" · ");
 
       return `
         <div class="asset-picker__row" role="button" tabindex="0"
@@ -265,51 +324,41 @@
   }
 
   // -----------------------------
-  // Search
+  // Search actions
   // -----------------------------
   async function runSearch() {
-    setLoading();
+    setLoading("Searching…");
 
-    const url = `${ASSETS_URL}?${buildParams().toString()}`;
+    const url = `${URLS.assets}?${buildAssetSearchParams().toString()}`;
 
     try {
-      const res = await fetch(url, { headers: { Accept: "application/json" } });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-
+      const data = await fetchJson(url);
       const items = Array.isArray(data) ? data : (data.items || []);
       renderResults(items);
     } catch (e) {
       console.error("Asset search failed:", e);
-      setEmpty("Search failed. Check console + endpoint.");
+      setEmpty("Search failed. Check console + API route.");
     }
   }
 
-  function clearFilters() {
+  function clearAll() {
     if (el.input) el.input.value = "";
+
     if (el.site) el.site.value = "";
     if (el.status) el.status.value = "";
     if (el.category) el.category.value = "";
-    if (el.make) el.make.value = "";
 
-    // Don’t destroy server-provided options; just reset values + disable cascade
-    if (el.model) {
-      el.model.value = "";
-      el.model.disabled = true;
-    }
-    if (el.variant) {
-      el.variant.value = "";
-      el.variant.disabled = true;
-    }
+    // Reset cascade
+    resetSelect(el.make, true);
+    resetSelect(el.model, true);
+    resetSelect(el.variant, true);
 
     setEmpty("Use filters or search, then hit Apply.");
   }
 
-  // Buttons
   el.apply?.addEventListener("click", runSearch);
-  el.clear?.addEventListener("click", clearFilters);
+  el.clear?.addEventListener("click", clearAll);
 
-  // Enter in search triggers apply
   el.input?.addEventListener("keydown", (e) => {
     if (e.key === "Enter") {
       e.preventDefault();
@@ -317,26 +366,8 @@
     }
   });
 
-  // Optional live-search (disabled by default; enable if you want it)
-  let debounceTimer = null;
-  const LIVE_SEARCH = false;
-
-  el.input?.addEventListener("input", () => {
-    if (!LIVE_SEARCH) return;
-    clearTimeout(debounceTimer);
-    debounceTimer = setTimeout(runSearch, 250);
-  });
-
-  // If dropdowns change, optionally live-search
-  [el.site, el.status, el.category, el.make, el.model, el.variant].forEach((sel) => {
-    if (!sel) return;
-    sel.addEventListener("change", () => {
-      if (LIVE_SEARCH) runSearch();
-    });
-  });
-
   // -----------------------------
-  // Select asset from results
+  // Select an asset
   // -----------------------------
   function selectRow(row) {
     const id = row.dataset.assetId;
@@ -359,7 +390,6 @@
       (bits.length ? ` <span class="muted"> · ${escapeHtml(bits.join(" · "))}</span>` : "")
     );
 
-    // Close picker after selection
     el.panel.hidden = true;
   }
 
@@ -369,11 +399,9 @@
     selectRow(row);
   });
 
-  // Keyboard select (Enter/Space)
   el.results?.addEventListener("keydown", (e) => {
     const row = e.target.closest(".asset-picker__row");
     if (!row) return;
-
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       selectRow(row);
@@ -384,16 +412,30 @@
   // Init
   // -----------------------------
   (async function init() {
-    // Initial empty state
+    // Initial state for cascade: make/model/variant disabled until category chosen
+    if (el.make) el.make.disabled = true;
+    if (el.model) el.model.disabled = true;
+    if (el.variant) el.variant.disabled = true;
+
+    // Ensure results box has content
     if (el.results && el.results.innerHTML.trim() === "") {
       setEmpty("Use filters or search, then hit Apply.");
     }
 
-    // Populate statuses if needed + build label map
     await loadAssetStatuses();
 
-    // If an asset is already selected (editing / coming from asset page),
-    // you can optionally auto-close, nothing to do here.
+    // If category is already selected (e.g., page reload), load makes
+    if (el.category?.value) {
+      await loadMakesForCategory(el.category.value);
+    }
+    // If make is already selected, load models
+    if (el.make?.value) {
+      await loadModelsForMake(el.make.value);
+    }
+    // If model is already selected, load variants
+    if (el.model?.value) {
+      await loadVariantsForModel(el.model.value);
+    }
   })();
 
 })();
