@@ -1,4 +1,7 @@
+{# specific_issue.html #}
 {% extends "base.html" %}
+
+{% from "_macros/dropdown.html" import dropdown %}
 
 {% block title %}Maintenance – Issue{% endblock %}
 {% block page_title %}Issue{% endblock %}
@@ -46,6 +49,7 @@
           <div class="issue-desc-preview">
             {{ issue.description or "-" }}
           </div>
+
           {# Full issue info for modal (cloned into modal on click) #}
           <div id="issueModalFull" hidden>
             {% set code = issue.status.code if issue.status else 'UNKNOWN' %}
@@ -232,26 +236,40 @@
           action="{{ url_for('app.add_issue_action', issue_id=issue.id) }}"
           class="issue-form issue-form--update"
         >
-          <div class="field">
-            <label class="issue-label">Action type</label>
-            <select name="action_type_code" required>
-              {% for at in action_types %}
-                {% if at.code != "CREATED" %}
-                  <option value="{{ at.code }}">{{ at.label }}</option>
-                {% endif %}
-              {% endfor %}
-            </select>
-          </div>
 
-          <div class="field">
-            <label class="issue-label">New status (optional)</label>
-            <select name="new_status_id">
-              <option value="">(no status change)</option>
-              {% for st in status_options %}
-                <option value="{{ st.id }}">{{ st.label }}</option>
-              {% endfor %}
-            </select>
-          </div>
+          {# Build dropdown options in Jinja (no list unpacking) #}
+          {% set action_type_opts = [] %}
+          {% for at in action_types %}
+            {% if at.code != "CREATED" %}
+              {% set _ = action_type_opts.append({"value": at.code, "label": at.label}) %}
+            {% endif %}
+          {% endfor %}
+
+          {% set status_opts = [] %}
+          {% set _ = status_opts.append({"value": "", "label": "(no status change)"}) %}
+          {% for st in status_options %}
+            {% set _ = status_opts.append({"value": st.id, "label": st.label}) %}
+          {% endfor %}
+
+          {# Action type (required) #}
+          {{ dropdown(
+            name="action_type_code",
+            id="action_type_code",
+            label="Action type",
+            options=action_type_opts,
+            selected_value="",
+            placeholder="Select action type…"
+          ) }}
+
+          {# New status (optional) #}
+          {{ dropdown(
+            name="new_status_id",
+            id="new_status_id",
+            label="New status (optional)",
+            options=status_opts,
+            selected_value="",
+            placeholder="(no status change)"
+          ) }}
 
           <div class="field">
             <label class="issue-label">Created by</label>

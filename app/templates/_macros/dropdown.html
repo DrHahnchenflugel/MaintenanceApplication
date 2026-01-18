@@ -1,0 +1,64 @@
+{# templates/_macros/dropdown.html #}
+{% macro dropdown(name, id, label, options, selected_value='', placeholder='Select…', disabled=False) %}
+  <div class="field">
+    {% if label %}
+      <label class="label" for="{{ id }}">{{ label }}</label>
+    {% endif %}
+
+    {# Native select (mobile/touch) #}
+    <select
+      id="{{ id }}"
+      name="{{ name }}"
+      class="select select--native"
+      {% if disabled %}disabled{% endif %}
+    >
+      {% for opt in options %}
+        {# opt = {value, label, disabled?} #}
+        <option
+          value="{{ opt.value }}"
+          {% if opt.disabled %}disabled{% endif %}
+          {% if opt.value == selected_value %}selected{% endif %}
+        >{{ opt.label }}</option>
+      {% endfor %}
+    </select>
+
+    {# Custom dropdown (desktop) #}
+    <div
+      class="dropdown select--custom"
+      data-dropdown
+      {% if disabled %}data-disabled="1"{% endif %}
+    >
+      <button
+        type="button"
+        class="dropdown__btn"
+        data-dropdown-btn
+        aria-haspopup="listbox"
+        aria-expanded="false"
+        {% if disabled %}disabled{% endif %}
+      >
+        {# Show selected label, else placeholder #}
+        {% set _sel = None %}
+        {% for opt in options %}
+          {% if opt.value == selected_value %}
+            {% set _sel = opt.label %}
+          {% endif %}
+        {% endfor %}
+        <span class="dropdown__value" data-dropdown-value>
+          {{ _sel if _sel else placeholder }}
+        </span>
+        <span class="dropdown__chev" aria-hidden="true">▾</span>
+      </button>
+
+      <div class="dropdown__menu" data-dropdown-menu role="listbox">
+        {% for opt in options %}
+          <button
+            type="button"
+            class="dropdown__item"
+            data-value="{{ opt.value }}"
+            {% if opt.disabled %}disabled{% endif %}
+          >{{ opt.label }}</button>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+{% endmacro %}

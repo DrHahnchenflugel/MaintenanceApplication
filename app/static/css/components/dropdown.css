@@ -1,0 +1,121 @@
+/* =========================================================
+   components.dropdown.css
+   Desktop custom dropdown + mobile native select (Option C)
+   ========================================================= */
+
+/* --- Native select baseline (still used on mobile) --- */
+.select {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--text);
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 15px;
+  line-height: 1.2;
+}
+
+.select:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--line), var(--brand) 45%);
+  box-shadow: 0 0 0 3px color-mix(in srgb, transparent, var(--brand) 18%);
+}
+
+/* --- Desktop custom dropdown --- */
+.dropdown {
+  position: relative;
+  width: 100%;
+}
+
+.dropdown__btn {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  border: 1px solid var(--line);
+  background: var(--panel);
+  color: var(--text);
+  border-radius: 12px;
+
+  padding: 10px 12px;
+  font-size: 15px;
+  line-height: 1.2;
+
+  cursor: pointer;
+}
+
+.dropdown__btn:focus {
+  outline: none;
+  border-color: color-mix(in srgb, var(--line), var(--brand) 45%);
+  box-shadow: 0 0 0 3px color-mix(in srgb, transparent, var(--brand) 18%);
+}
+
+.dropdown__chev {
+  opacity: 0.8;
+  margin-left: 10px;
+}
+
+/* Menu */
+.dropdown__menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 12px 28px rgba(0,0,0,0.45);
+
+  padding: 6px;
+  display: none;
+  z-index: 50;
+}
+
+.dropdown.is-open .dropdown__menu {
+  display: block;
+}
+
+.dropdown__item {
+  width: 100%;
+  text-align: left;
+
+  background: transparent;
+  border: 0;
+  color: var(--text);
+
+  padding: 10px 10px;
+  border-radius: 10px;
+
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 1.15;
+}
+
+.dropdown__item:hover {
+  background: color-mix(in srgb, var(--panel), white 6%);
+}
+
+.dropdown__item:focus {
+  outline: none;
+  background: color-mix(in srgb, var(--panel), white 8%);
+}
+
+.dropdown__item[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.dropdown__item[disabled]:hover {
+  background: transparent;
+}
+
+/* --- Option C switch: use native on coarse pointers (phones/tablets) --- */
+.select--custom { display: block; }
+.select--native { display: none; }
+
+@media (pointer: coarse) {
+  .select--custom { display: none; }
+  .select--native { display: block; }
+}
