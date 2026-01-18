@@ -34,14 +34,16 @@ def list_category_rows():
 
 def list_makes(category_id=None):
     sql = """
-      SELECT
-        make.id,
-        make.label,
-        make.category_id
-      FROM make
-      WHERE (:category_id::uuid IS NULL OR make.category_id = :category_id::uuid)
-      ORDER BY make.label ASC
+    SELECT id, label, category_id
+    FROM make
     """
+
+    params = {}
+    if category_id:
+        sql += " WHERE category_id = :category_id"
+        params["category_id"] = category_id
+
+    sql += " ORDER BY label ASC"
     
     with get_connection() as conn:
         rows = conn.execute(
