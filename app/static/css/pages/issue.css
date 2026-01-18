@@ -128,7 +128,7 @@
   grid-template-columns: repeat(2, minmax(0, 1fr));
   row-gap: 8px;
   column-gap: 16px;
-  font-size: 13px;
+  font-size: 1.1rem;
 }
 
 .issue-modal__desc {
