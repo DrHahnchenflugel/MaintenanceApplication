@@ -535,12 +535,13 @@ def update_issue_row(issue_id, fields: dict = None):
             params[param_name] = value
             idx += 1
 
-    # Always bump updated_at
-    set_clauses.append("updated_at = NOW()")
+        # Always bump updated_at
+        set_clauses.append("updated_at = NOW()")
 
-    if fields:
         set_sql = ", ".join(set_clauses)
-
+    else:
+        set_sql = "updated_at = NOW()"
+    
     sql = text(f"""
         UPDATE issue
         SET {set_sql}
