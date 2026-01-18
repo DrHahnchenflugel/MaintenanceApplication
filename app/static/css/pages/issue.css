@@ -265,29 +265,9 @@
 /* =========================================================
    Tablet (A,B,C / D,E,E)
    ========================================================= */
-/* iPad mini-ish: stop forcing 3-up */
-@media (max-width: 1050px){
-  .issue-layout{
-    grid-template-columns: 1fr 1fr;
-    grid-template-rows: auto auto auto;
-    grid-template-areas:
-      "issue-main status"
-      "issue-image issue-image"
-      "update update"
-      "actions actions";
-    align-items: start;
-  }
-
-  .issue-photo-frame{
-    height: clamp(220px, 32vh, 380px);
-  }
-
-  .issue-desc-preview{ -webkit-line-clamp: 5; }
-}
-
 @media (max-width: 1200px) {
   .issue-layout {
-    grid-template-columns: 1.35fr 1.45fr 1.2fr;
+    grid-template-columns: 1.65fr 1.25fr 0.85fr;
     grid-template-rows: 42vh 46vh;
 
     grid-template-areas:
