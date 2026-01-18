@@ -511,7 +511,7 @@ def get_issue_status_id(issue_id):
 
     return row["status_id"]
 
-def update_issue_row(issue_id, fields: dict):
+def update_issue_row(issue_id, fields: dict = None):
     """
     Partially update an issue row.
 
