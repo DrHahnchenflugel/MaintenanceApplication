@@ -33,18 +33,19 @@
       {# B: description + meta (scrolls) #}
       <div class="issue-main-body">
         <div class="field issue-block">
-          <label class="issue-label">Description (Click for more)</label>
-
-          {# preview: clamped + clickable #}
           <button
             type="button"
-            class="issue-desc-preview"
+            class="issue-desc-trigger"
             onclick="openTextModalFromEl('issueModalFull', 'Issue')"
-            aria-label="Open full issue details"
+            aria-controls="issueModalFull"
+            aria-expanded="false"
           >
-            {{ issue.description or "-" }}
+            Description <span class="muted">(Click for more)</span>
           </button>
 
+          <div class="issue-desc-preview">
+            {{ issue.description or "-" }}
+          </div>
           {# Full issue info for modal (cloned into modal on click) #}
           <div id="issueModalFull" hidden>
             {% set code = issue.status.code if issue.status else 'UNKNOWN' %}

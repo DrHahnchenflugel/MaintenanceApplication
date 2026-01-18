@@ -157,8 +157,14 @@
 .issue-asset-right .mmv {
   font-weight: 650;
   line-height: 1.35;
-  overflow-wrap: anywhere;
-  word-break: break-word;
+  overflow-wrap: break-word;
+  word-break: normal;
+  hyphens: auto;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
 }
 
 /* Photo card */
@@ -335,4 +341,45 @@
   }
 
   .issue-image { min-height: 320px; }
+}
+
+.issue-desc-trigger{
+  display: block;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+
+  background: none;
+  border: 0;
+
+  font: inherit;
+  font-weight: 600;
+  text-align: left;
+  color: var(--text);
+
+  cursor: pointer;
+}
+
+.issue-desc-trigger .muted{
+  font-weight: 400;
+  opacity: 0.7;
+}
+
+.issue-desc-trigger:hover{
+  text-decoration: underline;
+}
+
+.issue-desc-preview{
+  margin-top: 6px;
+  line-height: 1.45;
+
+  opacity: 0.9;
+
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+
+  overflow-wrap: break-word;
+  word-break: normal;
 }

@@ -15,13 +15,18 @@
 }
 
 /* Ensure fields don’t overflow the grid */
-.issue-form--update .field { min-width: 0; }
+.issue-form--update .field{
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
 
 /* =========================================================
    Desktop / large tablet
    ========================================================= */
 
-@media (min-width: 769px) {
+@media (min-width: 1024px) {
   .issue-form--update {
     grid-template-columns: 1fr 1fr;
     column-gap: 16px;
@@ -72,6 +77,7 @@
   padding: 12px 14px;
   font-size: 14px;
   line-height: 1.25;
+  text-overflow: ellipsis;
 
   outline: none;
 }
