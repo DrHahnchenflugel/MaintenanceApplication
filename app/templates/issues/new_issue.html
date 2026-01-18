@@ -43,16 +43,16 @@
       </div>
 
       <div class="new-issue-asset__picker asset-picker"
-          id="assetPicker"
-          hidden
-          data-search-url="{{ url_for('app.assets_search_api') }}">
+        id="assetPicker"
+        hidden
+        data-assets-url="/maintenance/api/v2/assets"
+        data-asset-statuses-url="/maintenance/api/v2/asset-statuses">
 
         <div class="asset-picker__filters">
           <label class="asset-picker__field">
             <span class="asset-picker__label">Site</span>
             <select class="asset-picker__select" id="apSite">
               <option value="">All</option>
-              {# if you have sites in context #}
               {% for s in site_options|default([]) %}
                 <option value="{{ s.id }}">{{ s.shorthand }}</option>
               {% endfor %}
@@ -63,9 +63,8 @@
             <span class="asset-picker__label">Status</span>
             <select class="asset-picker__select" id="apStatus">
               <option value="">All</option>
-              {# if you have statuses in context #}
               {% for st in asset_status_options|default([]) %}
-                <option value="{{ st.code }}">{{ st.label }}</option>
+                <option value="{{ st.id }}">{{ st.label }}</option>
               {% endfor %}
             </select>
           </label>
