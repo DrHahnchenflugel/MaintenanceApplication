@@ -8,7 +8,7 @@
 
     <nav class="nav">
         <a href="#" {% if request.endpoint == 'app.dashboard' %}class="is-active"{% endif %}>Dashboard</a>
-        <a href="{{ url_for('app.issues_list', status='IN_PROGRESS') }}"
+        <a href="{{ url_for('app.issues_list', status='ACTIVE') }}"
             {% if request.endpoint == 'app.issues_active' %}class="is-active"{% endif %}>Active Issues</a>
         <a href="{{ url_for('app.issues_list', status='CLOSED') }}"
             {% if request.endpoint == 'app.issues_past' %}class="is-active"{% endif %}>Past Issues</a>

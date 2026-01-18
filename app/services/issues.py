@@ -21,9 +21,7 @@ def list_issues(page: int, page_size: int, filters: dict):
     search = filters.get("search")
     if search == "":
         search = None
-    print("call")
-    print(filters)
-    print(filters.get("active_status_ids"))
+        
     rows, total = issue_db.list_issue_rows(
         site_id=filters.get("site_id"),
         asset_id=filters.get("asset_id"),

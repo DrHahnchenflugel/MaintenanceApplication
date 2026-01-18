@@ -117,9 +117,6 @@ def issues_list():
     if status_code and status_code in status_by_code: 
         filters["status_id"] = status_by_code[status_code]["id"]
     elif status_code == "ACTIVE":
-        print("active")
-        print((status_by_code["OPEN"]["id"],status_by_code["IN_PROGRESS"]["id"]))
-        print("active^^")
         filters["status_id"] = "00000000-0000-0000-0000-000000000000"
         filters["active_status_ids"] = (status_by_code["OPEN"]["id"],status_by_code["IN_PROGRESS"]["id"]) # TODO: Sad face
 
