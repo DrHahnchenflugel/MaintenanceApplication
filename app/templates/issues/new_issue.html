@@ -42,12 +42,83 @@
         </button>
       </div>
 
-      <div class="new-issue-asset__picker" id="assetPicker" hidden>
-        {# Basic placeholder UI; wire JS later #}
-        <label class="new-issue-label" for="assetSearch">Search</label>
-        <input class="new-issue-input" id="assetSearch" type="search" placeholder="Search asset tag (RB-042)" autocomplete="off">
-        <div class="new-issue-results" aria-live="polite">
-          <div class="new-issue-results__empty muted">Type to search…</div>
+      <div class="new-issue-asset__picker asset-picker"
+          id="assetPicker"
+          hidden
+          data-search-url="{{ url_for('app.assets_search_api') }}">
+
+        <div class="asset-picker__filters">
+          <label class="asset-picker__field">
+            <span class="asset-picker__label">Site</span>
+            <select class="asset-picker__select" id="apSite">
+              <option value="">All</option>
+              {# if you have sites in context #}
+              {% for s in site_options|default([]) %}
+                <option value="{{ s.id }}">{{ s.shorthand }}</option>
+              {% endfor %}
+            </select>
+          </label>
+
+          <label class="asset-picker__field">
+            <span class="asset-picker__label">Status</span>
+            <select class="asset-picker__select" id="apStatus">
+              <option value="">All</option>
+              {# if you have statuses in context #}
+              {% for st in asset_status_options|default([]) %}
+                <option value="{{ st.code }}">{{ st.label }}</option>
+              {% endfor %}
+            </select>
+          </label>
+
+          <label class="asset-picker__field">
+            <span class="asset-picker__label">Category</span>
+            <select class="asset-picker__select" id="apCategory">
+              <option value="">All</option>
+              {% for c in category_options|default([]) %}
+                <option value="{{ c.id }}">{{ c.label }}</option>
+              {% endfor %}
+            </select>
+          </label>
+
+          <label class="asset-picker__field">
+            <span class="asset-picker__label">Make</span>
+            <select class="asset-picker__select" id="apMake">
+              <option value="">All</option>
+              {% for m in make_options|default([]) %}
+                <option value="{{ m.id }}">{{ m.label }}</option>
+              {% endfor %}
+            </select>
+          </label>
+
+          <label class="asset-picker__field">
+            <span class="asset-picker__label">Model</span>
+            <select class="asset-picker__select" id="apModel" disabled>
+              <option value="">All</option>
+            </select>
+          </label>
+
+          <label class="asset-picker__field">
+            <span class="asset-picker__label">Variant</span>
+            <select class="asset-picker__select" id="apVariant" disabled>
+              <option value="">All</option>
+            </select>
+          </label>
+
+          <div class="asset-picker__search">
+            <label class="asset-picker__field asset-picker__field--search">
+              <span class="asset-picker__label">Search</span>
+              <input class="asset-picker__input" id="assetSearch" type="search"
+                    placeholder="Asset tag, serial, or keywords (RB-042)"
+                    autocomplete="off">
+            </label>
+
+            <button type="button" class="btn asset-picker__btn" id="apApply">Apply</button>
+            <button type="button" class="btn btn-secondary asset-picker__btn" id="apClear">Clear</button>
+          </div>
+        </div>
+
+        <div class="asset-picker__results" id="apResults" aria-live="polite">
+          <div class="asset-picker__empty muted">Use filters or search, then hit Apply.</div>
         </div>
       </div>
     </section>
@@ -106,21 +177,8 @@
     </form>
 
   </div>
+{% endblock %}
 
-  <script>
-    // Basic toggle only (search wiring later)
-    (function(){
-      const btn = document.getElementById('toggleAssetPicker');
-      const panel = document.getElementById('assetPicker');
-      if (!btn || !panel) return;
-      btn.addEventListener('click', () => {
-        panel.hidden = !panel.hidden;
-        if (!panel.hidden) {
-          const input = panel.querySelector('input');
-          if (input) input.focus();
-        }
-      });
-    })();
-  </script>
-
+{% block page_js %}
+  <script src="{{ url_for('static', filename='js/pages/new_issue/asset_picker.js') }}" defer></script>
 {% endblock %}
