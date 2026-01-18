@@ -42,6 +42,10 @@ def list_makes(category_id=None):
       WHERE (:category_id::uuid IS NULL OR make.category_id = :category_id::uuid)
       ORDER BY make.label ASC
     """
+    
+    with get_connection() as conn:
+        rows = conn.execute(sql, {"category_id": category_id}).mappings().all()
+
     rows = db.session.execute(text(sql), {"category_id": category_id}).mappings().all()
     return [dict(r) for r in rows]
 
