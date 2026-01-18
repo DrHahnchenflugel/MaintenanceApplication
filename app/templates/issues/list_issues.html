@@ -115,9 +115,10 @@
             <div class="issue-cell-title">
               <div class="issue-title">{{ issue.title }}</div>
               <div class="issue-sub">
-                {% if issue.reported_by %}Reported by {{ issue.reported_by }} |{% else %}{% endif %}
+                {% if issue.reported_by %}Reported by {{ issue.reported_by }} {% else %}{% endif %}
+                {% if issue.reported_by and issue.last_action_at %}| {% endif %}
                 {% if issue.last_action_at %}Last 
-                  {% set time, date = issue.created_at | format_dt %}
+                  {% set time, date = issue.updated_at | format_dt %}
                   {{ date }}
                   <span class="time">  {{ time }}</span>
                 {% endif %}
