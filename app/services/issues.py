@@ -406,16 +406,36 @@ def get_issue_attachment(issue_id: str):
     return issue_db.get_issue_attachment_by_issue_id(issue_id)
 
 def add_issue_attachment(issue_id: str, file_storage):
-    # file_storage is request.files.get("file")
-
     if file_storage is None or not getattr(file_storage, "filename", ""):
         raise ValueError("Missing file")
 
+    # Normalize content type (uploads are messy IRL)
     content_type = (file_storage.mimetype or "").lower().strip()
-    if not content_type:
-        raise ValueError("Missing content type")
+
+    aliases = {
+        "image/jpg": "image/jpeg",
+        "image/heif": "image/heic",
+        "image/heic-sequence": "image/heic",
+        "image/heif-sequence": "image/heic",
+    }
+    content_type = aliases.get(content_type, content_type)
+
+    # Fallback if browser sends garbage
+    if content_type in ("", "application/octet-stream"):
+        fn = (file_storage.filename or "").lower()
+        if fn.endswith((".jpg", ".jpeg")):
+            content_type = "image/jpeg"
+        elif fn.endswith(".png"):
+            content_type = "image/png"
+        elif fn.endswith(".webp"):
+            content_type = "image/webp"
+        elif fn.endswith((".heic", ".heif")):
+            content_type = "image/heic"
+        else:
+            raise ValueError("Unsupported file type")
 
     accepted = set(issue_db.list_accepted_attachment_content_types())
+    # If your DB list doesn't include "image/heic" but you want to accept it, add it there.
     if content_type not in accepted:
         raise ValueError(f"Unsupported content type: {content_type}")
 
@@ -425,32 +445,45 @@ def add_issue_attachment(issue_id: str, file_storage):
 
     attachment_root = current_app.config.get("ATTACHMENT_ROOT", "/tmp/attachments")
 
-    ext_map = {
+    rel_dir = f"issues/{issue_id}"
+    abs_dir = os.path.join(attachment_root, rel_dir)
+    os.makedirs(abs_dir, exist_ok=True)
+
+    # Always store web-friendly output
+    out_content_type = content_type
+    out_ext = {
         "image/jpeg": "jpg",
         "image/png": "png",
         "image/webp": "webp",
-    }
-    ext = ext_map.get(content_type)
-    if not ext:
-        raise ValueError(f"Unsupported content type: {content_type}")
+        "image/heic": "jpg",   # convert to jpeg
+    }[content_type]
 
-    rel_dir = f"issues/{issue_id}"
-    rel_path = f"{rel_dir}/attachment.{ext}"
-
-    abs_dir = os.path.join(attachment_root, rel_dir)
+    rel_path = f"{rel_dir}/attachment.{out_ext}"
     abs_path = os.path.join(attachment_root, rel_path)
 
-    os.makedirs(abs_dir, exist_ok=True)
-
-    # CRITICAL: rewind stream (fixes 0-byte save after any prior reads)
+    # Rewind stream (good)
     try:
         file_storage.stream.seek(0)
     except Exception:
         pass
 
-    file_storage.save(abs_path)
+    if content_type == "image/heic":
+        # Convert HEIC/HEIF -> JPEG for browser compatibility
+        try:
+            from PIL import Image
+            from pillow_heif import register_heif_opener
+            register_heif_opener()
 
-    # Guardrail: fail fast if file saved empty
+            img = Image.open(file_storage.stream)
+            img = img.convert("RGB")
+            img.save(abs_path, format="JPEG", quality=92, optimize=True)
+
+            out_content_type = "image/jpeg"
+        except Exception as e:
+            raise ValueError(f"Failed to process HEIC image: {e}")
+    else:
+        file_storage.save(abs_path)
+
     if not os.path.isfile(abs_path) or os.path.getsize(abs_path) == 0:
         try:
             os.remove(abs_path)
@@ -461,7 +494,7 @@ def add_issue_attachment(issue_id: str, file_storage):
     row = issue_db.create_issue_attachment(
         issue_id=issue_id,
         filepath=rel_path,
-        content_type=content_type,
+        content_type=out_content_type,
     )
     return row
 

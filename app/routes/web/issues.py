@@ -226,13 +226,11 @@ def new_issue_form():
 
 @bp.route("/issues", methods=["POST"])
 @bp.route("/issues", methods=["POST"])
-def create_issue_web():
-    print("FORM:", dict(request.form))
-    # Read form values
+def create_issue_web():    
     asset_id = (request.form.get("asset_id") or "").strip()
     title = (request.form.get("title") or "").strip()
     description = (request.form.get("description") or "").strip()
-    photo = request.files.get("photo")
+    photo = request.files.get("photo")  # matches input name="photo"
 
     # Validate UUID format if present
     if asset_id:
@@ -276,17 +274,27 @@ def create_issue_web():
             form_error="Issue Description is required.",
         ), 400
 
-    payload = {
-        "asset_id": asset_id,
-        "title": title,
-        "description": description,
-        "reported_by": None,
-        "created_by": "-",
-    }
+    created = issue_service.create_issue({
+            "asset_id": asset_id,
+            "title": title,
+            "description": description,
+            "reported_by": None,
+            "created_by": "-",
+        })
 
-    created = issue_service.create_issue(payload)
     issue_id = created["id"]
 
-    # If you later want photo upload, do it here (after issue is created)
+    # If a file was provided, try to attach it
+    if photo and getattr(photo, "filename", ""):
+        try:
+            issue_service.add_issue_attachment(issue_id, photo)
+        except ValueError as e:
+            # If upload fails, re-render with the error instead of redirecting
+            return render_template(
+                "issues/new_issue.html",
+                asset=issue_service.get_asset(asset_id),
+                form_error=f"Photo upload failed: {str(e)}",
+            ), 400
 
     return redirect(url_for("app.view_issue", issue_id=issue_id))
+
