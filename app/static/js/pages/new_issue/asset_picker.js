@@ -142,8 +142,25 @@
   }
 
   // -----------------------------
-  // Cascading lookups: Makes -> Models -> Variants
+  // Cascading lookups: Categories -> Makes -> Models -> Variants
   // -----------------------------
+  async function loadCategories() {
+    if (!el.category) return;
+
+    const alreadyHas = (el.category.options?.length || 0) > 1;
+    if (alreadyHas) return;
+
+    try {
+      const items = await fetchJson(panel.dataset.assetCategoriesUrl);
+      el.category.innerHTML =
+        '<option value="">All</option>' +
+        items.map(c => `<option value="${escapeHtml(c.id)}">${escapeHtml(c.label)}</option>`).join("");
+    } catch (e) {
+      console.error("Failed to load categories:", e);
+    }
+  }
+
+
   async function loadMakesForCategory(categoryId) {
     if (!el.make) return;
 
@@ -151,7 +168,12 @@
     resetSelect(el.model, true);
     resetSelect(el.variant, true);
 
-    if (!categoryId) return; // keep make disabled until category chosen
+    // allow all makes when category is All
+    const url = categoryId
+      ? `${URLS.makes}?category_id=${encodeURIComponent(categoryId)}`
+      : `${URLS.makes}`;
+
+    const items = await fetchJson(url);
 
     try {
       const url = `${URLS.makes}?category_id=${encodeURIComponent(categoryId)}`;
@@ -421,7 +443,7 @@
     if (el.results && el.results.innerHTML.trim() === "") {
       setEmpty("Use filters or search, then hit Apply.");
     }
-
+    await loadCategories();
     await loadAssetStatuses();
 
     // If category is already selected (e.g., page reload), load makes
