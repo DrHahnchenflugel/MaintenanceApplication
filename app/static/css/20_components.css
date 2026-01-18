@@ -85,14 +85,14 @@
 .pill {
   display: inline-flex;
   align-items: center;
-  padding: 4px 10px;
+  padding: 6px 10px;
   border-radius: 999px;
-  font-size: 12px;
+  font-size: 0.95rem;
   margin: 0;
   border: 1px solid rgba(255,255,255,0.10);
 }
 
-.pill-active { background: rgba(80, 200, 140, 0.10); }
+.pill-active { background: rgba(17, 107, 62, 0.74); }
 
 /* =========================================================
    Buttons
