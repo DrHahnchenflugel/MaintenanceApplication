@@ -4,8 +4,8 @@
 
 .fab-container{
   position: fixed;
-  right: 24px;
-  bottom: 24px;
+  right: 28px;
+  bottom: 28px;
 
   z-index: 1000; /* higher than tables, cards, headers */
 
@@ -14,9 +14,9 @@
 }
 
 .fab-container .btn-primary-action{
-  padding: 14px 18px;
-  font-size: 15px;
-  border-radius: 14px;
+  padding: 16px 20px;
+  font-size: 1.2rem;
+  border-radius: 16px;
 }
 
 @media (max-width: 900px){

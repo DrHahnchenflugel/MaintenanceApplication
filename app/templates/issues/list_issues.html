@@ -7,151 +7,152 @@
 {% endblock %}
 
 {% block content %}
+<div class="issues-wrap">
+  <form method="get" class="issues-toolbar">
 
-<form method="get" class="issues-toolbar">
+    <div class="issues-toolbar__row">
 
-  <div class="issues-toolbar__row">
-
-    <label class="issues-field">
-      <span class="issues-label">Status</span>
-      <select class="issues-select" name="status" onchange="this.form.submit()">
-        <option value="" {{ 'selected' if not cur_status }}>All</option>
-        <option value="ACTIVE" {{ 'selected' if cur_status == "ACTIVE" else ''}}>
-          Active (Open + In Progress)
-        </option>
-        {% for st in status_options %}
-          <option value="{{ st.code }}" {{ 'selected' if cur_status == st.code else '' }}>
-            {{ st.label }}
+      <label class="issues-field">
+        <span class="issues-label">Status</span>
+        <select class="issues-select" name="status" onchange="this.form.submit()">
+          <option value="" {{ 'selected' if not cur_status }}>All</option>
+          <option value="ACTIVE" {{ 'selected' if cur_status == "ACTIVE" else ''}}>
+            Active (Open + In Progress)
           </option>
-        {% endfor %}
-      </select>
-    </label>
+          {% for st in status_options %}
+            <option value="{{ st.code }}" {{ 'selected' if cur_status == st.code else '' }}>
+              {{ st.label }}
+            </option>
+          {% endfor %}
+        </select>
+      </label>
 
-    <label class="issues-field">
-      <span class="issues-label">Category</span>
-      <select class="issues-select" name="category_id" onchange="this.form.submit()">
-        <option value="" {{ 'selected' if not cur_category_id }}>All</option>
-        {% for c in categories %}
-          <option value="{{ c.id }}" {{ 'selected' if cur_category_id == c.id else '' }}>
-            {{ c.label }}
-          </option>
-        {% endfor %}
-      </select>
-    </label>
+      <label class="issues-field">
+        <span class="issues-label">Category</span>
+        <select class="issues-select" name="category_id" onchange="this.form.submit()">
+          <option value="" {{ 'selected' if not cur_category_id }}>All</option>
+          {% for c in categories %}
+            <option value="{{ c.id }}" {{ 'selected' if cur_category_id == c.id else '' }}>
+              {{ c.label }}
+            </option>
+          {% endfor %}
+        </select>
+      </label>
 
-    <label class="issues-field">
-      <span class="issues-label">Make</span>
-      <select class="issues-select" name="make_id" onchange="this.form.submit()" {{ 'disabled' if not cur_category_id }}>
-        <option value="" {{ 'selected' if not cur_make_id }}>All</option>
-        {% for m in makes %}
-          <option value="{{ m.id }}" {{ 'selected' if cur_make_id == m.id else '' }}>
-            {{ m.label }}
-          </option>
-        {% endfor %}
-      </select>
-    </label>
+      <label class="issues-field">
+        <span class="issues-label">Make</span>
+        <select class="issues-select" name="make_id" onchange="this.form.submit()" {{ 'disabled' if not cur_category_id }}>
+          <option value="" {{ 'selected' if not cur_make_id }}>All</option>
+          {% for m in makes %}
+            <option value="{{ m.id }}" {{ 'selected' if cur_make_id == m.id else '' }}>
+              {{ m.label }}
+            </option>
+          {% endfor %}
+        </select>
+      </label>
 
-    <label class="issues-field">
-      <span class="issues-label">Model</span>
-      <select class="issues-select" name="model_id" onchange="this.form.submit()" {{ 'disabled' if not cur_make_id }}>
-        <option value="" {{ 'selected' if not cur_model_id }}>All</option>
-        {% for mo in models %}
-          <option value="{{ mo.id }}" {{ 'selected' if cur_model_id == mo.id else '' }}>
-            {{ mo.label }}
-          </option>
-        {% endfor %}
-      </select>
-    </label>
+      <label class="issues-field">
+        <span class="issues-label">Model</span>
+        <select class="issues-select" name="model_id" onchange="this.form.submit()" {{ 'disabled' if not cur_make_id }}>
+          <option value="" {{ 'selected' if not cur_model_id }}>All</option>
+          {% for mo in models %}
+            <option value="{{ mo.id }}" {{ 'selected' if cur_model_id == mo.id else '' }}>
+              {{ mo.label }}
+            </option>
+          {% endfor %}
+        </select>
+      </label>
 
-    <label class="issues-field">
-      <span class="issues-label">Variant</span>
-      <select class="issues-select" name="variant_id" onchange="this.form.submit()" {{ 'disabled' if not cur_model_id }}>
-        <option value="" {{ 'selected' if not cur_variant_id }}>All</option>
-        {% for v in variants %}
-          <option value="{{ v.id }}" {{ 'selected' if cur_variant_id == v.id else '' }}>
-            {{ v.label }}
-          </option>
-        {% endfor %}
-      </select>
-    </label>
+      <label class="issues-field">
+        <span class="issues-label">Variant</span>
+        <select class="issues-select" name="variant_id" onchange="this.form.submit()" {{ 'disabled' if not cur_model_id }}>
+          <option value="" {{ 'selected' if not cur_variant_id }}>All</option>
+          {% for v in variants %}
+            <option value="{{ v.id }}" {{ 'selected' if cur_variant_id == v.id else '' }}>
+              {{ v.label }}
+            </option>
+          {% endfor %}
+        </select>
+      </label>
 
-    <label class="issues-field issues-field--grow">
-      <span class="issues-label">Search</span>
-      <input class="issues-input" type="text" name="q" value="{{ search }}"
-             placeholder="Title or description">
-    </label>
+      <label class="issues-field issues-field--grow">
+        <span class="issues-label">Search</span>
+        <input class="issues-input" type="text" name="q" value="{{ search }}"
+              placeholder="Title or description">
+      </label>
 
-    <div class="issues-actions">
-      <button class="btn issues-apply" type="submit">Apply</button>
-      <a class="btn btn-secondary" href="{{ url_for('app.issues_list') }}">Clear</a>
+      <div class="issues-actions">
+        <button class="btn issues-apply" type="submit">Apply</button>
+        <a class="btn btn-secondary" href="{{ url_for('app.issues_list') }}">Clear</a>
+      </div>
+
     </div>
+  </form>
 
-  </div>
-</form>
+  {% if issues %}
+    <div class="table">
+      <div class="table-head table-head--4">
+        <div>Asset</div>
+        <div>Title</div>
+        <div>Opened</div>
+        <div>Status</div>
+      </div>
 
-{% if issues %}
-  <div class="table">
-    <div class="table-head table-head--4">
-      <div>Asset</div>
-      <div>Title</div>
-      <div>Opened</div>
-      <div>Status</div>
-    </div>
+      <div class="table-scroll">
+        {% for issue in issues %}
+          <a class="table-row table-row--4"
+            href="{{ url_for('app.view_issue', issue_id=issue.id) }}">
 
-    <div class="table-scroll">
-      {% for issue in issues %}
-        <a class="table-row table-row--4"
-           href="{{ url_for('app.view_issue', issue_id=issue.id) }}">
-
-          <div class="issue-asset">
-            {{ issue.asset.asset_tag }} <br>
-            <div class="issue-sub">
-              {{ issue.asset.make.label }} 
-              <br> {{ issue.asset.model.label }} 
-              <br> {{ issue.asset.variant.label }}
+            <div class="issue-asset">
+              {{ issue.asset.asset_tag }} <br>
+              <div class="issue-sub">
+                {{ issue.asset.make.label }} 
+                <br> {{ issue.asset.model.label }} 
+                <br> {{ issue.asset.variant.label }}
+              </div>
             </div>
-          </div>
 
-          <div class="issue-cell-title">
-            <div class="issue-title">{{ issue.title }}</div>
-            <div class="issue-sub">
-              {% if issue.reported_by %}Reported by {{ issue.reported_by }} |{% else %}{% endif %}
-              {% if issue.last_action_at %}Last 
-                {% set time, date = issue.created_at | format_dt %}
-                {{ date }}
-                <span class="time">  {{ time }}</span>
-              {% endif %}
+            <div class="issue-cell-title">
+              <div class="issue-title">{{ issue.title }}</div>
+              <div class="issue-sub">
+                {% if issue.reported_by %}Reported by {{ issue.reported_by }} |{% else %}{% endif %}
+                {% if issue.last_action_at %}Last 
+                  {% set time, date = issue.created_at | format_dt %}
+                  {{ date }}
+                  <span class="time">  {{ time }}</span>
+                {% endif %}
+              </div>
             </div>
-          </div>
 
-          <div>
-            {% set time, date = issue.created_at | format_dt %}
             <div>
-              {{ date }}<br>
-              <span class="time">{{ time }}</span>
+              {% set time, date = issue.created_at | format_dt %}
+              <div>
+                {{ date }}<br>
+                <span class="time">{{ time }}</span>
+              </div>
             </div>
-          </div>
 
-          {% set code = issue.status.code %}
-          <div>
-            <span class="issue-status {{
-              'status-open' if code == 'OPEN'
-              else 'status-in-progress' if code == 'IN_PROGRESS'
-              else 'status-blocked' if code == 'BLOCKED'
-              else 'status-closed' if code == 'CLOSED'
-              else 'status-unknown'
-            }}">
-              {{ issue.status.label }}
-            </span>
-          </div>
+            {% set code = issue.status.code %}
+            <div>
+              <span class="issue-status {{
+                'status-open' if code == 'OPEN'
+                else 'status-in-progress' if code == 'IN_PROGRESS'
+                else 'status-blocked' if code == 'BLOCKED'
+                else 'status-closed' if code == 'CLOSED'
+                else 'status-unknown'
+              }}">
+                {{ issue.status.label }}
+              </span>
+            </div>
 
-        </a>
-      {% endfor %}
+          </a>
+        {% endfor %}
+      </div>
     </div>
-  </div>
-{% else %}
-  <p style="margin-top:16px;">No issues match this filter.</p>
-{% endif %}
+  {% else %}
+    <p style="margin-top:16px;">No issues match this filter.</p>
+  {% endif %}
+</div>
 
 <div class="fab-container">
   {% with label="New Issue", href=url_for("app.new_issue_form"), icon="+" %}

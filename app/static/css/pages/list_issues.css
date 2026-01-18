@@ -1,6 +1,14 @@
 /* list_issues.css
-   Issues list page: toolbar + issues "table" (actually a grid list)
 */
+
+.issues-wrap{
+  max-height: calc(100vh - 64px); /* header/topbar */
+}
+
+.issues-wrap .table-scroll{
+  max-height: calc(100vh - 64px - 14px); /* leaves room for toolbar already inside */
+  overflow-y: auto;
+}
 
 .issues-toolbar {
   position: sticky;
