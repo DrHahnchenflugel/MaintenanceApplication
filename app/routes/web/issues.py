@@ -121,7 +121,7 @@ def issues_list():
         print((status_by_code["OPEN"]["id"],status_by_code["IN_PROGRESS"]["id"]))
         print("active^^")
         filters["status_id"] = "00000000-0000-0000-0000-000000000000"
-        filters["active_status_id"] = (status_by_code["OPEN"]["id"],status_by_code["IN_PROGRESS"]["id"]) # TODO: Sad face
+        filters["active_status_ids"] = (status_by_code["OPEN"]["id"],status_by_code["IN_PROGRESS"]["id"]) # TODO: Sad face
 
     # For now: single page, large page_size. You can paginate later.
     result = issue_service.list_issues(page=1, page_size=200, filters=filters)
