@@ -268,7 +268,7 @@
 @media (max-width: 1200px) {
   .issue-layout {
     grid-template-columns: 1.65fr 1.25fr 0.85fr;
-    grid-template-rows: 42vh 46vh;
+    grid-template-rows: 42vh 50vh;
 
     grid-template-areas:
       "issue-main issue-image status"
