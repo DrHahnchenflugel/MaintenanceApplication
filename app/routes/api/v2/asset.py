@@ -173,3 +173,21 @@ def list_makes_for_assets():
 
     items = lookups.list_makes(category_id=category_id)
     return jsonify(items), 200
+
+@bp.route("/assets/models", methods=["GET"])
+def list_models_for_assets():
+    make_id = parse_uuid_arg("make_id")
+    if not make_id:
+        return jsonify({"error": "missing_make_id"}), 400
+
+    items = lookups.list_models(make_id=make_id)
+    return jsonify(items), 200
+
+@bp.route("/assets/variants", methods=["GET"])
+def list_variants_for_assets():
+    model_id = parse_uuid_arg("model_id")
+    if not model_id:
+        return jsonify({"error": "missing_model_id"}), 400
+
+    items = lookups.list_variants(model_id=model_id)
+    return jsonify(items), 200

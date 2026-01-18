@@ -52,6 +52,28 @@ def list_makes(category_id=None):
         ).mappings().all()
     return [dict(r) for r in rows]
 
+def list_models(make_id):
+    sql = """
+      SELECT id, label
+      FROM model
+      WHERE make_id = :make_id
+      ORDER BY label ASC
+    """
+    with get_connection() as conn:
+        rows = conn.execute(text(sql), {"make_id": make_id}).mappings().all()
+    return [dict(r) for r in rows]
+
+def list_variants(model_id):
+    sql = """
+      SELECT id, label
+      FROM variant
+      WHERE model_id = :model_id
+      ORDER BY label ASC
+    """
+    with get_connection() as conn:
+        rows = conn.execute(text(sql), {"model_id": model_id}).mappings().all()
+    return [dict(r) for r in rows]
+
 def list_issue_status_rows():
     sql = text("""
         SELECT
