@@ -237,6 +237,15 @@
   transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
 }
 
+@media (min-width: 1201px){
+  .nav a{ font-size: 15px; }
+  .sidebar-title{ font-size: 15px; }
+}
+@media (min-width: 1600px){
+  .nav a{ font-size: 16px; }
+}
+
+
 .nav a:hover {
   background: rgba(255,255,255,0.04);
   color: var(--text);

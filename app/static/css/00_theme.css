@@ -100,6 +100,22 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+@media (min-width: 1201px){
+  body{
+    font-size: 16px; /* base */
+  }
+}
+@media (min-width: 1600px){
+  body{
+    font-size: 17px;
+  }
+}
+@media (min-width: 1920px){
+  body{
+    font-size: 18px;
+  }
+}
+
 /* Links */
 a { color: inherit; text-decoration: none; }
 
