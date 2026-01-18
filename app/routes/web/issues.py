@@ -225,7 +225,72 @@ def new_issue_form():
     return render_template("issues/new_issue.html", asset=asset, form_error=None)
 
 @bp.route("/issues", methods=["POST"])
+@bp.route("/issues", methods=["POST"])
 def create_issue_web():
+    print("FORM:", dict(request.form))
+    # Read form values
+    asset_id = (request.form.get("asset_id") or "").strip()
+    title = (request.form.get("title") or "").strip()
+    description = (request.form.get("description") or "").strip()
+    photo = request.files.get("photo")
+
+    # Validate UUID format if present
+    if asset_id:
+        try:
+            UUID(asset_id)
+        except ValueError:
+            abort(400, description="Invalid asset_id, must be UUID")
+
+    # Always rehydrate asset for re-render so UI doesn't "forget"
+    asset = issue_service.get_asset(asset_id) if asset_id else None
+
+    # Validation
+    if not asset_id:
+        return render_template(
+            "issues/new_issue.html",
+            asset=asset,
+            form_error="Asset is required. Scan the QR or use 'Not your robot?' to select one.",
+        ), 400
+
+    if asset is None:
+        abort(404, description="Asset not found")
+
+    if not title:
+        return render_template(
+            "issues/new_issue.html",
+            asset=asset,
+            form_error="Issue Title is required.",
+        ), 400
+
+    if len(title) > 50:
+        return render_template(
+            "issues/new_issue.html",
+            asset=asset,
+            form_error="Issue Title must be 50 characters or less.",
+        ), 400
+
+    if not description:
+        return render_template(
+            "issues/new_issue.html",
+            asset=asset,
+            form_error="Issue Description is required.",
+        ), 400
+
+    payload = {
+        "asset_id": asset_id,
+        "title": title,
+        "description": description,
+        "reported_by": None,
+        "created_by": "-",
+    }
+
+    created = issue_service.create_issue(payload)
+    issue_id = created["id"]
+
+    # If you later want photo upload, do it here (after issue is created)
+
+    return redirect(url_for("app.view_issue", issue_id=issue_id))
+
     asset_id = parse_uuid_form("asset_id")
     title = (request.form.get("title") or "").strip()
     description = (request.form.get("description") or "").strip()

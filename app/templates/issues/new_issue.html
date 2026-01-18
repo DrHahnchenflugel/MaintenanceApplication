@@ -112,7 +112,7 @@
             <label class="asset-picker__field asset-picker__field--search">
               <span class="asset-picker__label">Search</span>
               <input class="asset-picker__input" id="assetSearch" type="search"
-                    placeholder="Asset tag, serial, or keywords (RB-042)"
+                    placeholder="Asset tag, serial, or keywords (MIND-36)"
                     autocomplete="off">
             </label>
 
@@ -133,8 +133,11 @@
           enctype="multipart/form-data"
           action="{{ url_for('app.create_issue_web') }}">
 
-      <input type="hidden" name="asset_id" id="assetId" value="{{ asset.id if asset else '' }}">
-
+      <input type="hidden"
+      name="asset_id"
+      id="assetId"
+      value="{{ request.form.get('asset_id', asset.id if asset else '') }}">
+      
       <div class="new-issue-grid">
 
         <div class="new-issue-field">
@@ -144,7 +147,8 @@
                  name="title"
                  maxlength="50"
                  required
-                 placeholder="Short + specific (max 50 chars)">
+                 placeholder="Short + specific (max 50 chars)"
+                 value="{{ request.form.get('title','') }}">
           <div class="new-issue-hint muted">Max 50 characters.</div>
         </div>
 
@@ -155,7 +159,8 @@
                     name="description"
                     required
                     rows="6"
-                    placeholder="What happened? What did you try?"></textarea>
+                    placeholder="What happened? What did you try?">
+                    {{ request.form.get('description','') }}</textarea>
         </div>
 
         <div class="new-issue-field new-issue-wide">

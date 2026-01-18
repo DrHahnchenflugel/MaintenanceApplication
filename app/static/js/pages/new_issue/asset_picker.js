@@ -168,20 +168,16 @@
     resetSelect(el.model, true);
     resetSelect(el.variant, true);
 
-    // allow all makes when category is All
     const url = categoryId
       ? `${URLS.makes}?category_id=${encodeURIComponent(categoryId)}`
       : `${URLS.makes}`;
 
-    const items = await fetchJson(url);
-
     try {
-      const url = `${URLS.makes}?category_id=${encodeURIComponent(categoryId)}`;
       const items = await fetchJson(url);
 
       el.make.innerHTML =
         `<option value="">All</option>` +
-        items.map((x) => `<option value="${escapeHtml(x.id)}">${escapeHtml(x.label)}</option>`).join("");
+        items.map(x => `<option value="${escapeHtml(x.id)}">${escapeHtml(x.label)}</option>`).join("");
 
       el.make.disabled = false;
     } catch (e) {
@@ -189,6 +185,7 @@
       resetSelect(el.make, true);
     }
   }
+
 
   async function loadModelsForMake(makeId) {
     if (!el.model) return;
