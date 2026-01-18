@@ -6,3 +6,4 @@ psycopg2
 gunicorn
 python-dateutil
 SQLAlchemy>=2.0
+pillow-heif
