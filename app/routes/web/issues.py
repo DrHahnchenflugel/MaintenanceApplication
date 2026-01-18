@@ -1,6 +1,6 @@
 from flask import render_template, request, redirect, url_for, abort
 from . import bp
-from services import lookups 
+from app.services import lookups 
 
 from app.services import issues as issue_service
 from uuid import UUID
