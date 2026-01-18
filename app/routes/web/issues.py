@@ -1,5 +1,6 @@
 from flask import render_template, request, redirect, url_for, abort
 from . import bp
+from services import lookups 
 
 from app.services import issues as issue_service
 from uuid import UUID
@@ -139,6 +140,9 @@ def issues_list():
         cur_make_id=make_id,
         cur_model_id=model_id,
         cur_variant_id=variant_id,
+        category_options=lookups.list_asset_categories(),
+        make_options=lookups.list_makes(),
+
     )
 
 @bp.route("/issues/<issue_id>")

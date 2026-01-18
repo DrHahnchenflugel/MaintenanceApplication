@@ -160,3 +160,15 @@ def get_asset_by_tag(asset_tag: str):
     if not items:
         return jsonify({"error": "asset_not_found"}), 404
     return jsonify(items[0]), 200
+
+@bp.route("/assets/makes", methods=["GET"])
+def list_makes_for_assets():
+    """
+    List makes, optionally filtered by category_id.
+    Example:
+      /maintenance/api/v2/assets/makes?category_id=<uuid>
+    """
+    category_id = parse_uuid_arg("category_id")
+
+    items = lookups.list_makes(category_id=category_id)
+    return jsonify(items), 200
