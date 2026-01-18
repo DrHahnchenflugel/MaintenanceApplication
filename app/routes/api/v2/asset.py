@@ -2,6 +2,7 @@ from flask import abort, request, jsonify
 from . import bp
 from app.services import assets as asset_service
 from uuid import UUID
+from app.services import lookups 
 
 def parse_uuid_arg(name: str):
     value = request.args.get(name)
