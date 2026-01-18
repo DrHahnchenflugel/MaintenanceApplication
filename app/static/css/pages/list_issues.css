@@ -44,7 +44,7 @@
 }
 
 .issues-label{
-  font-size: 12px;
+  font-size: 1.2rem;
   font-weight: 800;
   letter-spacing: .02em;
   color: var(--muted);
