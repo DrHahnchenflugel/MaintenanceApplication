@@ -310,7 +310,7 @@
     }
 
     const rows = items.map((a) => {
-      const id = escapeHtml(a.id);
+      const id = escapeHtml(a.id || a.asset_id || "");
       const tag = escapeHtml(a.asset_tag || "");
       const serial = escapeHtml(a.serial_num || "");
       const site = escapeHtml(deriveSite(a));
@@ -395,7 +395,12 @@
     const make = row.dataset.make || "";
     const model = row.dataset.model || "";
     const variant = row.dataset.variant || "";
-
+    
+    if (!id) {
+      console.error("Selected row has no asset id. Check API response keys (id vs asset_id).", row.dataset);
+      return;
+    }
+    
     if (el.assetId) el.assetId.value = id;
 
     const bits = [];
