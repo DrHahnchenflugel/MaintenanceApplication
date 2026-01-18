@@ -44,9 +44,10 @@ def list_makes(category_id=None):
     """
     
     with get_connection() as conn:
-        rows = conn.execute(sql, {"category_id": category_id}).mappings().all()
-
-    rows = db.session.execute(text(sql), {"category_id": category_id}).mappings().all()
+        rows = conn.execute(
+            text(sql),
+            {"category_id": category_id}
+        ).mappings().all()
     return [dict(r) for r in rows]
 
 def list_issue_status_rows():
