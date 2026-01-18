@@ -115,7 +115,7 @@
 .select--custom { display: block; }
 .select--native { display: none; }
 
-@media (pointer: coarse) {
+@media (hover: none) and (pointer: coarse) {
   .select--custom { display: none; }
   .select--native { display: block; }
 }
