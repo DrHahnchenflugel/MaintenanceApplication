@@ -43,11 +43,22 @@
   min-width: 220px;
 }
 
-.issues-label{
-  font-size: 1.2rem;
-  font-weight: 800;
-  letter-spacing: .02em;
-  color: var(--muted);
+@media (min-width: 1025px) {
+  .issues-label{
+    font-size: 1.2rem;
+    font-weight: 750;
+    letter-spacing: .02em;
+    color: var(--muted);
+}
+}
+
+@media (max-width: 1024px) {
+  .issues-label{
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: .02em;
+    color: var(--muted);
+  }
 }
 
 .issues-input,
