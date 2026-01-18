@@ -191,7 +191,6 @@ def create_issue(data: dict):
       - title       (str, required)
       - description (str, required)
       - reported_by (str, optional)
-      - created_by  (str, optional, default "-")
       - status_id   (UUID string, optional; default status 'OPEN')
     """
 
@@ -199,7 +198,6 @@ def create_issue(data: dict):
     title = data.get("title")
     description = data.get("description") if data.get("description") != "" else None 
     reported_by = data.get("reported_by")
-    created_by = data.get("created_by") or "-"  # default here
     status_id = data.get("status_id")
 
     if not asset_id or not title or not description:
@@ -225,7 +223,7 @@ def create_issue(data: dict):
         issue_id=issue_id,
         from_status_id=status_id,
         to_status_id=status_id,
-        changed_by=created_by,  # string
+        changed_by=reported_by,  # string
     )
 
     # 3) initial action (CREATED)

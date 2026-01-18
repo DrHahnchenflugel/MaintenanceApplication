@@ -231,6 +231,7 @@ def create_issue_web():
     title = (request.form.get("title") or "").strip()
     description = (request.form.get("description") or "").strip()
     photo = request.files.get("photo")  # matches input name="photo"
+    reported_by = (request.form.get("reported_by") or "").strip()
 
     # Validate UUID format if present
     if asset_id:
@@ -278,8 +279,7 @@ def create_issue_web():
             "asset_id": asset_id,
             "title": title,
             "description": description,
-            "reported_by": None,
-            "created_by": "-",
+            "reported_by": reported_by,
         })
 
     issue_id = created["id"]
