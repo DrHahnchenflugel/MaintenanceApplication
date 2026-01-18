@@ -48,6 +48,7 @@ def list_issue_rows(
     sort=None,            # e.g. [("created_at","desc")]
     limit=200,
     offset=0,
+    active_status_ids=None, #TODO: sad face
 ):
     where = []
     params = {
@@ -84,6 +85,9 @@ def list_issue_rows(
     if status_id:
         if status_id in status_codes.values():
             where.append("issue.status_id = :status_id")
+        elif active_status_ids is not None: #hardcoded status uuid for ACTIVE issues (Open, In progress) TODO:sad face
+            print(active_status_ids)
+            where.append(f"issue.status_id IN {active_status_ids}")
         elif status_id == -1:
             where.append("issue.status_id IS NOT NULL")
         else:

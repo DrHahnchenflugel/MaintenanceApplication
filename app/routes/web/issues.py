@@ -111,10 +111,14 @@ def issues_list():
         "make_id": make_id,
         "model_id": model_id,
         "variant_id": variant_id,
+        "active_status_ids": None,
     }
 
-    if status_code and status_code in status_by_code:
+    if status_code and status_code in status_by_code: 
         filters["status_id"] = status_by_code[status_code]["id"]
+    elif status_code == "ACTIVE":
+        filters["status_id"] = "00000000-0000-0000-0000-000000000000"
+        filters["active_status_id"] = (status_by_code["OPEN"]["id"],status_by_code["IN_PROGRESS"]["id"]) # TODO: Sad face
 
     # For now: single page, large page_size. You can paginate later.
     result = issue_service.list_issues(page=1, page_size=200, filters=filters)

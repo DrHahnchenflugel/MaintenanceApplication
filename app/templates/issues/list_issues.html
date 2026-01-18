@@ -16,6 +16,9 @@
       <span class="issues-label">Status</span>
       <select class="issues-select" name="status" onchange="this.form.submit()">
         <option value="" {{ 'selected' if not cur_status }}>All</option>
+        <option value="ACTIVE" {{ 'selected' if cur_status == "ACTIVE" else ''}}>
+          Active (Open + In Progress)
+        </option>
         {% for st in status_options %}
           <option value="{{ st.code }}" {{ 'selected' if cur_status == st.code else '' }}>
             {{ st.label }}
