@@ -462,4 +462,13 @@
     }
   })();
 
+  function openPicker() {
+    el.panel.hidden = false;
+    if (el.input) el.input.focus();
+  }
+
+  if (!el.assetId || !String(el.assetId.value || "").trim()) {
+    openPicker();
+  }
+
 })();
