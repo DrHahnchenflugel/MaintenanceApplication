@@ -197,7 +197,7 @@ def create_issue(data: dict):
 
     asset_id = data.get("asset_id")
     title = data.get("title")
-    description = data.get("description")
+    description = data.get("description") if data.get("description") != "" else None 
     reported_by = data.get("reported_by")
     created_by = data.get("created_by") or "-"  # default here
     status_id = data.get("status_id")

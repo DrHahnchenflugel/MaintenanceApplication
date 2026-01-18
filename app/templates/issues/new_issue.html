@@ -152,14 +152,23 @@
         </div>
 
         <div class="new-issue-field new-issue-wide">
-          <label class="new-issue-label" for="description">Issue Description</label>
+          <label class="new-issue-label" for="description">Issue Description<span class="muted">(optional)</span></label>
           <textarea class="new-issue-textarea"
                     id="description"
                     name="description"
-                    required
                     rows="6"
                     placeholder="What happened? What did you try?">{{ request.form.get('description','') }}</textarea>
         </div>
+
+        <div class="new-issue-field">
+        <label class="new-issue-label" for="title">Reported by <span class="muted">(optional)</span></label>
+        <input class="new-issue-input"
+                id="created_by"
+                name="created_by"
+                placeholder="Name"
+                value="{{ request.form.get('created_by','') }}">
+      </div>
+       
 
         <div class="new-issue-field new-issue-wide">
           <label class="new-issue-label" for="photo">Photo (optional)</label>
