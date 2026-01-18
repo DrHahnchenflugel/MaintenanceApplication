@@ -3,6 +3,7 @@ from werkzeug.utils import secure_filename
 from flask import current_app
 import app.db.helpers as helpers
 from app.db import issues as issue_db
+import datetime as dt
 
 def list_issues(page: int, page_size: int, filters: dict):
     offset = (page - 1) * page_size
@@ -296,6 +297,9 @@ def add_issue_action(issue_id: str, data: dict):
             issue_id,
             {"status_id": new_status_id, "closed_at": None if str(new_status_id) != str(issue_db.get_issue_status_id_by_code("CLOSED")) else helpers.get_current_utc_timestamp()},
         )
+
+    # 3) updated_at change
+    issue_db.update_issue_row(issue_id=issue_id,fields={"updated_at":dt.now()})
 
     return {"issue_id": issue_id}
 
