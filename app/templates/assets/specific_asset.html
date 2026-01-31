@@ -1,140 +1,368 @@
+{# specific_asset.html #}
 {% extends "base.html" %}
-{% block title %} Maintenance - Asset {{ asset.get('asset_friendly_tag') }} {% endblock %}
-{% block page_title %} Maintenance - Asset {{ asset.get('asset_friendly_tag') }} {% endblock %}
+
+{% block title %}Maintenance – Asset{% endblock %}
+{% block page_title %}Asset{% endblock %}
+
+{% block page_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/asset.css') }}">
+{% endblock %}
 
 {% block content %}
-    <div class="asset-layout">
+  {% if form_error %}
+    <div class="card asset-error">
+      <strong>Error:</strong> {{ form_error }}
+    </div>
+  {% endif %}
 
-        <form id="assetForm"
-                method="post"
-                action="{{ url_for('app.update_asset', asset_uuid=asset.get('asset_uuid')) }}">
+  {% set status_code = asset.get('asset_status') or 'UNKNOWN' %}
 
-            <section class="card asset-asset" style="min-height:10vh">
-                <div><h2 style="margin:0;">
-                    <b>Name: </b>
-                    <span class="view-only">{{ asset.get('asset_friendly_tag') }}</span>
-                    <input class="edit-field" type="text" name="asset_friendly_tag"
-                           value="{{ asset.get('asset_friendly_tag') }}" style="display:none;" disabled>
-                </h2></div>
-                <div class="muted">{{ asset.get('asset_age') }} old</div>
-            </section>
+  <div class="asset-layout">
 
-            <section class="card asset-location" style="min-height:10vh">
-                <h2 style="margin:0;"> {{ asset.get('site_friendly_name') }} </h2>
-                <div class="muted"> - </div>
-                <div><b>Before: </b>-</div>
-                <div class="muted"> - ago </div>
-            </section>
+    {# ─────────────────────────────
+       Main Asset Card (Issue-style)
+       ───────────────────────────── #}
+    <div class="card asset-main card--accent">
 
-            <section class="card asset-meta" id="assetMeta"
-                style="min-height:10vh; display:flex; flex-direction:column; justify-content:space-evenly;">
+      {# A: title + status #}
+      <div class="asset-main-header">
+        <h2 class="asset-title">
+          <span class="view-only">{{ asset.get('asset_friendly_tag') }}</span>
+        </h2>
 
-                <div><h4><b>Make: </b>
-                    <span class="view-only">{{ asset.get('asset_make') }}</span>
-                    <input class="edit-field" type="text" name="asset_make"
-                         value="{{ asset.get('asset_make') }}" style="display:none;" disabled>
-                </h4></div>
+        <span class="asset-status status-{{ status_code|lower|replace('_','-') }}">
+          {{ status_code }}
+        </span>
+      </div>
 
-                <div><h4><b>Model: </b>
-                    <span class="view-only">{{ asset.get('asset_model') }}</span>
-                    <input class="edit-field" type="text" name="asset_model"
-                         value="{{ asset.get('asset_model') }}" style="display:none;" disabled>
-                </h4></div>
+      {# B: description + meta (scrolls) #}
+      <div class="asset-main-body">
 
-                <div><h4><b>Variant: </b>
-                    <span class="view-only">{{ asset.get('asset_variant') }}</span>
-                    <input class="edit-field" type="text" name="asset_variant"
-                         value="{{ asset.get('asset_variant') }}" style="display:none;" disabled>
-                </h4></div>
-            </section>
-        </form>
+        {# Optional: "Notes" preview + modal hook (same pattern as issue page) #}
+        <div class="field asset-block">
+          <button
+            type="button"
+            class="asset-desc-trigger"
+            onclick="openTextModalFromEl('assetModalFull', 'Asset')"
+            aria-controls="assetModalFull"
+            aria-expanded="false"
+          >
+            Asset details <span class="muted">(Click for more)</span>
+          </button>
 
-        <section class="card card--{{ 'warn' if asset.get('asset_status') == 'IN_MAINTENANCE'
-                                        else 'ok' if asset.get('asset_status') == 'ACTIVE'
-                                        else 'bad' }}
-                                    asset-status" style="min-height:5vh">
-            <div><b>Status: </b><span class="badge badge--{{ 'warn' if asset.get('asset_status') == 'IN_MAINTENANCE'
-                                        else 'ok' if asset.get('asset_status') == 'ACTIVE'
-                                        else 'bad' }}
-                                    asset_status" style="min-height:5vh">
-                                    {{ asset.get('asset_status') }} </span></div>
-            <div class="muted"> - </div>
-        </section>
+          <div class="asset-desc-preview">
+            {# If you don't have notes/description yet, this just shows a dash #}
+            {{ asset.get('asset_notes') or "-" }}
+          </div>
 
+          <div id="assetModalFull" hidden>
+            <div class="asset-modal">
+              <div class="asset-modal__top">
+                <div class="asset-modal__title">{{ asset.get('asset_friendly_tag') }}</div>
 
-        <section class="card asset-metrics" style="min-height:5vh">
-            <div><b>Last Maintenance:</b>
-                <div class="muted"> - </div>
-            </div>
-            <div><b>Uptime:</b>
-                <div class="muted"> - </div>
-            </div>
-        </section>
+                <span class="chip chip-status status-{{ status_code|lower|replace('_','-') }}">
+                  {{ status_code }}
+                </span>
+              </div>
 
-        <section class="card--nobg column asset-history">
-            <h2 style="text-align:center;">Maintenance History</h2>
-            <div class="table table--asset-issues">
-                <div class="thead--four">
-                    <div><b>Date</b></div>
-                    <div><b>Issue</b></div>
-                    <div><b>Length</b></div>
-                    <div><b>Result</b></div>
+              <div class="asset-modal__meta">
+                <div class="meta">
+                  <div class="meta__k">Tag</div>
+                  <div class="meta__v">{{ asset.get('asset_tag') or asset.get('asset_friendly_tag') }}</div>
                 </div>
 
-                {% for issue in issues %}
-                    <a href="{{ url_for('app.view_issue', issue_uuid=issue.get('issue_uuid')) }}" class="trow--four">
-                        <div>{{ issue.get('date') }}</div>
-                        <div>{{ issue.get('issue') }}</div>
-                        <div>{{ issue.get('length') }}</div>
-                        <div>{{ issue.get('result') }}</div>
-                    </a>
-                {% endfor %}
+                <div class="meta">
+                  <div class="meta__k">Site</div>
+                  <div class="meta__v">{{ asset.get('site_friendly_name') or "-" }}</div>
+                </div>
 
+                <div class="meta">
+                  <div class="meta__k">Age</div>
+                  <div class="meta__v">{{ asset.get('asset_age') or "-" }}</div>
+                </div>
+              </div>
+
+              <div class="asset-modal__desc">
+                <div class="asset-modal__descTitle"><b>Details</b></div>
+                <div class="asset-modal__descBody">
+                  {{ asset.get('asset_notes') or "—" }}
+                </div>
+              </div>
             </div>
-        </section>
+          </div>
+        </div>
+
+        {# Edit form lives here, but looks like meta pills #}
+        <form
+          id="assetForm"
+          method="post"
+          action="{{ url_for('app.update_asset', asset_uuid=asset.get('asset_uuid')) }}"
+          class="asset-form"
+        >
+          <div class="asset-meta">
+
+            <div class="row asset-row">
+              <div class="field">
+                <label class="asset-label">Name</label>
+                <div class="pill">
+                  <span class="view-only">{{ asset.get('asset_friendly_tag') }}</span>
+                  <input
+                    class="edit-field input-inline"
+                    type="text"
+                    name="asset_friendly_tag"
+                    value="{{ asset.get('asset_friendly_tag') }}"
+                    disabled
+                    hidden
+                  >
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="asset-label">Age</label>
+                <div class="pill">
+                  <div class="muted">{{ asset.get('asset_age') or "-" }}</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="row asset-row">
+              <div class="field">
+                <label class="asset-label">Make</label>
+                <div class="pill">
+                  <span class="view-only">{{ asset.get('asset_make') or "-" }}</span>
+                  <input
+                    class="edit-field input-inline"
+                    type="text"
+                    name="asset_make"
+                    value="{{ asset.get('asset_make') }}"
+                    disabled
+                    hidden
+                  >
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="asset-label">Model</label>
+                <div class="pill">
+                  <span class="view-only">{{ asset.get('asset_model') or "-" }}</span>
+                  <input
+                    class="edit-field input-inline"
+                    type="text"
+                    name="asset_model"
+                    value="{{ asset.get('asset_model') }}"
+                    disabled
+                    hidden
+                  >
+                </div>
+              </div>
+            </div>
+
+            <div class="row asset-row">
+              <div class="field">
+                <label class="asset-label">Variant</label>
+                <div class="pill">
+                  <span class="view-only">{{ asset.get('asset_variant') or "-" }}</span>
+                  <input
+                    class="edit-field input-inline"
+                    type="text"
+                    name="asset_variant"
+                    value="{{ asset.get('asset_variant') }}"
+                    disabled
+                    hidden
+                  >
+                </div>
+              </div>
+
+              <div class="field">
+                <label class="asset-label">Site</label>
+                <div class="pill">
+                  <div class="muted">{{ asset.get('site_friendly_name') or "-" }}</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </form>
+
+      </div>
+
+      {# C: bottom strip (fixed) #}
+      <div class="asset-strip">
+        <div class="asset-strip-left">
+          <div class="field">
+            <label class="asset-label">Tag</label>
+            <div class="pill">
+              {{ asset.get('asset_tag') or asset.get('asset_friendly_tag') }}
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="asset-label">Site</label>
+            <div class="pill">
+              {{ asset.get('site_friendly_name') or "-" }}
+            </div>
+          </div>
+        </div>
+
+        <div class="asset-strip-right">
+          <div class="mmv">
+            {{ asset.get('asset_make') or "-" }} / {{ asset.get('asset_model') or "-" }} / {{ asset.get('asset_variant') or "-" }}
+          </div>
+
+          <div class="pill pill-active">
+            <a class="asset-link" href="{{ url_for('app.assets_list') }}">
+              Back to assets
+            </a>
+          </div>
+        </div>
+      </div>
+
     </div>
+
+    {# ─────────────────────────────
+       Photo
+       ───────────────────────────── #}
+    <div class="card asset-image">
+      <h3 class="card-title">Photo (Click to expand)</h3>
+
+      <div class="asset-photo-frame">
+        {% if asset.get("has_attachment") %}
+          <button
+            type="button"
+            class="photo-thumb-btn"
+            onclick="openImgModal('/maintenance/api/v2/assets/{{ asset.get('asset_uuid') }}/attachment')"
+            aria-label="Open asset photo"
+          >
+            <img
+              class="photo-thumb"
+              src="/maintenance/api/v2/assets/{{ asset.get('asset_uuid') }}/attachment"
+              alt="Asset photo"
+              loading="lazy"
+            />
+          </button>
+        {% else %}
+          <div class="asset-photo-empty">No photo</div>
+        {% endif %}
+      </div>
+    </div>
+
+    {# ─────────────────────────────
+       Status Changes (optional data)
+       ───────────────────────────── #}
+    <div class="asset-status-col">
+      <div class="card status-card asset-status-changes">
+        <h3 class="card-title">Status Changes</h3>
+
+        <div class="table table-scroll">
+          <div class="table-head table-head--2">
+            <div>When</div>
+            <div>New Status</div>
+          </div>
+
+          {% if asset.get("status_history") %}
+            {% for h in asset.get("status_history") %}
+              <div class="table-row table-row--2">
+                <div>{{ h.get("changed_at") or "-" }}</div>
+                <div>{{ h.get("to_status") or "-" }}</div>
+              </div>
+            {% endfor %}
+          {% else %}
+            <div class="table-row table-row--2">
+              <div>-</div>
+              <div>-</div>
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    {# ─────────────────────────────
+       Maintenance History (existing issues list)
+       ───────────────────────────── #}
+    <div class="card asset-history">
+      <h3 class="card-title">Maintenance History</h3>
+
+      <div class="table table-scroll">
+        <div class="table-head table-head--4">
+          <div>Date</div>
+          <div>Issue</div>
+          <div>Length</div>
+          <div>Result</div>
+        </div>
+
+        {% if issues %}
+          {% for issue in issues %}
+            <a href="{{ url_for('app.view_issue', issue_uuid=issue.get('issue_uuid')) }}" class="table-row table-row--4 row-link">
+              <div>{{ issue.get('date') or "-" }}</div>
+              <div>{{ issue.get('issue') or "-" }}</div>
+              <div>{{ issue.get('length') or "-" }}</div>
+              <div>{{ issue.get('result') or "-" }}</div>
+            </a>
+          {% endfor %}
+        {% else %}
+          <div class="table-row table-row--4">
+            <div>-</div>
+            <div>No history yet.</div>
+            <div>-</div>
+            <div>-</div>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+  </div>
 {% endblock %}
 
 {% block footer_center_right %}
-    <button type="button" class="btn btn--fixed--bottomright btn--lg" id="startEdit">Update</button>
+  <button type="button" class="btn btn--fixed--bottomright btn--lg" id="startEdit">Update</button>
 
-    <div id="editActions" style="display:none; position:fixed; bottom:20px; right:20px; z-index:1000; gap:8px;">
-        <button type="submit" form="assetForm" class="btn btn--ok btn--lg">Save</button>
-        <button type="button" class="btn btn--bad btn--lg" id="cancelEdit">Cancel</button>
-    </div>
+  <div id="editActions" class="edit-actions" hidden>
+    <button type="submit" form="assetForm" class="btn btn--ok btn--lg">Save</button>
+    <button type="button" class="btn btn--bad btn--lg" id="cancelEdit">Cancel</button>
+  </div>
 
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const startBtn  = document.getElementById('startEdit');
-        const cancelBtn = document.getElementById('cancelEdit')
+  <script>
+  document.addEventListener('DOMContentLoaded', () => {
+    const startBtn  = document.getElementById('startEdit');
+    const cancelBtn = document.getElementById('cancelEdit');
+    const actions   = document.getElementById('editActions');
+    const form      = document.getElementById('assetForm');
 
-        const actions   = document.getElementById('editActions');;
-        const form      = document.getElementById('assetForm');
+    const viewEls = document.querySelectorAll('#assetForm .view-only');
+    const inputs  = document.querySelectorAll('#assetForm .edit-field');
 
-        const viewEls = document.querySelectorAll('#assetForm .view-only');
-        const inputs  = document.querySelectorAll('#assetForm .edit-field');
+    const original = new Map();
+    inputs.forEach(f => original.set(f.name, f.value));
 
-        const original = new Map(); inputs.forEach(f => original.set(f.name, f.value));
+    startBtn?.addEventListener('click', () => {
+      startBtn.style.display = 'none';
+      actions.hidden = false;
 
-        startBtn?.addEventListener('click', () => {
-            startBtn.style.display = 'none';
-            actions.style.display = 'flex';
-            viewEls.forEach(el => el.style.display = 'none');
-            inputs.forEach(f => { f.style.display = 'inline-block'; f.disabled = false; });
-            inputs[0]?.focus();
-        });
+      viewEls.forEach(el => el.style.display = 'none');
+      inputs.forEach(f => {
+        f.hidden = false;
+        f.disabled = false;
+      });
 
-        cancelBtn?.addEventListener('click', () => {
-            actions.style.display = 'none';
-            startBtn.style.display = 'inline-flex';
-            inputs.forEach(f => { f.value = original.get(f.name); f.style.display = 'none'; f.disabled = true; });
-            viewEls.forEach(el => el.style.display = 'inline');
-        });
-
-        form?.addEventListener('submit', () => {
-            inputs.forEach(f => f.disabled = false);
-        });
+      inputs[0]?.focus();
     });
-    </script>
-{% endblock %}
 
+    cancelBtn?.addEventListener('click', () => {
+      actions.hidden = true;
+      startBtn.style.display = 'inline-flex';
+
+      inputs.forEach(f => {
+        f.value = original.get(f.name);
+        f.disabled = true;
+        f.hidden = true;
+      });
+
+      viewEls.forEach(el => el.style.display = 'inline');
+    });
+
+    form?.addEventListener('submit', () => {
+      inputs.forEach(f => f.disabled = false);
+    });
+  });
+  </script>
+{% endblock %}

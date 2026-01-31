@@ -1,21 +1,177 @@
-/* Asset overview page grid (other screen) */
-.asset-layout {
-    display: grid;
-    gap: 16px;
+/* css/pages/asset.css */
 
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-    grid-template-rows: minmax(0px,100px) auto 1fr;
+.asset-layout{
+  display:grid;
+  gap:16px;
 
-    grid-template-areas:
-        "asset-asset    asset-location    asset-meta    asset-status"
-        "asset-metrics  asset-location    asset-meta    asset-status"
-        "asset-history  asset-history     asset-history .";
-    align-items: start;
+  grid-template-columns: 2fr 1fr;
+  grid-template-areas:
+    "main  photo"
+    "main  status"
+    "hist  hist";
 }
 
-.asset-asset    { grid-area: asset-asset;    align-self: stretch; }
-.asset-location { grid-area: asset-location; align-self: stretch; }
-.asset-meta     { grid-area: asset-meta;     align-self: stretch; }
-.asset-status   { grid-area: asset-status; }
-.asset-metrics  { grid-area: asset-metrics; }
-.asset-history  { grid-area: asset-history; }
+/* Responsive */
+@media (max-width: 1100px){
+  .asset-layout{
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "main"
+      "photo"
+      "status"
+      "hist";
+  }
+}
+
+.asset-main{ grid-area: main; display:flex; flex-direction:column; min-height: 520px; }
+.asset-image{ grid-area: photo; }
+.asset-status-col{ grid-area: status; }
+.asset-history{ grid-area: hist; }
+
+/* Header / body / strip */
+.asset-main-header{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  padding:16px 16px 10px;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+}
+
+.asset-title{
+  margin:0;
+  font-size:1.4rem;
+  line-height:1.2;
+}
+
+.asset-status{
+  display:inline-flex;
+  align-items:center;
+  padding:6px 10px;
+  border-radius:999px;
+  font-weight:700;
+  font-size:0.9rem;
+  white-space:nowrap;
+}
+
+.asset-main-body{
+  padding:14px 16px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  overflow:auto;
+}
+
+/* Bottom strip pinned to card bottom */
+.asset-strip{
+  margin-top:auto;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:12px 16px;
+  border-top:1px solid rgba(255,255,255,0.08);
+}
+
+.asset-strip-left{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.asset-strip-right{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  text-align:right;
+}
+
+.mmv{
+  opacity:0.78;
+  font-size:0.95rem;
+}
+
+/* “Description” block (modal trigger style) */
+.asset-desc-trigger{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.03);
+  cursor:pointer;
+  font-weight:700;
+}
+
+.asset-desc-preview{
+  padding:10px 12px;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.06);
+  background: rgba(255,255,255,0.02);
+  max-height: 92px;
+  overflow:hidden;
+}
+
+/* Meta rows */
+.asset-meta{ display:flex; flex-direction:column; gap:12px; }
+.asset-row{
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap:12px;
+}
+@media (max-width: 700px){
+  .asset-row{ grid-template-columns: 1fr; }
+}
+
+.asset-label{
+  display:block;
+  font-size:0.9rem;
+  opacity:0.78;
+  margin-bottom:6px;
+}
+
+.input-inline{
+  width:100%;
+  border:0;
+  outline:none;
+  background:transparent;
+  color:inherit;
+  font:inherit;
+}
+
+/* Photo */
+.asset-photo-frame{
+  padding:12px;
+}
+.asset-photo-empty{
+  padding:28px 12px;
+  text-align:center;
+  opacity:0.7;
+  border-radius:12px;
+  border:1px dashed rgba(255,255,255,0.15);
+}
+
+/* Tables */
+.table-head--4{ display:grid; grid-template-columns: 140px 1fr 110px 110px; gap:10px; }
+.table-row--4{ display:grid; grid-template-columns: 140px 1fr 110px 110px; gap:10px; }
+@media (max-width: 700px){
+  .table-head--4, .table-row--4{ grid-template-columns: 120px 1fr 90px 90px; }
+}
+
+.row-link{
+  text-decoration:none;
+  color:inherit;
+}
+
+/* Edit actions container */
+.edit-actions{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  z-index:1000;
+  display:flex;
+  gap:8px;
+}
