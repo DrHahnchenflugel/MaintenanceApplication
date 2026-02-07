@@ -32,21 +32,38 @@ def get_asset_row(asset_id):
 
     sql = text("""
         SELECT
-            id,
-            variant_id,
-            category_id,
-            site_id,
-            status_id,
-            serial_num,
-            asset_tag,
-            acquired_at,
-            retired_at,
-            retire_reason,
-            created_at,
-            updated_at,
+            asset.id,
+            asset.variant_id,
+            asset.category_id,
+            asset.site_id,
+            asset.status_id,
+            asset.serial_num,
+            asset.asset_tag,
+            asset.acquired_at,
+            asset.retired_at,
+            asset.retire_reason,
+            asset.created_at,
+            asset.updated_at,
+            site.shorthand AS site_shorthand,
+            site.fullname AS site_fullname,
+            category.name AS category_name,
+            category.label AS category_label,
+            asset_status.code AS status_code,
+            asset_status.label AS status_label,
+            variant.name AS variant_name,
+            variant.label AS variant_label,
+            model.name AS model_name,
+            model.label AS model_label,
+            make.name AS make_name,
+            make.label AS make_label
         FROM asset
-        JOIN site ON asset.site_id = site.id
-        WHERE id = :id
+        LEFT JOIN site ON asset.site_id = site.id
+        LEFT JOIN category ON asset.category_id = category.id
+        LEFT JOIN asset_status ON asset.status_id = asset_status.id
+        LEFT JOIN variant ON asset.variant_id = variant.id
+        LEFT JOIN model ON variant.model_id = model.id
+        LEFT JOIN make ON model.make_id = make.id
+        WHERE asset.id = :id
     """)
 
     with (get_connection() as conn):
