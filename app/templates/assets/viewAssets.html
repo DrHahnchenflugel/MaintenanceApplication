@@ -1,210 +1,159 @@
 {% extends "base.html" %}
+{% block title %}Maintenance – Assets{% endblock %}
+{% block page_title %}Assets{% endblock %}
 
-{% block title %}Assets · Maintenance{% endblock %}
-
-{% block content_header %}
-    <div class="page-header">
-        <h1>Assets</h1>
-    </div>
+{% block page_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/list_issues.css') }}">
 {% endblock %}
 
 {% block content %}
-<div class="assets-page">
+<div class="issues-wrap">
+  <form method="get" class="issues-toolbar">
 
-    <div id="assets-error" class="alert alert-danger" style="display:none;">
-        Failed to load assets. Please try again.
+    <div class="issues-toolbar__row">
+
+      <label class="issues-field">
+        <span class="issues-label">Retired</span>
+        <select class="issues-select" name="retired" onchange="this.form.submit()">
+          <option value="active" {{ 'selected' if cur_retired_mode == 'active' else '' }}>Active only</option>
+          <option value="all" {{ 'selected' if cur_retired_mode == 'all' else '' }}>All</option>
+          <option value="retired" {{ 'selected' if cur_retired_mode == 'retired' else '' }}>Retired only</option>
+        </select>
+      </label>
+
+      <label class="issues-field">
+        <span class="issues-label">Status</span>
+        <select class="issues-select" name="status_id" onchange="this.form.submit()">
+          <option value="" {{ 'selected' if not cur_status_id }}>All</option>
+          {% for st in status_options %}
+            <option value="{{ st.id }}" {{ 'selected' if cur_status_id == st.id else '' }}>
+              {{ st.label }}
+            </option>
+          {% endfor %}
+        </select>
+      </label>
+
+      <label class="issues-field">
+        <span class="issues-label">Site</span>
+        <select class="issues-select" name="site_id" onchange="this.form.submit()">
+          <option value="" {{ 'selected' if not cur_site_id }}>All</option>
+          {% for s in sites %}
+            <option value="{{ s.id }}" {{ 'selected' if cur_site_id == s.id else '' }}>
+              {{ s.fullname }} ({{ s.shorthand }})
+            </option>
+          {% endfor %}
+        </select>
+      </label>
+
+      <label class="issues-field">
+        <span class="issues-label">Category</span>
+        <select class="issues-select" name="category_id" onchange="this.form.submit()">
+          <option value="" {{ 'selected' if not cur_category_id }}>All</option>
+          {% for c in categories %}
+            <option value="{{ c.id }}" {{ 'selected' if cur_category_id == c.id else '' }}>
+              {{ c.label }}
+            </option>
+          {% endfor %}
+        </select>
+      </label>
+
+      <label class="issues-field">
+        <span class="issues-label">Make</span>
+        <select class="issues-select" name="make_id" onchange="this.form.submit()" {{ 'disabled' if not cur_category_id }}>
+          <option value="" {{ 'selected' if not cur_make_id }}>All</option>
+          {% for m in makes %}
+            <option value="{{ m.id }}" {{ 'selected' if cur_make_id == m.id else '' }}>
+              {{ m.label }}
+            </option>
+          {% endfor %}
+        </select>
+      </label>
+
+      <label class="issues-field">
+        <span class="issues-label">Model</span>
+        <select class="issues-select" name="model_id" onchange="this.form.submit()" {{ 'disabled' if not cur_make_id }}>
+          <option value="" {{ 'selected' if not cur_model_id }}>All</option>
+          {% for mo in models %}
+            <option value="{{ mo.id }}" {{ 'selected' if cur_model_id == mo.id else '' }}>
+              {{ mo.label }}
+            </option>
+          {% endfor %}
+        </select>
+      </label>
+
+      <label class="issues-field">
+        <span class="issues-label">Variant</span>
+        <select class="issues-select" name="variant_id" onchange="this.form.submit()" {{ 'disabled' if not cur_model_id }}>
+          <option value="" {{ 'selected' if not cur_variant_id }}>All</option>
+          {% for v in variants %}
+            <option value="{{ v.id }}" {{ 'selected' if cur_variant_id == v.id else '' }}>
+              {{ v.label }}
+            </option>
+          {% endfor %}
+        </select>
+      </label>
+
+      <label class="issues-field issues-field--grow">
+        <span class="issues-label">Asset Tag</span>
+        <input class="issues-input" type="text" name="asset_tag" value="{{ cur_asset_tag }}"
+              placeholder="Exact asset tag">
+      </label>
+
+      <div class="issues-actions">
+        <button class="btn issues-apply" type="submit">Apply</button>
+        <a class="btn btn-secondary" href="{{ url_for('app.assets_index') }}">Clear</a>
+      </div>
+
     </div>
+  </form>
 
-    <section class="assets-controls">
-        <form id="assets-filters-form">
-            <label>
-                Retired:
-                <select id="filter-retired">
-                    <option value="active">Active only</option>
-                    <option value="all">All</option>
-                    <option value="retired">Retired only</option>
-                </select>
-            </label>
+  {% if assets %}
+    <div class="table">
+      <div class="table-head table-head--4">
+        <div>Asset</div>
+        <div>Classification</div>
+        <div>Acquired</div>
+        <div>Status</div>
+      </div>
 
-            <label>
-                Asset tag:
-                <input type="text" id="filter-asset-tag" placeholder="Exact tag (optional)">
-            </label>
+      <div class="table-scroll">
+        {% for asset in assets %}
+          <a class="table-row table-row--4" href="{{ url_for('app.view_asset', asset_id=asset.asset_id) }}">
 
-            <button type="submit">Apply</button>
-        </form>
-    </section>
+            <div class="issue-asset">
+              {{ asset.asset_tag }} <br>
+              <div class="issue-sub">Serial: {{ asset.serial_number or '-' }}</div>
+            </div>
 
-    <section class="assets-summary">
-        <p id="assets-summary-text">Loading assets…</p>
-    </section>
+            <div class="issue-cell-title">
+              <div class="issue-title">
+                {{ (sites | selectattr('id', 'equalto', asset.site_id) | map(attribute='fullname') | first) or '-' }}
+              </div>
+              <div class="issue-sub">
+                Category: {{ (categories | selectattr('id', 'equalto', asset.category_id) | map(attribute='label') | first) or '-' }}
+              </div>
+            </div>
 
-    <section class="assets-table-wrapper">
-        <table class="table assets-table">
-            <thead>
-                <tr>
-                    <th>Asset tag</th>
-                    <th>Serial</th>
-                    <th>Site</th>
-                    <th>Status</th>
-                    <th>Acquired</th>
-                    <th>Retired</th>
-                </tr>
-            </thead>
-            <tbody id="assets-table-body">
-                <!-- Filled by JavaScript -->
-            </tbody>
-        </table>
-    </section>
+            <div>
+              {% set time, date = asset.acquired_at | format_dt %}
+              <div>
+                {{ date if date else '-' }}<br>
+                <span class="time">{{ time if time else '' }}</span>
+              </div>
+            </div>
 
+            <div>
+              <span class="issue-status status-unknown">
+                {{ (status_options | selectattr('id', 'equalto', asset.status_id) | map(attribute='label') | first) or '-' }}
+              </span>
+            </div>
+
+          </a>
+        {% endfor %}
+      </div>
+    </div>
+  {% else %}
+    <p style="margin-top:16px;">No assets match this filter.</p>
+  {% endif %}
 </div>
-
-<script>
-document.addEventListener("DOMContentLoaded", function () {
-    // API URL passed from Flask route
-    var apiUrl = "{{ api_assets_url }}";
-
-    // DOM elements
-    var errorBox = document.getElementById("assets-error");
-    var summaryText = document.getElementById("assets-summary-text");
-    var tableBody = document.getElementById("assets-table-body");
-    var retiredSelect = document.getElementById("filter-retired");
-    var assetTagInput = document.getElementById("filter-asset-tag");
-    var filtersForm = document.getElementById("assets-filters-form");
-
-    function clearTable() {
-        while (tableBody.firstChild) {
-            tableBody.removeChild(tableBody.firstChild);
-        }
-    }
-
-    function renderRows(items) {
-        clearTable();
-
-        if (!items || items.length === 0) {
-            var row = document.createElement("tr");
-            var cell = document.createElement("td");
-            cell.colSpan = 6;
-            cell.textContent = "No assets found.";
-            row.appendChild(cell);
-            tableBody.appendChild(row);
-            return;
-        }
-
-        for (var i = 0; i < items.length; i++) {
-            var asset = items[i];
-
-            var row = document.createElement("tr");
-
-            var cellTag = document.createElement("td");
-            cellTag.textContent = asset.asset_tag || "";
-            row.appendChild(cellTag);
-
-            var cellSerial = document.createElement("td");
-            cellSerial.textContent = asset.serial_number || "";
-            row.appendChild(cellSerial);
-
-            var cellSite = document.createElement("td");
-            // For now show raw UUID; later you can replace with site.name when includes are implemented
-            cellSite.textContent = asset.site_id || "";
-            row.appendChild(cellSite);
-
-            var cellStatus = document.createElement("td");
-            cellStatus.textContent = asset.status_id || "";
-            row.appendChild(cellStatus);
-
-            var cellAcquired = document.createElement("td");
-            cellAcquired.textContent = asset.acquired_at || "";
-            row.appendChild(cellAcquired);
-
-            var cellRetired = document.createElement("td");
-            cellRetired.textContent = asset.retired_at || "";
-            row.appendChild(cellRetired);
-
-            tableBody.appendChild(row);
-        }
-    }
-
-    function setError(message) {
-        if (summaryText) {
-            summaryText.textContent = "Failed to load assets.";
-        }
-        if (errorBox) {
-            errorBox.textContent = message || "Failed to load assets.";
-            errorBox.style.display = "block";
-        }
-    }
-
-    function clearError() {
-        if (errorBox) {
-            errorBox.style.display = "none";
-        }
-    }
-
-    function loadAssets() {
-        clearError();
-
-        var retiredMode = retiredSelect.value;
-        var assetTag = assetTagInput.value;
-
-        var params = [];
-        params.push("sort=asset_tag");
-        params.push("retired=" + encodeURIComponent(retiredMode));
-        // first page for now, could add paging later
-        params.push("page=1");
-        params.push("page_size=50");
-
-        if (assetTag) {
-            params.push("asset_tag=" + encodeURIComponent(assetTag));
-        }
-
-        var url = apiUrl + "?" + params.join("&");
-
-        if (summaryText) {
-            summaryText.textContent = "Loading assets…";
-        }
-
-        fetch(url)
-            .then(function (response) {
-                if (!response.ok) {
-                    throw new Error("HTTP status " + response.status);
-                }
-                return response.json();
-            })
-            .then(function (data) {
-                if (!data || !("items" in data)) {
-                    throw new Error("Unexpected response format");
-                }
-
-                var items = data.items;
-                var total = data.total;
-                var page = data.page;
-                var pageSize = data.page_size;
-
-                renderRows(items);
-
-                if (summaryText) {
-                    var count = items ? items.length : 0;
-                    summaryText.textContent =
-                        "Showing " + count + " of " + total + " assets (page " + page + ", page size " + pageSize + ").";
-                }
-            })
-            .catch(function (error) {
-                console.error("Error loading assets:", error);
-                setError(error.message);
-            });
-    }
-
-    // Initial load
-    loadAssets();
-
-    // Re-load when filters are submitted
-    if (filtersForm) {
-        filtersForm.addEventListener("submit", function (event) {
-            event.preventDefault();
-            loadAssets();
-        });
-    }
-});
-</script>
 {% endblock %}
