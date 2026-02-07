@@ -1,9 +1,12 @@
+from datetime import datetime, timezone
 from flask import render_template, request, abort
 from . import bp as web_bp
 from uuid import UUID
 from app.services import assets as asset_service
 from app.services import lookups
 from app.services import sites as site_service
+from app.services import issues as issue_service
+from app.helpers import human_delta_2_times
 
 
 def parse_uuid_arg(name: str):
@@ -15,6 +18,7 @@ def parse_uuid_arg(name: str):
     except ValueError:
         abort(400, description=f"Invalid {name}, must be UUID")
     return value
+
 
 @web_bp.get("/assets", strict_slashes=False)
 def assets_index():
@@ -93,4 +97,44 @@ def assets_index():
         cur_variant_id=variant_id,
         cur_asset_tag=asset_tag or "",
         cur_retired_mode=retired_mode,
+    )
+
+
+@web_bp.get("/assets/<uuid:asset_id>", strict_slashes=False)
+def view_asset(asset_id):
+    asset = asset_service.get_asset_service(asset_id)
+    if asset is None:
+        abort(404)
+
+    acquired_at = asset.get("acquired_at")
+    asset_age = "-"
+    if acquired_at:
+        asset_age = human_delta_2_times(acquired_at, datetime.now(timezone.utc))
+
+    issue_result = issue_service.list_issues(
+        page=1,
+        page_size=10,
+        filters={
+            "site_id": None,
+            "asset_id": str(asset_id),
+            "status_id": None,
+            "reported_by": None,
+            "created_from": None,
+            "created_to": None,
+            "search": None,
+            "category_id": None,
+            "make_id": None,
+            "model_id": None,
+            "variant_id": None,
+            "active_status_ids": None,
+        },
+    )
+
+    past_actions = issue_result["items"]
+
+    return render_template(
+        "assets/specific_asset.html",
+        asset=asset,
+        asset_age=asset_age,
+        past_actions=past_actions,
     )
