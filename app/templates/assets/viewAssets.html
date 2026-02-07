@@ -118,7 +118,7 @@
 
       <div class="table-scroll">
         {% for asset in assets %}
-          <a class="table-row table-row--4" href="{{ url_for('app.view_asset', asset_id=asset.asset_id) }}">
+          <div class="table-row table-row--4">
 
             <div class="issue-asset">
               {{ asset.asset_tag }} <br>
