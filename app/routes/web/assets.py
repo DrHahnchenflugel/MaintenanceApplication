@@ -42,10 +42,15 @@ def assets_index():
         variant_id = None
 
     categories = lookups.list_asset_categories()
+    '''
     makes = lookups.list_makes(category_id=category_id) if category_id else []
     models = lookups.list_models(make_id=make_id) if make_id else []
     variants = lookups.list_variants(model_id=model_id) if model_id else []
-
+    '''
+    makes = lookups.list_makes()
+    models = lookups.list_models() 
+    variants = lookups.list_variants()
+    
     if make_id and make_id not in {m["id"] for m in makes}:
         make_id = model_id = variant_id = None
         models = []
