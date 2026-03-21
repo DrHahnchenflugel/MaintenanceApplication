@@ -121,7 +121,9 @@
             href="{{ url_for('app.view_asset', asset_id=asset.id) }}">
 
             <div class="issue-asset">
-              {{ asset }} <br>
+              Ma:{{ makes }} <br>
+              Mo:{{ models }} <br>
+              Va:{{ variants }} <br>
               <div class="issue-sub">Serial: {{ asset.serial_number or '-' }}</div>
             </div>
 
