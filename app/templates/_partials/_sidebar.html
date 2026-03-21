@@ -19,6 +19,6 @@
             {% if request.endpoint == 'app.inventory' %}class="is-active"{% endif %}>Inventory</a>
         <a href="#" 
             {% if request.endpoint == 'app.settings' %}class="is-active"{% endif %}>Settings</a>
-        {{ request.endpoint }} | {{ cur_status }}
+        {{ request.endpoint }} | {{ cur_status }} | {{ cur_status == "BLOCKED"}}
     </nav>
 </aside>
