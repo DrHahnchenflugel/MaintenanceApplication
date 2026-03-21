@@ -243,6 +243,7 @@ def list_asset_rows(
         FROM asset
         LEFT JOIN variant ON asset.variant_id = variant.id
         LEFT JOIN model ON variant.model_id = model.id
+        LEFT JOIN make ON model.make_id = make.id
         {where_sql}
     """)
 
@@ -253,6 +254,7 @@ def list_asset_rows(
         result = conn.execute(select_sql, params).mappings().all()
 
     rows = [dict(row) for row in result]
+    print(rows)
     return rows, total
 
 def create_asset_row(
