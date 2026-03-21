@@ -132,7 +132,9 @@ def list_asset_rows(
             asset.retired_at,
             asset.retire_reason,
             asset.created_at,
-            asset.updated_at
+            asset.updated_at,
+            variant.model_id,
+            model.make_id
         FROM asset
         LEFT JOIN variant ON asset.variant_id = variant.id
         LEFT JOIN model ON variant.model_id = model.id
@@ -243,7 +245,6 @@ def list_asset_rows(
         FROM asset
         LEFT JOIN variant ON asset.variant_id = variant.id
         LEFT JOIN model ON variant.model_id = model.id
-        LEFT JOIN make ON model.make_id = make.id
         {where_sql}
     """)
 
