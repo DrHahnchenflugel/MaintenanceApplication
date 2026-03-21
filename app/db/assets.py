@@ -255,7 +255,6 @@ def list_asset_rows(
         result = conn.execute(select_sql, params).mappings().all()
 
     rows = [dict(row) for row in result]
-    print(rows)
     return rows, total
 
 def create_asset_row(
