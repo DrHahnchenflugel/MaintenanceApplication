@@ -16,8 +16,9 @@
         <a href="{{ url_for('app.issues_list', status='BLOCKED') }}"
             {% if request.endpoint == 'app.issues_list' and cur_status == 'BLOCKED' %}class="is-active"{% endif %}>Blocked Issues</a>
         <a href="{{ url_for('app.assets_index') }}" 
-            {% if request.endpoint == 'app.inventory' %}class="is-active"{% endif %}>Inventory</a>
+            {% if request.endpoint == 'app.assets_index' %}class="is-active"{% endif %}>Inventory</a>
         <a href="#" 
             {% if request.endpoint == 'app.settings' %}class="is-active"{% endif %}>Settings</a>
+        {{cur_status}}
     </nav>
 </aside>
