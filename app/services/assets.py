@@ -1,6 +1,5 @@
 from app.db import assets as assets_repo
 from uuid import UUID
-from lookups import 
 
 def _parse_uuid_field(payload, field_name: str, required: bool = True):
     value = payload.get(field_name)
