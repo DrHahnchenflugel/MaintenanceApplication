@@ -8,34 +8,13 @@
 
 {% block content %}
 <div class="issues-wrap">
-  <form method="get" class="issues-toolbar">
+  <form method="get" action="{{ url_for('app.assets_index') }}" class="issues-toolbar" data-assets-filter-form>
 
     <div class="issues-toolbar__row">
 
       <label class="issues-field">
-        <span class="issues-label">Retired</span>
-        <select class="issues-select" name="retired" onchange="this.form.submit()">
-          <option value="active" {{ 'selected' if cur_retired_mode == 'active' else '' }}>Active only</option>
-          <option value="all" {{ 'selected' if cur_retired_mode == 'all' else '' }}>All</option>
-          <option value="retired" {{ 'selected' if cur_retired_mode == 'retired' else '' }}>Retired only</option>
-        </select>
-      </label>
-
-      <label class="issues-field">
-        <span class="issues-label">Status</span>
-        <select class="issues-select" name="status_id" onchange="this.form.submit()">
-          <option value="" {{ 'selected' if not cur_status_id }}>All</option>
-          {% for st in status_options %}
-            <option value="{{ st.id }}" {{ 'selected' if cur_status_id == st.id else '' }}>
-              {{ st.label }}
-            </option>
-          {% endfor %}
-        </select>
-      </label>
-
-      <label class="issues-field">
         <span class="issues-label">Site</span>
-        <select class="issues-select" name="site_id" onchange="this.form.submit()">
+        <select class="issues-select" name="site_id">
           <option value="" {{ 'selected' if not cur_site_id }}>All</option>
           {% for s in sites %}
             <option value="{{ s.id }}" {{ 'selected' if cur_site_id == s.id else '' }}>
@@ -47,7 +26,7 @@
 
       <label class="issues-field">
         <span class="issues-label">Category</span>
-        <select class="issues-select" name="category_id" onchange="this.form.submit()">
+        <select class="issues-select" name="category_id">
           <option value="" {{ 'selected' if not cur_category_id }}>All</option>
           {% for c in categories %}
             <option value="{{ c.id }}" {{ 'selected' if cur_category_id == c.id else '' }}>
@@ -59,7 +38,7 @@
 
       <label class="issues-field">
         <span class="issues-label">Make</span>
-        <select class="issues-select" name="make_id" onchange="this.form.submit()" {{ 'disabled' if not cur_category_id }}>
+        <select class="issues-select" name="make_id">
           <option value="" {{ 'selected' if not cur_make_id }}>All</option>
           {% for m in makes %}
             <option value="{{ m.id }}" {{ 'selected' if cur_make_id == m.id else '' }}>
@@ -71,8 +50,12 @@
 
       <label class="issues-field">
         <span class="issues-label">Model</span>
-        <select class="issues-select" name="model_id" onchange="this.form.submit()" {{ 'disabled' if not cur_make_id }}>
-          <option value="" {{ 'selected' if not cur_model_id }}>All</option>
+        <select class="issues-select" name="model_id" {{ 'disabled' if not cur_make_id else '' }}>
+          {% if cur_make_id %}
+            <option value="" {{ 'selected' if not cur_model_id else '' }}>All</option>
+          {% else %}
+            <option value="" selected>Select make first</option>
+          {% endif %}
           {% for mo in models %}
             <option value="{{ mo.id }}" {{ 'selected' if cur_model_id == mo.id else '' }}>
               {{ mo.label }}
@@ -83,8 +66,12 @@
 
       <label class="issues-field">
         <span class="issues-label">Variant</span>
-        <select class="issues-select" name="variant_id" onchange="this.form.submit()" {{ 'disabled' if not cur_model_id }}>
-          <option value="" {{ 'selected' if not cur_variant_id }}>All</option>
+        <select class="issues-select" name="variant_id" {{ 'disabled' if not cur_model_id else '' }}>
+          {% if cur_model_id %}
+            <option value="" {{ 'selected' if not cur_variant_id else '' }}>All</option>
+          {% else %}
+            <option value="" selected>Select model first</option>
+          {% endif %}
           {% for v in variants %}
             <option value="{{ v.id }}" {{ 'selected' if cur_variant_id == v.id else '' }}>
               {{ v.label }}
@@ -93,10 +80,26 @@
         </select>
       </label>
 
+      <label class="issues-field">
+        <span class="issues-label">Active</span>
+        <select class="issues-select" name="active">
+          <option value="active" {{ 'selected' if cur_active_mode == 'active' else '' }}>Active only</option>
+          <option value="all" {{ 'selected' if cur_active_mode == 'all' else '' }}>All</option>
+          <option value="retired" {{ 'selected' if cur_active_mode == 'retired' else '' }}>Retired only</option>
+        </select>
+      </label>
+
       <label class="issues-field issues-field--grow">
         <span class="issues-label">Asset Tag</span>
-        <input class="issues-input" type="text" name="asset_tag" value="{{ cur_asset_tag }}"
-              placeholder="Exact asset tag">
+        <input
+          class="issues-input"
+          type="search"
+          name="asset_tag"
+          value="{{ cur_asset_tag }}"
+          placeholder="Search asset tag"
+          autocomplete="off"
+          spellcheck="false"
+        >
       </label>
 
       <div class="issues-actions">
@@ -118,7 +121,7 @@
       <div class="table-scroll">
         {% for asset in assets %}
           <a class="table-row table-row--4"
-            href="{{ url_for('app.view_asset', asset_id=asset.id) }}">
+            href="{{ url_for('app.view_asset', asset_id=asset.asset_id) }}">
 
             <div class="issue-asset">
               {{ asset.get('asset_tag') or '-' }} <br>
@@ -127,7 +130,7 @@
 
             <div class="issue-cell-title">
               <div class="issue-title">
-                {{ asset.get('make_name') or '-'}}/{{ asset.get('model_name') or '-' }}/{{ asset.get('variant_name') or '-' }}
+                {{ asset.get('make_name') or '-'}} / {{ asset.get('model_name') or '-' }} / {{ asset.get('variant_name') or '-' }}
               </div>
               <div class="issue-sub">
                 Category: {{ (categories | selectattr('id', 'equalto', asset.category_id) | map(attribute='label') | first) or '-' }}
@@ -156,4 +159,47 @@
     <p style="margin-top:16px;">No assets match this filter.</p>
   {% endif %}
 </div>
+{% endblock %}
+
+{% block page_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.querySelector("[data-assets-filter-form]");
+    if (!form) return;
+
+    const siteSelect = form.elements.site_id;
+    const categorySelect = form.elements.category_id;
+    const makeSelect = form.elements.make_id;
+    const modelSelect = form.elements.model_id;
+    const variantSelect = form.elements.variant_id;
+    const activeSelect = form.elements.active;
+
+    const submitFilters = () => form.requestSubmit();
+    const clearSelect = (select) => {
+      if (!select) return;
+      select.value = "";
+    };
+
+    [siteSelect, categorySelect, variantSelect, activeSelect].forEach((select) => {
+      if (!select) return;
+      select.addEventListener("change", submitFilters);
+    });
+
+    if (makeSelect) {
+      makeSelect.addEventListener("change", () => {
+        // Clear dependent ids before the GET submits so the URL matches the UI.
+        clearSelect(modelSelect);
+        clearSelect(variantSelect);
+        submitFilters();
+      });
+    }
+
+    if (modelSelect) {
+      modelSelect.addEventListener("change", () => {
+        clearSelect(variantSelect);
+        submitFilters();
+      });
+    }
+  });
+</script>
 {% endblock %}

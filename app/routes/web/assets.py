@@ -1,5 +1,5 @@
 from datetime import datetime, timezone
-from flask import render_template, request, abort
+from flask import render_template, request, abort, redirect, url_for
 from . import bp as web_bp
 from uuid import UUID
 from app.services import assets as asset_service
@@ -14,62 +14,144 @@ def parse_uuid_arg(name: str):
     if not value:
         return None
     try:
-        UUID(value)
+        return str(UUID(value))
     except ValueError:
         abort(400, description=f"Invalid {name}, must be UUID")
-    return value
+
+
+def _normalize_uuid_rows(rows, *field_names):
+    normalized_rows = []
+    for row in rows:
+        item = dict(row)
+        for field_name in field_names:
+            if field_name in item and item[field_name] is not None:
+                item[field_name] = str(item[field_name])
+        normalized_rows.append(item)
+    return normalized_rows
+
+
+def _build_asset_filter_query_params(
+    *,
+    site_id=None,
+    category_id=None,
+    make_id=None,
+    model_id=None,
+    variant_id=None,
+    active_mode="active",
+    asset_tag=None,
+    include_active=False,
+):
+    params = {}
+
+    if site_id:
+        params["site_id"] = site_id
+    if category_id:
+        params["category_id"] = category_id
+    if make_id:
+        params["make_id"] = make_id
+    if model_id:
+        params["model_id"] = model_id
+    if variant_id:
+        params["variant_id"] = variant_id
+    if include_active or active_mode != "active":
+        params["active"] = active_mode
+    if asset_tag:
+        params["asset_tag"] = asset_tag
+
+    return params
 
 
 @web_bp.get("/assets", strict_slashes=False)
 def assets_index():
-    status_id = parse_uuid_arg("status_id")
-    site_id = parse_uuid_arg("site_id")
-    category_id = parse_uuid_arg("category_id")
-    make_id = parse_uuid_arg("make_id")
-    model_id = parse_uuid_arg("model_id")
-    variant_id = parse_uuid_arg("variant_id")
+    requested_site_id = parse_uuid_arg("site_id")
+    requested_category_id = parse_uuid_arg("category_id")
+    requested_make_id = parse_uuid_arg("make_id")
+    requested_model_id = parse_uuid_arg("model_id")
+    requested_variant_id = parse_uuid_arg("variant_id")
+
+    site_id = requested_site_id
+    category_id = requested_category_id
+    make_id = requested_make_id
+    model_id = requested_model_id
+    variant_id = requested_variant_id
+
     asset_tag = (request.args.get("asset_tag") or "").strip() or None
-    retired_mode = (request.args.get("retired") or "active").strip().lower()
+    raw_active_mode = (request.args.get("active") or request.args.get("retired") or "active").strip().lower()
+    active_mode = raw_active_mode if raw_active_mode in ("active", "retired", "all") else "active"
 
-    if retired_mode not in ("active", "retired", "all"):
-        retired_mode = "active"
+    categories = _normalize_uuid_rows(lookups.list_asset_categories(), "id")
+    makes = _normalize_uuid_rows(
+        lookups.list_makes(category_id=category_id) if category_id else lookups.list_makes(),
+        "id",
+        "category_id",
+    )
 
-    if not category_id:
-        make_id = model_id = variant_id = None
-    elif not make_id:
+    # Category narrows the make list, but make itself stays selectable even when
+    # category is blank.
+    if make_id and make_id not in {make["id"] for make in makes}:
+        make_id = None
+        variant_id = None
+        model_id = None
+
+    if not make_id:
         model_id = variant_id = None
-    elif not model_id:
+
+    models = _normalize_uuid_rows(
+        lookups.list_models(make_id=make_id) if make_id else [],
+        "id",
+    )
+    if model_id and model_id not in {model["id"] for model in models}:
+        model_id = None
         variant_id = None
 
-    categories = lookups.list_asset_categories()
-    '''
-    makes = lookups.list_makes(category_id=category_id) if category_id else []
-    models = lookups.list_models(make_id=make_id) if make_id else []
-    variants = lookups.list_variants(model_id=model_id) if model_id else []
-    '''
-    makes = lookups.list_makes()
-    models = lookups.list_models() 
-    variants = lookups.list_variants()
-    
-    if make_id and make_id not in {m["id"] for m in makes}:
-        make_id = model_id = variant_id = None
-        models = []
-        variants = []
-
-    if model_id and model_id not in {m["id"] for m in models}:
-        model_id = variant_id = None
-        variants = []
-
-    if variant_id and variant_id not in {v["id"] for v in variants}:
+    if not model_id:
         variant_id = None
 
-    status_options = lookups.list_asset_statuses()
-    sites = site_service.list_sites()
+    variants = _normalize_uuid_rows(
+        lookups.list_variants(model_id=model_id) if model_id else [],
+        "id",
+    )
+    if variant_id and variant_id not in {variant["id"] for variant in variants}:
+        variant_id = None
+
+    include_active_param = "active" in request.args or "retired" in request.args
+    requested_params = _build_asset_filter_query_params(
+        site_id=requested_site_id,
+        category_id=requested_category_id,
+        make_id=requested_make_id,
+        model_id=requested_model_id,
+        variant_id=requested_variant_id,
+        active_mode=active_mode,
+        asset_tag=asset_tag,
+        include_active="active" in request.args,
+    )
+    effective_params = _build_asset_filter_query_params(
+        site_id=site_id,
+        category_id=category_id,
+        make_id=make_id,
+        model_id=model_id,
+        variant_id=variant_id,
+        active_mode=active_mode,
+        asset_tag=asset_tag,
+        include_active=include_active_param,
+    )
+
+    # Redirect once to the cleaned query string if we dropped invalid dependent
+    # ids or converted legacy params like ?retired=... / ?status_id=...
+    if (
+        requested_params != effective_params
+        or "retired" in request.args
+        or "status_id" in request.args
+        or ("active" in request.args and raw_active_mode not in ("active", "retired", "all"))
+    ):
+        return redirect(url_for("app.assets_index", **effective_params))
+
+    status_options = _normalize_uuid_rows(lookups.list_asset_statuses(), "id")
+    sites = _normalize_uuid_rows(site_service.list_sites(), "id")
 
     filters = {
         "site_id": site_id,
         "category_id": category_id,
-        "status_id": status_id,
         "make_id": make_id,
         "model_id": model_id,
         "variant_id": variant_id,
@@ -82,26 +164,34 @@ def assets_index():
         page=1,
         page_size=200,
         include=[],
-        retired_mode=retired_mode,
+        retired_mode=active_mode,
+    )
+
+    assets = _normalize_uuid_rows(
+        result["items"],
+        "asset_id",
+        "category_id",
+        "site_id",
+        "status_id",
+        "variant_id",
     )
 
     return render_template(
         "assets/viewAssets.html",
-        assets=result["items"],
+        assets=assets,
         categories=categories,
         makes=makes,
         models=models,
         variants=variants,
         status_options=status_options,
         sites=sites,
-        cur_status_id=status_id,
         cur_site_id=site_id,
         cur_category_id=category_id,
         cur_make_id=make_id,
         cur_model_id=model_id,
         cur_variant_id=variant_id,
         cur_asset_tag=asset_tag or "",
-        cur_retired_mode=retired_mode,
+        cur_active_mode=active_mode,
     )
 
 
