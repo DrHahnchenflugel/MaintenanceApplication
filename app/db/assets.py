@@ -133,11 +133,13 @@ def list_asset_rows(
             asset.retire_reason,
             asset.created_at,
             asset.updated_at,
-            variant.model_id,
-            model.make_id
+            variant.name AS variant_name,
+            model.name AS model_name,
+            make.name AS make_name
         FROM asset
         LEFT JOIN variant ON asset.variant_id = variant.id
         LEFT JOIN model ON variant.model_id = model.id
+        LEFT JOIN make ON model.make_id = make.id
     """
 
     where_clauses = []
