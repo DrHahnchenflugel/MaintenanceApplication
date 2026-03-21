@@ -109,7 +109,7 @@ def view_asset(asset_id):
     acquired_at = asset.get("acquired_at")
     asset_age = "-"
     if acquired_at:
-        asset_age = human_delta_2_times(acquired_at, datetime.now(timezone.utc))
+        asset_age = human_delta_2_times(acquired_at, datetime.now(timezone.utc).date)
 
     issue_result = issue_service.list_issues(
         page=1,
