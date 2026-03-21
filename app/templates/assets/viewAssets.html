@@ -100,7 +100,6 @@
       </label>
 
       <div class="issues-actions">
-        <button class="btn issues-apply" type="submit">Apply</button>
         <a class="btn btn-secondary" href="{{ url_for('app.assets_index') }}">Clear</a>
       </div>
 
@@ -118,7 +117,8 @@
 
       <div class="table-scroll">
         {% for asset in assets %}
-          <a class="table-row table-row--4" href="{{ url_for('app.view_asset', asset_id=asset.asset_id) }}">
+          <a class="table-row table-row--4"
+            href="{{ url_for('app.view_asset', asset_id=asset.id) }}">
 
             <div class="issue-asset">
               {{ asset.asset_tag }} <br>
@@ -148,7 +148,7 @@
               </span>
             </div>
 
-          </a>
+          </div>
         {% endfor %}
       </div>
     </div>

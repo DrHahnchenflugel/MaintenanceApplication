@@ -7,14 +7,17 @@
     <hr class="sidebar-divider">
 
     <nav class="nav">
-        <a href="#" {% if request.endpoint == 'app.dashboard' %}class="is-active"{% endif %}>Dashboard</a>
+        <a href="#" 
+            {% if request.endpoint == 'app.dashboard' %}class="is-active"{% endif %}>Dashboard</a>
         <a href="{{ url_for('app.issues_list', status='ACTIVE') }}"
-            {% if request.endpoint == 'app.issues_active' %}class="is-active"{% endif %}>Active Issues</a>
+            {% if request.endpoint == 'app.issues_list and (cur_status = "OPEN" or cur_status = "IN_PROGRESS")' %}class="is-active"{% endif %}>Active Issues</a>
         <a href="{{ url_for('app.issues_list', status='CLOSED') }}"
-            {% if request.endpoint == 'app.issues_past' %}class="is-active"{% endif %}>Past Issues</a>
+            {% if request.endpoint == 'app.issues_list and cur_status = "CLOSED"' %}class="is-active"{% endif %}>Past Issues</a>
         <a href="{{ url_for('app.issues_list', status='BLOCKED') }}"
-            {% if request.endpoint == 'app.issues_blocked' %}class="is-active"{% endif %}>Blocked Issues</a>
-        <a href="#" {% if request.endpoint == 'app.inventory' %}class="is-active"{% endif %}>Inventory</a>
-        <a href="#" {% if request.endpoint == 'app.settings' %}class="is-active"{% endif %}>Settings</a>
+            {% if request.endpoint == 'app.issues_list and cur_status = "BLOCKED"' %}class="is-active"{% endif %}>Blocked Issues</a>
+        <a href="{{ url_for('app.assets_index') }}" 
+            {% if request.endpoint == 'app.inventory' %}class="is-active"{% endif %}>Inventory</a>
+        <a href="#" 
+            {% if request.endpoint == 'app.settings' %}class="is-active"{% endif %}>Settings</a>
     </nav>
 </aside>
