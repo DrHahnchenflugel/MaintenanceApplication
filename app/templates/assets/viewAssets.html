@@ -127,7 +127,7 @@
 
             <div class="issue-cell-title">
               <div class="issue-title">
-                {{ asset.get(make_name) or '-'}}/{{ asset.get(model_name) or '' }}/{{ asset.get(variant_name) or '' }}
+                {{ asset.get('make_name') or '-'}}/{{ asset.get('model_name') or '-' }}/{{ asset.get('variant_name') or '-' }}
               </div>
               <div class="issue-sub">
                 Category: {{ (categories | selectattr('id', 'equalto', asset.category_id) | map(attribute='label') | first) or '-' }}
