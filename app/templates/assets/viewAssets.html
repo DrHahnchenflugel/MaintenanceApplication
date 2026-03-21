@@ -121,13 +121,13 @@
             href="{{ url_for('app.view_asset', asset_id=asset.id) }}">
 
             <div class="issue-asset">
-              {{ asset.get('variant_name') }} <br>
+              {{ asset.get('asset_tag') or '-' }} <br>
               <div class="issue-sub">Serial: {{ asset.serial_number or '-' }}</div>
             </div>
 
             <div class="issue-cell-title">
               <div class="issue-title">
-                {{ (sites | selectattr('id', 'equalto', asset.site_id) | map(attribute='fullname') | first) or '-' }}
+                {{ asset.get(make_name) or '-'}}/{{ asset.get(model_name) or '' }}/{{ asset.get(variant_name) or '' }}
               </div>
               <div class="issue-sub">
                 Category: {{ (categories | selectattr('id', 'equalto', asset.category_id) | map(attribute='label') | first) or '-' }}
@@ -138,7 +138,7 @@
               {% set time, date = asset.acquired_at | format_dt %}
               <div>
                 {{ date if date else '-' }}<br>
-                <span class="time">{{ time if time else '' }}</span>
+                <span class="issue-sub">{{ (sites | selectattr('id', 'equalto', asset.site_id) | map(attribute='fullname') | first) or '-' }}</span>
               </div>
             </div>
 
