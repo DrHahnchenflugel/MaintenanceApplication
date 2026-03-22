@@ -34,6 +34,7 @@
       <section class="card asset-card">
         <div class="asset-card__header">
           <h3 class="asset-card__title">Details</h3>
+          <span class="asset-pill asset-pill--inline">{{ asset.status_label or asset.status_code or '-' }}</span>
 
           <button
             type="button"
@@ -56,7 +57,6 @@
           <div class="asset-field">
             <span class="asset-field__label">Asset Tag</span>
             <strong class="asset-field__value">{{ asset.asset_tag or '-' }}</strong>
-            <span class="asset-pill asset-pill--inline">{{ asset.status_label or asset.status_code or '-' }}</span>
           </div>
           <div class="asset-field">
             <span class="asset-field__label">Serial</span>
