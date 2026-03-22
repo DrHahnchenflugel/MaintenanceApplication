@@ -203,6 +203,7 @@
     const clearSelect = (select) => {
       if (!select) return;
       select.value = "";
+      select.dispatchEvent(new Event("dropdown:sync", { bubbles: true }));
     };
 
     [siteSelect, categorySelect, variantSelect, activeSelect].forEach((select) => {

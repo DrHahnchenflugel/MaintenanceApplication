@@ -17,6 +17,13 @@
       <label class="{{ label_class }}" for="{{ id }}">{{ label }}</label>
     {% endif %}
 
+    {% set ns = namespace(selected_label=placeholder) %}
+    {% for opt in options %}
+      {% if opt.value == selected_value %}
+        {% set ns.selected_label = opt.label %}
+      {% endif %}
+    {% endfor %}
+
     {# Native select (mobile/touch) #}
     <select
       id="{{ id }}"
@@ -39,6 +46,7 @@
     <div
       class="dropdown select--custom"
       data-dropdown
+      data-dropdown-placeholder="{{ placeholder }}"
       {% if disabled %}data-disabled="1"{% endif %}
     >
       <button
@@ -49,15 +57,8 @@
         aria-expanded="false"
         {% if disabled %}disabled{% endif %}
       >
-        {# Show selected label, else placeholder #}
-        {% set _sel = None %}
-        {% for opt in options %}
-          {% if opt.value == selected_value %}
-            {% set _sel = opt.label %}
-          {% endif %}
-        {% endfor %}
         <span class="dropdown__value" data-dropdown-value>
-          {{ _sel if _sel else placeholder }}
+          {{ ns.selected_label }}
         </span>
         <span class="dropdown__chev" aria-hidden="true">▾</span>
       </button>
@@ -68,6 +69,7 @@
             type="button"
             class="dropdown__item"
             data-value="{{ opt.value }}"
+            {% if opt.value == selected_value %}data-selected="1"{% endif %}
             {% if opt.disabled %}disabled{% endif %}
           >{{ opt.label }}</button>
         {% endfor %}
