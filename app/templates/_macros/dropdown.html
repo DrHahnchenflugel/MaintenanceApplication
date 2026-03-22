@@ -1,15 +1,28 @@
 {# templates/_macros/dropdown.html #}
-{% macro dropdown(name, id, label, options, selected_value='', placeholder='Select…', disabled=False) %}
-  <div class="field">
+{% macro dropdown(
+  name,
+  id,
+  label,
+  options,
+  selected_value='',
+  placeholder='Select…',
+  disabled=False,
+  field_class='',
+  label_class='label',
+  native_select_class='',
+  native_onchange=''
+) %}
+  <div class="field{% if field_class %} {{ field_class }}{% endif %}">
     {% if label %}
-      <label class="label" for="{{ id }}">{{ label }}</label>
+      <label class="{{ label_class }}" for="{{ id }}">{{ label }}</label>
     {% endif %}
 
     {# Native select (mobile/touch) #}
     <select
       id="{{ id }}"
       name="{{ name }}"
-      class="select select--native"
+      class="select select--native{% if native_select_class %} {{ native_select_class }}{% endif %}"
+      {% if native_onchange %}onchange="{{ native_onchange }}"{% endif %}
       {% if disabled %}disabled{% endif %}
     >
       {% for opt in options %}

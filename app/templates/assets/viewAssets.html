@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_macros/dropdown.html" import dropdown %}
 {% block title %}Maintenance – Assets{% endblock %}
 {% block page_title %}Assets{% endblock %}
 
@@ -7,87 +8,111 @@
 {% endblock %}
 
 {% block content %}
+{% set site_opts = [{"value": "", "label": "All"}] %}
+{% for s in sites %}
+  {% set _ = site_opts.append({"value": s.id, "label": s.fullname ~ " (" ~ s.shorthand ~ ")"}) %}
+{% endfor %}
+
+{% set category_opts = [{"value": "", "label": "All"}] %}
+{% for c in categories %}
+  {% set _ = category_opts.append({"value": c.id, "label": c.label}) %}
+{% endfor %}
+
+{% set make_opts = [{"value": "", "label": "All"}] %}
+{% for m in makes %}
+  {% set _ = make_opts.append({"value": m.id, "label": m.label}) %}
+{% endfor %}
+
+{% if cur_make_id %}
+  {% set model_opts = [{"value": "", "label": "All"}] %}
+  {% for mo in models %}
+    {% set _ = model_opts.append({"value": mo.id, "label": mo.label}) %}
+  {% endfor %}
+{% else %}
+  {% set model_opts = [{"value": "", "label": "Select make first", "disabled": True}] %}
+{% endif %}
+
+{% if cur_model_id %}
+  {% set variant_opts = [{"value": "", "label": "All"}] %}
+  {% for v in variants %}
+    {% set _ = variant_opts.append({"value": v.id, "label": v.label}) %}
+  {% endfor %}
+{% else %}
+  {% set variant_opts = [{"value": "", "label": "Select model first", "disabled": True}] %}
+{% endif %}
+
+{% set active_opts = [
+  {"value": "active", "label": "Active only"},
+  {"value": "all", "label": "All"},
+  {"value": "retired", "label": "Retired only"}
+] %}
+
 <div class="issues-wrap">
   <form method="get" action="{{ url_for('app.assets_index') }}" class="issues-toolbar" data-assets-filter-form>
 
     <div class="issues-toolbar__row">
 
-      <label class="issues-field">
-        <span class="issues-label">Site</span>
-        <select class="issues-select" name="site_id">
-          <option value="" {{ 'selected' if not cur_site_id }}>All</option>
-          {% for s in sites %}
-            <option value="{{ s.id }}" {{ 'selected' if cur_site_id == s.id else '' }}>
-              {{ s.fullname }} ({{ s.shorthand }})
-            </option>
-          {% endfor %}
-        </select>
-      </label>
+      {{ dropdown(
+        name="site_id",
+        id="assets_site",
+        label="Site",
+        options=site_opts,
+        selected_value=cur_site_id or "",
+        field_class="issues-field",
+        label_class="issues-label"
+      ) }}
 
-      <label class="issues-field">
-        <span class="issues-label">Category</span>
-        <select class="issues-select" name="category_id">
-          <option value="" {{ 'selected' if not cur_category_id }}>All</option>
-          {% for c in categories %}
-            <option value="{{ c.id }}" {{ 'selected' if cur_category_id == c.id else '' }}>
-              {{ c.label }}
-            </option>
-          {% endfor %}
-        </select>
-      </label>
+      {{ dropdown(
+        name="category_id",
+        id="assets_category",
+        label="Category",
+        options=category_opts,
+        selected_value=cur_category_id or "",
+        field_class="issues-field",
+        label_class="issues-label"
+      ) }}
 
-      <label class="issues-field">
-        <span class="issues-label">Make</span>
-        <select class="issues-select" name="make_id">
-          <option value="" {{ 'selected' if not cur_make_id }}>All</option>
-          {% for m in makes %}
-            <option value="{{ m.id }}" {{ 'selected' if cur_make_id == m.id else '' }}>
-              {{ m.label }}
-            </option>
-          {% endfor %}
-        </select>
-      </label>
+      {{ dropdown(
+        name="make_id",
+        id="assets_make",
+        label="Make",
+        options=make_opts,
+        selected_value=cur_make_id or "",
+        field_class="issues-field",
+        label_class="issues-label"
+      ) }}
 
-      <label class="issues-field">
-        <span class="issues-label">Model</span>
-        <select class="issues-select" name="model_id" {{ 'disabled' if not cur_make_id else '' }}>
-          {% if cur_make_id %}
-            <option value="" {{ 'selected' if not cur_model_id else '' }}>All</option>
-          {% else %}
-            <option value="" selected>Select make first</option>
-          {% endif %}
-          {% for mo in models %}
-            <option value="{{ mo.id }}" {{ 'selected' if cur_model_id == mo.id else '' }}>
-              {{ mo.label }}
-            </option>
-          {% endfor %}
-        </select>
-      </label>
+      {{ dropdown(
+        name="model_id",
+        id="assets_model",
+        label="Model",
+        options=model_opts,
+        selected_value=cur_model_id or "",
+        disabled=not cur_make_id,
+        field_class="issues-field",
+        label_class="issues-label"
+      ) }}
 
-      <label class="issues-field">
-        <span class="issues-label">Variant</span>
-        <select class="issues-select" name="variant_id" {{ 'disabled' if not cur_model_id else '' }}>
-          {% if cur_model_id %}
-            <option value="" {{ 'selected' if not cur_variant_id else '' }}>All</option>
-          {% else %}
-            <option value="" selected>Select model first</option>
-          {% endif %}
-          {% for v in variants %}
-            <option value="{{ v.id }}" {{ 'selected' if cur_variant_id == v.id else '' }}>
-              {{ v.label }}
-            </option>
-          {% endfor %}
-        </select>
-      </label>
+      {{ dropdown(
+        name="variant_id",
+        id="assets_variant",
+        label="Variant",
+        options=variant_opts,
+        selected_value=cur_variant_id or "",
+        disabled=not cur_model_id,
+        field_class="issues-field",
+        label_class="issues-label"
+      ) }}
 
-      <label class="issues-field">
-        <span class="issues-label">Active</span>
-        <select class="issues-select" name="active">
-          <option value="active" {{ 'selected' if cur_active_mode == 'active' else '' }}>Active only</option>
-          <option value="all" {{ 'selected' if cur_active_mode == 'all' else '' }}>All</option>
-          <option value="retired" {{ 'selected' if cur_active_mode == 'retired' else '' }}>Retired only</option>
-        </select>
-      </label>
+      {{ dropdown(
+        name="active",
+        id="assets_active",
+        label="Active",
+        options=active_opts,
+        selected_value=cur_active_mode or "active",
+        field_class="issues-field",
+        label_class="issues-label"
+      ) }}
 
       <label class="issues-field issues-field--grow">
         <span class="issues-label">Asset Tag</span>

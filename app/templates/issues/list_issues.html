@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% from "_macros/dropdown.html" import dropdown %}
 {% block title %}Maintenance – Issues{% endblock %}
 {% block page_title %}Issues{% endblock %}
 
@@ -7,73 +8,96 @@
 {% endblock %}
 
 {% block content %}
+{% set status_opts = [
+  {"value": "", "label": "All"},
+  {"value": "ACTIVE", "label": "Active (Open + In Progress)"}
+] %}
+{% for st in status_options %}
+  {% set _ = status_opts.append({"value": st.code, "label": st.label}) %}
+{% endfor %}
+
+{% set category_opts = [{"value": "", "label": "All"}] %}
+{% for c in categories %}
+  {% set _ = category_opts.append({"value": c.id, "label": c.label}) %}
+{% endfor %}
+
+{% set make_opts = [{"value": "", "label": "All"}] %}
+{% for m in makes %}
+  {% set _ = make_opts.append({"value": m.id, "label": m.label}) %}
+{% endfor %}
+
+{% set model_opts = [{"value": "", "label": "All"}] %}
+{% for mo in models %}
+  {% set _ = model_opts.append({"value": mo.id, "label": mo.label}) %}
+{% endfor %}
+
+{% set variant_opts = [{"value": "", "label": "All"}] %}
+{% for v in variants %}
+  {% set _ = variant_opts.append({"value": v.id, "label": v.label}) %}
+{% endfor %}
+
 <div class="issues-wrap">
   <form method="get" class="issues-toolbar">
 
     <div class="issues-toolbar__row">
 
-      <label class="issues-field">
-        <span class="issues-label">Status</span>
-        <select class="issues-select" name="status" onchange="this.form.submit()">
-          <option value="" {{ 'selected' if not cur_status }}>All</option>
-          <option value="ACTIVE" {{ 'selected' if cur_status == "ACTIVE" else ''}}>
-            Active (Open + In Progress)
-          </option>
-          {% for st in status_options %}
-            <option value="{{ st.code }}" {{ 'selected' if cur_status == st.code else '' }}>
-              {{ st.label }}
-            </option>
-          {% endfor %}
-        </select>
-      </label>
+      {{ dropdown(
+        name="status",
+        id="issues_status",
+        label="Status",
+        options=status_opts,
+        selected_value=cur_status or "",
+        field_class="issues-field",
+        label_class="issues-label",
+        native_onchange="this.form.submit()"
+      ) }}
 
-      <label class="issues-field">
-        <span class="issues-label">Category</span>
-        <select class="issues-select" name="category_id" onchange="this.form.submit()">
-          <option value="" {{ 'selected' if not cur_category_id }}>All</option>
-          {% for c in categories %}
-            <option value="{{ c.id }}" {{ 'selected' if cur_category_id == c.id else '' }}>
-              {{ c.label }}
-            </option>
-          {% endfor %}
-        </select>
-      </label>
+      {{ dropdown(
+        name="category_id",
+        id="issues_category",
+        label="Category",
+        options=category_opts,
+        selected_value=cur_category_id or "",
+        field_class="issues-field",
+        label_class="issues-label",
+        native_onchange="this.form.submit()"
+      ) }}
 
-      <label class="issues-field">
-        <span class="issues-label">Make</span>
-        <select class="issues-select" name="make_id" onchange="this.form.submit()" {{ 'disabled' if not cur_category_id }}>
-          <option value="" {{ 'selected' if not cur_make_id }}>All</option>
-          {% for m in makes %}
-            <option value="{{ m.id }}" {{ 'selected' if cur_make_id == m.id else '' }}>
-              {{ m.label }}
-            </option>
-          {% endfor %}
-        </select>
-      </label>
+      {{ dropdown(
+        name="make_id",
+        id="issues_make",
+        label="Make",
+        options=make_opts,
+        selected_value=cur_make_id or "",
+        disabled=not cur_category_id,
+        field_class="issues-field",
+        label_class="issues-label",
+        native_onchange="this.form.submit()"
+      ) }}
 
-      <label class="issues-field">
-        <span class="issues-label">Model</span>
-        <select class="issues-select" name="model_id" onchange="this.form.submit()" {{ 'disabled' if not cur_make_id }}>
-          <option value="" {{ 'selected' if not cur_model_id }}>All</option>
-          {% for mo in models %}
-            <option value="{{ mo.id }}" {{ 'selected' if cur_model_id == mo.id else '' }}>
-              {{ mo.label }}
-            </option>
-          {% endfor %}
-        </select>
-      </label>
+      {{ dropdown(
+        name="model_id",
+        id="issues_model",
+        label="Model",
+        options=model_opts,
+        selected_value=cur_model_id or "",
+        disabled=not cur_make_id,
+        field_class="issues-field",
+        label_class="issues-label",
+        native_onchange="this.form.submit()"
+      ) }}
 
-      <label class="issues-field">
-        <span class="issues-label">Variant</span>
-        <select class="issues-select" name="variant_id" onchange="this.form.submit()" {{ 'disabled' if not cur_model_id }}>
-          <option value="" {{ 'selected' if not cur_variant_id }}>All</option>
-          {% for v in variants %}
-            <option value="{{ v.id }}" {{ 'selected' if cur_variant_id == v.id else '' }}>
-              {{ v.label }}
-            </option>
-          {% endfor %}
-        </select>
-      </label>
+      {{ dropdown(
+        name="variant_id",
+        id="issues_variant",
+        label="Variant",
+        options=variant_opts,
+        selected_value=cur_variant_id or "",
+        disabled=not cur_model_id,
+        field_class="issues-field",
+        label_class="issues-label",
+        native_onchange="this.form.submit()"
+      ) }}
 
       <label class="issues-field issues-field--grow">
         <span class="issues-label">Search</span>

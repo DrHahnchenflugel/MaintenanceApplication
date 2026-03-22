@@ -73,6 +73,17 @@
   color: var(--text);
 }
 
+.issues-field .select--native,
+.issues-field .dropdown__btn{
+  min-height: 40px;
+}
+
+.issues-field .dropdown__value{
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .issues-select{
   appearance: none;
   padding-right: 40px;
@@ -153,5 +164,7 @@
 
 @media (max-width: 768px){
   .issues-input,
-  .issues-select{ height: 38px; border-radius: 12px; }
+  .issues-select,
+  .issues-field .select--native,
+  .issues-field .dropdown__btn{ height: 38px; border-radius: 12px; }
 }
