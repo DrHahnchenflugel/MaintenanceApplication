@@ -98,6 +98,12 @@
     </div>
   </section>
 </div>
+
+<div class="fab-container">
+  {% with label="New Issue", href=url_for("app.new_issue_form"), icon="+" %}
+    {% include "_partials/_primary_action_button.html" %}
+  {% endwith %}
+</div>
 {% endblock %}
 
 {% block page_js %}
