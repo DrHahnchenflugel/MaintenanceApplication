@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Maintenance – Asset{% endblock %}
+{% block title %}Maintenance â€“ Asset{% endblock %}
 {% block page_title %}Asset{% endblock %}
 
 {% block page_css %}
@@ -13,34 +13,36 @@
   asset.variant_label or asset.variant_name
 ] %}
 {% set full_asset_name = asset_name_parts | select | list | join(' / ') %}
-{% set _, purchased_date = asset.acquired_at | format_dt %}
+{% set purchased_time, purchased_date = asset.acquired_at | format_dt %}
 {% if asset.retired_at %}
-  {% set _, retired_date = asset.retired_at | format_dt %}
+  {% set retired_time, retired_date = asset.retired_at | format_dt %}
 {% endif %}
 
-<div class="asset-detail-page">
-  <section class="asset-detail-hero">
-    <div class="asset-detail-hero__content">
-      <h2 class="asset-detail-hero__title">{{ asset.asset_tag or 'Unknown Asset' }}</h2>
-      <p class="asset-detail-hero__subtitle">
+<div class="asset-page">
+  <section class="card asset-hero">
+    <div class="asset-hero__content">
+      <h2 class="asset-hero__title">{{ asset.asset_tag or 'Unknown Asset' }}</h2>
+      <p class="asset-hero__subtitle">
         {{ full_asset_name or '-' }}
       </p>
     </div>
-    <span class="asset-detail-hero__status">{{ asset.status_label or asset.status_code or 'UNKNOWN' }}</span>
+    <span class="asset-pill">{{ asset.status_label or asset.status_code or 'UNKNOWN' }}</span>
   </section>
 
-  <section class="asset-detail-grid">
-    <div class="asset-detail-main">
-      <section class="asset-detail-panel asset-detail-panel--details" id="asset-details">
-        <div class="asset-detail-panel__header">
-          <h3 class="asset-detail-panel__title">Details</h3>
+  <section class="asset-dashboard">
+    <div class="asset-column asset-column--details">
+      <section class="card asset-card">
+        <div class="asset-card__header">
+          <h3 class="asset-card__title">Details</h3>
+
           <button
             type="button"
-            class="asset-detail-edit"
+            class="asset-card__action"
             aria-label="Edit asset"
-            title="Edit workflow is not available in this view yet."
+            title="Edit is not available in this view yet."
+            disabled
           >
-            <span class="asset-detail-edit__icon" aria-hidden="true">
+            <span class="asset-card__action-icon" aria-hidden="true">
               <svg viewBox="0 0 24 24" focusable="false">
                 <path d="M12 20h9"></path>
                 <path d="M16.5 3.5a2.12 2.12 0 1 1 3 3L7 19l-4 1 1-4Z"></path>
@@ -50,107 +52,105 @@
           </button>
         </div>
 
-        <div class="asset-detail-primary-row">
-          <div class="asset-detail-primary-row__label">Asset Tag</div>
-          <div class="asset-detail-primary-row__value">
-            <span class="asset-detail-primary-row__text">{{ asset.asset_tag or '-' }}</span>
-            <span class="asset-detail-status-chip">{{ asset.status_label or asset.status_code or 'UNKNOWN' }}</span>
+        <div class="asset-info-grid">
+          <div class="asset-field">
+            <span class="asset-field__label">Asset Tag</span>
+            <strong class="asset-field__value">{{ asset.asset_tag or '-' }}</strong>
+          </div>
+          <div class="asset-field">
+            <span class="asset-field__label">Serial</span>
+            <strong class="asset-field__value">{{ asset.serial_number or '-' }}</strong>
+          </div>
+          <div class="asset-field">
+            <span class="asset-field__label">Category</span>
+            <strong class="asset-field__value">{{ asset.category_label or asset.category_name or '-' }}</strong>
+          </div>
+          <div class="asset-field">
+            <span class="asset-field__label">Make</span>
+            <strong class="asset-field__value">{{ asset.make_label or asset.make_name or '-' }}</strong>
+          </div>
+          <div class="asset-field">
+            <span class="asset-field__label">Model</span>
+            <strong class="asset-field__value">{{ asset.model_label or asset.model_name or '-' }}</strong>
+          </div>
+          <div class="asset-field">
+            <span class="asset-field__label">Variant</span>
+            <strong class="asset-field__value">{{ asset.variant_label or asset.variant_name or '-' }}</strong>
           </div>
         </div>
-
-        <dl class="asset-detail-meta-grid">
-          <div class="asset-detail-meta">
-            <dt>Serial</dt>
-            <dd>{{ asset.serial_number or '-' }}</dd>
-          </div>
-          <div class="asset-detail-meta">
-            <dt>Category</dt>
-            <dd>{{ asset.category_label or asset.category_name or '-' }}</dd>
-          </div>
-          <div class="asset-detail-meta">
-            <dt>Make</dt>
-            <dd>{{ asset.make_label or asset.make_name or '-' }}</dd>
-          </div>
-          <div class="asset-detail-meta">
-            <dt>Model</dt>
-            <dd>{{ asset.model_label or asset.model_name or '-' }}</dd>
-          </div>
-          <div class="asset-detail-meta">
-            <dt>Variant</dt>
-            <dd>{{ asset.variant_label or asset.variant_name or '-' }}</dd>
-          </div>
-        </dl>
       </section>
 
-      <div class="asset-detail-secondary-grid">
-        <section class="asset-detail-panel asset-detail-panel--compact">
-          <div class="asset-detail-panel__header">
-            <h3 class="asset-detail-panel__title">Lifecycle</h3>
+      <section class="card asset-card">
+        <div class="asset-card__header">
+          <h3 class="asset-card__title">Lifecycle</h3>
+        </div>
+
+        <div class="asset-info-grid">
+          <div class="asset-field">
+            <span class="asset-field__label">Purchased</span>
+            <strong class="asset-field__value">{{ purchased_date if purchased_date else '-' }}</strong>
           </div>
-
-          <dl class="asset-detail-compact-grid">
-            <div class="asset-detail-meta asset-detail-meta--compact">
-              <dt>Purchased</dt>
-              <dd>{{ purchased_date if purchased_date else '-' }}</dd>
-            </div>
-            <div class="asset-detail-meta asset-detail-meta--compact">
-              <dt>Age</dt>
-              <dd>{{ asset_age or '-' }}</dd>
-            </div>
-            {% if asset.retired_at %}
-              <div class="asset-detail-meta asset-detail-meta--compact">
-                <dt>Retired</dt>
-                <dd>{{ retired_date if retired_date else '-' }}</dd>
-              </div>
-            {% endif %}
-          </dl>
-        </section>
-
-        <section class="asset-detail-panel asset-detail-panel--compact">
-          <div class="asset-detail-panel__header">
-            <h3 class="asset-detail-panel__title">Location</h3>
+          <div class="asset-field">
+            <span class="asset-field__label">Age</span>
+            <strong class="asset-field__value">{{ asset_age or '-' }}</strong>
           </div>
-
-          <dl class="asset-detail-compact-grid">
-            <div class="asset-detail-meta asset-detail-meta--compact">
-              <dt>Site</dt>
-              <dd>{{ asset.site_shorthand or '-' }}</dd>
+          <div class="asset-field">
+            <span class="asset-field__label">Status</span>
+            <strong class="asset-field__value">
+              <span class="asset-pill asset-pill--inline">{{ asset.status_label or asset.status_code or '-' }}</span>
+            </strong>
+          </div>
+          {% if asset.retired_at %}
+            <div class="asset-field">
+              <span class="asset-field__label">Retired</span>
+              <strong class="asset-field__value">{{ retired_date if retired_date else '-' }}</strong>
             </div>
-            <div class="asset-detail-meta asset-detail-meta--compact">
-              <dt>Location</dt>
-              <dd>{{ asset.site_fullname or '-' }}</dd>
-            </div>
-          </dl>
-        </section>
-      </div>
+          {% endif %}
+        </div>
+      </section>
 
-      <div class="asset-detail-footer">
-        <a class="asset-back-button" href="{{ url_for('app.assets_index') }}">Back to list</a>
+      <section class="card asset-card">
+        <div class="asset-card__header">
+          <h3 class="asset-card__title">Location</h3>
+        </div>
+
+        <div class="asset-info-grid">
+          <div class="asset-field">
+            <span class="asset-field__label">Site</span>
+            <strong class="asset-field__value">{{ asset.site_shorthand or '-' }}</strong>
+          </div>
+          <div class="asset-field">
+            <span class="asset-field__label">Location</span>
+            <strong class="asset-field__value">{{ asset.site_fullname or '-' }}</strong>
+          </div>
+        </div>
+      </section>
+
+      <div class="asset-footer">
+        <a class="btn asset-back-link" href="{{ url_for('app.assets_index') }}">Back to list</a>
       </div>
     </div>
 
-    <aside class="asset-history-panel">
-      <div class="asset-history-panel__header">
-        <h3 class="asset-history-panel__title">Past Actions</h3>
+    <aside class="card asset-history-card">
+      <div class="asset-history__header">
+        <h3 class="asset-card__title">Past Actions</h3>
 
-        <a class="btn-primary-action asset-history-panel__cta" href="{{ url_for('app.new_issue_form', asset_id=asset.asset_id) }}">
+        <a class="btn-primary-action asset-history__cta" href="{{ url_for('app.new_issue_form', asset_id=asset.asset_id) }}">
           <span class="btn-primary-action__icon">+</span>
           <span class="btn-primary-action__label">New Issue</span>
         </a>
       </div>
 
-      <div class="asset-history-list">
+      <div class="asset-history__body">
         {% if past_actions %}
           {% for action in past_actions %}
             {% set action_code = action.status.code if action.status else 'UNKNOWN' %}
-            <a class="asset-history-item" href="{{ url_for('app.view_issue', issue_id=action.id) }}">
-              <div class="asset-history-item__top">
-                <div class="asset-history-item__stamp">
+            <a class="history-item" href="{{ url_for('app.view_issue', issue_id=action.id) }}">
+              <div class="history-item__top">
+                <div class="history-item__date">
                   {% set action_time, action_date = action.created_at | format_dt %}
-                  <span class="asset-history-item__date">{{ action_date or '-' }}</span>
-                  {% if action_time %}
-                    <span class="asset-history-item__time">{{ action_time }}</span>
-                  {% endif %}
+                  {{ action_date or '-' }}<br>
+                  <span class="time">{{ action_time or '' }}</span>
                 </div>
 
                 <span class="issue-status {{
@@ -164,15 +164,15 @@
                 </span>
               </div>
 
-              <div class="asset-history-item__title">{{ action.title or '-' }}</div>
+              <div class="history-item__title">{{ action.title or '-' }}</div>
 
               {% if action.reported_by %}
-                <div class="asset-history-item__meta">Reported by {{ action.reported_by }}</div>
+                <div class="history-item__meta">Reported by {{ action.reported_by }}</div>
               {% endif %}
             </a>
           {% endfor %}
         {% else %}
-          <p class="asset-history-empty">No past actions for this asset yet.</p>
+          <p class="history-empty">No past actions for this asset yet.</p>
         {% endif %}
       </div>
     </aside>
