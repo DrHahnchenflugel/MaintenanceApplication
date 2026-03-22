@@ -11,6 +11,7 @@ from . import health    # noqa: F401
 from . import sites     # noqa: F401
 from . import asset_statuses #noqa:F401
 from . import asset_categories #noqa:F401
+from . import dashboard #noqa:F401
 
 @bp.route("/", methods=["GET"])
 def api_v2_root():
@@ -22,6 +23,7 @@ def api_v2_root():
             "assets": "/assets",
             "issues": "/issues",
             "sites": "/sites",
+            "dashboard": "/dashboard",
             "action_types": "/action-types",
             "issue_statuses": "/issue-statuses",
             "asset_statuses": "/asset-statuses",
