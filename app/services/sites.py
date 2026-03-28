@@ -2,6 +2,7 @@ from time import monotonic
 from uuid import UUID
 
 from flask import request
+from sqlalchemy.exc import IntegrityError
 
 from app.db import sites as sites_db
 
@@ -113,6 +114,13 @@ def get_current_site(site_code: str | None = None):
     return get_site_by_code(site_code)
 
 
+def _normalize_site_fullname(fullname: str | None) -> str:
+    value = (fullname or "").strip()
+    if not value:
+        raise ValueError("Site name is required")
+    return value
+
+
 def validate_site_id(site_id, *, required: bool = False, field_name: str = "site_id") -> str | None:
     if site_id is None or str(site_id).strip() == "":
         if required:
@@ -128,6 +136,32 @@ def validate_site_id(site_id, *, required: bool = False, field_name: str = "site
         raise ValueError(f"Unknown {field_name}")
 
     return normalized_site_id
+
+
+def create_site(*, shorthand: str, fullname: str) -> dict:
+    normalized_shorthand = _normalize_site_code(shorthand)
+    normalized_fullname = _normalize_site_fullname(fullname)
+
+    if not normalized_shorthand:
+        raise ValueError("Site short code is required")
+
+    if sites_db.site_shorthand_exists(normalized_shorthand):
+        raise ValueError("Site short code already exists")
+
+    try:
+        row = sites_db.create_site_row(
+            shorthand=normalized_shorthand,
+            fullname=normalized_fullname,
+        )
+    except IntegrityError as exc:
+        raise ValueError("Site short code already exists") from exc
+
+    _get_site_snapshot(force_refresh=True)
+
+    site = dict(row)
+    site["id"] = str(site["id"])
+    site["code"] = _normalize_site_code(site.get("shorthand"))
+    return site
 
 
 def _should_use_secure_cookie(req=None) -> bool:

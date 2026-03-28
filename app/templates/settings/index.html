@@ -9,9 +9,16 @@
 
 {% block content %}
 <div class="settings-page">
+  {% include "_partials/_settings_nav.html" %}
+
   <section class="card settings-card">
     <div class="settings-state">
-      <h2 class="card-title">Settings Access</h2>
+      <div>
+        <h2 class="card-title">Settings Access</h2>
+        <p class="settings-copy">
+          This area only supports adding new sites, asset types, and assets right now.
+        </p>
+      </div>
       <span class="issue-status {{ 'status-closed' if settings_unlocked else 'status-blocked' }}">
         {{ "Unlocked" if settings_unlocked else "Locked" }}
       </span>
@@ -19,7 +26,7 @@
 
     {% if settings_unlocked %}
       <p class="settings-copy">
-        This browser is currently allowed to use protected settings endpoints. Lock it again to remove access.
+        This browser can submit settings changes until you lock it again.
       </p>
 
       <div class="settings-actions">
@@ -29,7 +36,7 @@
       <p id="settingsLockError" class="settings-error" hidden></p>
     {% else %}
       <p class="settings-copy">
-        Enter the shared admin password to unlock settings edits in this browser.
+        Enter the shared admin password to unlock settings changes in this browser.
       </p>
 
       <form id="settingsUnlockForm" class="issue-form--update settings-form">
@@ -53,11 +60,36 @@
     {% endif %}
   </section>
 
-  <section class="card settings-card">
-    <h2 class="card-title">Notes</h2>
-    <p class="settings-copy">
-      Unlocking only sets a simple browser cookie flag. The password itself is never stored in the cookie.
-    </p>
+  <section class="settings-links">
+    <a class="card settings-link-card" href="{{ url_for('app.settings_sites') }}">
+      <h2 class="card-title">Sites</h2>
+      <p class="settings-copy">List sites and add a new site.</p>
+    </a>
+
+    <a class="card settings-link-card" href="{{ url_for('app.settings_categories') }}">
+      <h2 class="card-title">Categories</h2>
+      <p class="settings-copy">List categories and add a new category.</p>
+    </a>
+
+    <a class="card settings-link-card" href="{{ url_for('app.settings_makes') }}">
+      <h2 class="card-title">Makes</h2>
+      <p class="settings-copy">List makes and add a new make.</p>
+    </a>
+
+    <a class="card settings-link-card" href="{{ url_for('app.settings_models') }}">
+      <h2 class="card-title">Models</h2>
+      <p class="settings-copy">List models and add a new model.</p>
+    </a>
+
+    <a class="card settings-link-card" href="{{ url_for('app.settings_variants') }}">
+      <h2 class="card-title">Variants</h2>
+      <p class="settings-copy">List variants and add a new variant.</p>
+    </a>
+
+    <a class="card settings-link-card" href="{{ url_for('app.settings_new_asset') }}">
+      <h2 class="card-title">Assets</h2>
+      <p class="settings-copy">Add a new asset from existing controlled values.</p>
+    </a>
   </section>
 </div>
 {% endblock %}

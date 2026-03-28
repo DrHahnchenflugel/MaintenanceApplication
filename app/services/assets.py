@@ -1,5 +1,8 @@
 from app.db import assets as assets_repo
 from uuid import UUID
+from sqlalchemy.exc import IntegrityError
+
+from app.services import lookups
 from app.services import sites as site_service
 
 def _parse_uuid_field(payload, field_name: str, required: bool = True):
@@ -21,6 +24,55 @@ def _parse_site_id_field(payload, field_name: str = "site_id", required: bool = 
         field_name=field_name,
     )
     return UUID(normalized_site_id) if normalized_site_id else None
+
+
+def _normalize_asset_tag(value) -> str:
+    asset_tag = (value or "").strip()
+    if not asset_tag:
+        raise ValueError("asset_tag is required and must be a string")
+    return asset_tag
+
+
+def _validate_asset_relationships(payload: dict) -> tuple[str, str, str, str]:
+    category_id = lookups.validate_category_id(
+        payload.get("category_id"),
+        required=True,
+        field_name="category_id",
+    )
+    variant_id = lookups.validate_variant_id(
+        payload.get("variant_id"),
+        required=True,
+        field_name="variant_id",
+    )
+
+    variant = lookups.get_variant(variant_id)
+    resolved_model_id = variant["model_id"]
+
+    model_id = lookups.validate_model_id(
+        payload.get("model_id"),
+        required=True,
+        field_name="model_id",
+    )
+    if model_id != resolved_model_id:
+        raise ValueError("Selected variant does not belong to the selected model")
+
+    model = lookups.get_model(model_id)
+    resolved_make_id = model["make_id"]
+
+    make_id = lookups.validate_make_id(
+        payload.get("make_id"),
+        required=True,
+        field_name="make_id",
+    )
+    if make_id != resolved_make_id:
+        raise ValueError("Selected model does not belong to the selected make")
+
+    make = lookups.get_make(make_id)
+
+    if make["category_id"] != category_id:
+        raise ValueError("Selected make does not belong to the selected category")
+
+    return category_id, make_id, model_id, variant_id
 
 def get_asset_service(asset_id, include=None):
     """
@@ -177,6 +229,8 @@ def create_asset_service(payload: dict) -> dict:
       - asset_tag (str, required)
       - site_id (UUID string, required)
       - category_id (UUID string, required)
+      - make_id (UUID string, required)
+      - model_id (UUID string, required)
       - status_id (UUID string, required)
       - variant_id (UUID string, required)
       - serial_number (str, optional)
@@ -186,29 +240,37 @@ def create_asset_service(payload: dict) -> dict:
       dict representing the created asset row.
     """
 
-    # Required simple fields
-    asset_tag = payload.get("asset_tag")
-    if not asset_tag or not isinstance(asset_tag, str):
-        raise ValueError("asset_tag is required and must be a string")
+    asset_tag = _normalize_asset_tag(payload.get("asset_tag"))
+    if assets_repo.asset_tag_exists(asset_tag):
+        raise ValueError("asset_tag already exists")
 
-    # UUID fields
-    site_id = _parse_site_id_field(payload, "site_id", required=True)
-    category_id = _parse_uuid_field(payload, "category_id", required=True)
-    status_id = _parse_uuid_field(payload, "status_id", required=True)
-    variant_id = _parse_uuid_field(payload, "variant_id", required=True)
+    site_id = site_service.validate_site_id(
+        payload.get("site_id"),
+        required=True,
+        field_name="site_id",
+    )
+    category_id, _make_id, _model_id, variant_id = _validate_asset_relationships(payload)
+    status_id = lookups.validate_asset_status_id(
+        payload.get("status_id"),
+        required=True,
+        field_name="status_id",
+    )
 
     # Optional fields
     acquired_at = payload.get("acquired_at")      # let Postgres cast if given
 
     # Call L3 to actually insert
-    row = assets_repo.create_asset_row(
-        variant_id=variant_id,
-        category_id=category_id,
-        site_id=site_id,
-        status_id=status_id,
-        asset_tag=asset_tag,
-        acquired_at=acquired_at,
-    )
+    try:
+        row = assets_repo.create_asset_row(
+            variant_id=variant_id,
+            category_id=category_id,
+            site_id=site_id,
+            status_id=status_id,
+            asset_tag=asset_tag,
+            acquired_at=acquired_at,
+        )
+    except IntegrityError as exc:
+        raise ValueError("Unable to create asset with the supplied values") from exc
 
     return row
 

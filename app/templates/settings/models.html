@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Maintenance - Settings - Models{% endblock %}
+{% block page_title %}Settings - Models{% endblock %}
+
+{% block page_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/settings.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="settings-page">
+  {% include "_partials/_settings_nav.html" %}
+
+  <div class="settings-split">
+    <section class="card settings-panel">
+      <div class="settings-panel__header">
+        <h2 class="card-title">Existing Models</h2>
+        <p class="settings-copy">{{ models|length }} total</p>
+      </div>
+
+      <div class="table">
+        <div class="table-head table-head--2">
+          <div>Model</div>
+          <div>Make</div>
+        </div>
+        <div class="table-scroll">
+          {% for model in models %}
+            <div class="table-row table-row--2">
+              <div><strong>{{ model.label }}</strong></div>
+              <div>
+                {{ model.make_label or "-" }}
+                {% if model.category_label %}
+                  <div class="settings-table-sub">{{ model.category_label }}</div>
+                {% endif %}
+              </div>
+            </div>
+          {% else %}
+            <div class="table-row table-row--2">
+              <div>No models found.</div>
+              <div></div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <section class="card settings-panel settings-form-card">
+      <h2 class="card-title">Add Model</h2>
+      <p class="settings-copy">A model must belong to an existing make.</p>
+
+      {% if created %}
+        <p class="settings-feedback settings-feedback--success">Model created.</p>
+      {% endif %}
+      {% if form_error %}
+        <p class="settings-feedback settings-feedback--error">{{ form_error }}</p>
+      {% endif %}
+      {% if not settings_unlocked %}
+        <p class="settings-copy">Unlock settings on the overview page before submitting changes.</p>
+      {% endif %}
+
+      <form method="post" class="issue-form--update settings-form-stack">
+        <fieldset class="settings-fieldset" {% if not settings_unlocked %}disabled{% endif %}>
+          <div class="field">
+            <label class="issue-label" for="model_make">Make</label>
+            <select id="model_make" name="make_id" required>
+              <option value="">Select a make</option>
+              {% for make in makes %}
+                <option value="{{ make.id }}" {% if form_values.make_id == make.id %}selected{% endif %}>
+                  {{ make.label }}{% if make.category_label %} ({{ make.category_label }}){% endif %}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="field">
+            <label class="issue-label" for="model_name">Model Name</label>
+            <input id="model_name" name="name" value="{{ form_values.name }}" required>
+          </div>
+        </fieldset>
+
+        <div class="issue-form-actions">
+          <button class="btn btn--ok" type="submit" {% if not settings_unlocked %}disabled{% endif %}>Add Model</button>
+          <a class="btn btn-secondary" href="{{ url_for('app.settings') }}">Back to Settings</a>
+        </div>
+      </form>
+    </section>
+  </div>
+</div>
+{% endblock %}

@@ -259,6 +259,18 @@ def list_asset_rows(
     rows = [dict(row) for row in result]
     return rows, total
 
+def asset_tag_exists(asset_tag: str) -> bool:
+    sql = text("""
+        SELECT 1
+        FROM asset
+        WHERE LOWER(asset_tag) = LOWER(:asset_tag)
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(sql, {"asset_tag": asset_tag}).mappings().first()
+
+    return row is not None
+
 def create_asset_row(
     variant_id,
     category_id,

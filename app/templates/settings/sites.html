@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Maintenance - Settings - Sites{% endblock %}
+{% block page_title %}Settings - Sites{% endblock %}
+
+{% block page_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/settings.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="settings-page">
+  {% include "_partials/_settings_nav.html" %}
+
+  <div class="settings-split">
+    <section class="card settings-panel">
+      <div class="settings-panel__header">
+        <h2 class="card-title">Existing Sites</h2>
+        <p class="settings-copy">{{ sites|length }} total</p>
+      </div>
+
+      <div class="table">
+        <div class="table-head table-head--2">
+          <div>Short Code</div>
+          <div>Site</div>
+        </div>
+        <div class="table-scroll">
+          {% for site in sites %}
+            <div class="table-row table-row--2">
+              <div><strong>{{ site.code or "-" }}</strong></div>
+              <div>{{ site.fullname }}</div>
+            </div>
+          {% else %}
+            <div class="table-row table-row--2">
+              <div>No sites found.</div>
+              <div></div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <section class="card settings-panel settings-form-card">
+      <h2 class="card-title">Add Site</h2>
+      <p class="settings-copy">Create a site with a unique short code.</p>
+
+      {% if created %}
+        <p class="settings-feedback settings-feedback--success">Site created.</p>
+      {% endif %}
+      {% if form_error %}
+        <p class="settings-feedback settings-feedback--error">{{ form_error }}</p>
+      {% endif %}
+      {% if not settings_unlocked %}
+        <p class="settings-copy">Unlock settings on the overview page before submitting changes.</p>
+      {% endif %}
+
+      <form method="post" class="issue-form--update settings-form-stack">
+        <fieldset class="settings-fieldset" {% if not settings_unlocked %}disabled{% endif %}>
+          <div class="field">
+            <label class="issue-label" for="site_fullname">Site Name</label>
+            <input id="site_fullname" name="fullname" value="{{ form_values.fullname }}" required>
+          </div>
+
+          <div class="field">
+            <label class="issue-label" for="site_shorthand">Short Code</label>
+            <input id="site_shorthand" name="shorthand" value="{{ form_values.shorthand }}" required>
+          </div>
+        </fieldset>
+
+        <div class="issue-form-actions">
+          <button class="btn btn--ok" type="submit" {% if not settings_unlocked %}disabled{% endif %}>Add Site</button>
+          <a class="btn btn-secondary" href="{{ url_for('app.settings') }}">Back to Settings</a>
+        </div>
+      </form>
+    </section>
+  </div>
+</div>
+{% endblock %}

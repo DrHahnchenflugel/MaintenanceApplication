@@ -1,0 +1,297 @@
+{% extends "base.html" %}
+
+{% block title %}Maintenance - Settings - Add Asset{% endblock %}
+{% block page_title %}Settings - Add Asset{% endblock %}
+
+{% block page_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/settings.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="settings-page">
+  {% include "_partials/_settings_nav.html" %}
+
+  {% if created and created_asset %}
+    <section class="card settings-card">
+      <h2 class="card-title">Asset Created</h2>
+      <p class="settings-copy">
+        <strong>{{ created_asset.asset_tag }}</strong>
+        {% if created_asset.site_shorthand %} at {{ created_asset.site_shorthand }}{% endif %}
+        {% if created_asset.make_name and created_asset.model_name %}
+          as {{ created_asset.make_name }} / {{ created_asset.model_name }}{% if created_asset.variant_name %} / {{ created_asset.variant_name }}{% endif %}
+        {% endif %}
+      </p>
+      <div class="settings-actions">
+        <a class="btn" href="{{ url_for('app.view_asset', asset_id=created_asset.asset_id) }}">Open Asset</a>
+      </div>
+    </section>
+  {% endif %}
+
+  <div class="settings-split">
+    <section class="card settings-panel">
+      <div class="settings-panel__header">
+        <h2 class="card-title">Existing Assets</h2>
+        <p class="settings-copy">Showing the first {{ assets|length }} by asset tag.</p>
+      </div>
+
+      <div class="table">
+        <div class="table-head table-head--3">
+          <div>Asset Tag</div>
+          <div>Site</div>
+          <div>Classification</div>
+        </div>
+        <div class="table-scroll">
+          {% for asset in assets %}
+            <div class="table-row table-row--3">
+              <div>
+                <strong>{{ asset.asset_tag }}</strong>
+                {% if status_by_id.get(asset.status_id) %}
+                  <div class="settings-table-sub">{{ status_by_id.get(asset.status_id).label }}</div>
+                {% endif %}
+              </div>
+              <div>
+                {{ site_by_id.get(asset.site_id).fullname if site_by_id.get(asset.site_id) else "-" }}
+                {% if site_by_id.get(asset.site_id) and site_by_id.get(asset.site_id).code %}
+                  <div class="settings-table-sub">{{ site_by_id.get(asset.site_id).code }}</div>
+                {% endif %}
+              </div>
+              <div>
+                {{ category_by_id.get(asset.category_id).label if category_by_id.get(asset.category_id) else "-" }}
+                <div class="settings-table-sub">
+                  {{ asset.make_name or "-" }} / {{ asset.model_name or "-" }} / {{ asset.variant_name or "-" }}
+                </div>
+              </div>
+            </div>
+          {% else %}
+            <div class="table-row table-row--3">
+              <div>No assets found.</div>
+              <div></div>
+              <div></div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <section class="card settings-panel settings-form-card">
+      <h2 class="card-title">Add Asset</h2>
+      <p class="settings-copy">Site, category, make, model, and variant must be chosen from existing records.</p>
+
+      {% if form_error %}
+        <p class="settings-feedback settings-feedback--error">{{ form_error }}</p>
+      {% endif %}
+      {% if not settings_unlocked %}
+        <p class="settings-copy">Unlock settings on the overview page before submitting changes.</p>
+      {% endif %}
+
+      <form
+        method="post"
+        class="issue-form--update settings-form-stack"
+        data-settings-asset-form
+        data-makes-url="/maintenance/api/v2/assets/makes"
+        data-models-url="/maintenance/api/v2/assets/models"
+        data-variants-url="/maintenance/api/v2/assets/variants"
+      >
+        <fieldset class="settings-fieldset" {% if not settings_unlocked %}disabled{% endif %}>
+          <div class="field">
+            <label class="issue-label" for="asset_tag">Asset Tag</label>
+            <input id="asset_tag" name="asset_tag" value="{{ form_values.asset_tag }}" required>
+          </div>
+
+          <div class="field">
+            <label class="issue-label" for="asset_site">Site</label>
+            <select id="asset_site" name="site_id" required>
+              <option value="">Select a site</option>
+              {% for site in site_options %}
+                <option value="{{ site.id }}" {% if form_values.site_id == site.id %}selected{% endif %}>
+                  {{ site.fullname }}{% if site.code %} ({{ site.code }}){% endif %}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="field">
+            <label class="issue-label" for="asset_category">Category</label>
+            <select id="asset_category" name="category_id" required>
+              <option value="">Select a category</option>
+              {% for category in category_options %}
+                <option value="{{ category.id }}" {% if form_values.category_id == category.id %}selected{% endif %}>
+                  {{ category.label }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="field">
+            <label class="issue-label" for="asset_make">Make</label>
+            <select id="asset_make" name="make_id" required {% if not form_values.category_id %}disabled{% endif %}>
+              <option value="">{{ "Select a category first" if not form_values.category_id else "Select a make" }}</option>
+              {% for make in make_options %}
+                <option value="{{ make.id }}" {% if form_values.make_id == make.id %}selected{% endif %}>
+                  {{ make.label }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="field">
+            <label class="issue-label" for="asset_model">Model</label>
+            <select id="asset_model" name="model_id" required {% if not form_values.make_id %}disabled{% endif %}>
+              <option value="">{{ "Select a make first" if not form_values.make_id else "Select a model" }}</option>
+              {% for model in model_options %}
+                <option value="{{ model.id }}" {% if form_values.model_id == model.id %}selected{% endif %}>
+                  {{ model.label }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="field">
+            <label class="issue-label" for="asset_variant">Variant</label>
+            <select id="asset_variant" name="variant_id" required {% if not form_values.model_id %}disabled{% endif %}>
+              <option value="">{{ "Select a model first" if not form_values.model_id else "Select a variant" }}</option>
+              {% for variant in variant_options %}
+                <option value="{{ variant.id }}" {% if form_values.variant_id == variant.id %}selected{% endif %}>
+                  {{ variant.label }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="field">
+            <label class="issue-label" for="asset_status">Status</label>
+            <select id="asset_status" name="status_id" required>
+              <option value="">Select a status</option>
+              {% for status in status_options %}
+                <option value="{{ status.id }}" {% if form_values.status_id == status.id %}selected{% endif %}>
+                  {{ status.label }}
+                </option>
+              {% endfor %}
+            </select>
+          </div>
+        </fieldset>
+
+        <div class="issue-form-actions">
+          <button class="btn btn--ok" type="submit" {% if not settings_unlocked %}disabled{% endif %}>Add Asset</button>
+          <a class="btn btn-secondary" href="{{ url_for('app.settings') }}">Back to Settings</a>
+        </div>
+      </form>
+    </section>
+  </div>
+</div>
+{% endblock %}
+
+{% block page_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var form = document.querySelector("[data-settings-asset-form]");
+    if (!form) return;
+
+    var categorySelect = document.getElementById("asset_category");
+    var makeSelect = document.getElementById("asset_make");
+    var modelSelect = document.getElementById("asset_model");
+    var variantSelect = document.getElementById("asset_variant");
+
+    function resetSelect(selectEl, placeholder, disabled) {
+      if (!selectEl) return;
+      selectEl.innerHTML = "";
+      var option = document.createElement("option");
+      option.value = "";
+      option.textContent = placeholder;
+      selectEl.appendChild(option);
+      selectEl.value = "";
+      selectEl.disabled = !!disabled;
+    }
+
+    function fillSelect(selectEl, items, selectedValue, placeholder) {
+      resetSelect(selectEl, placeholder, false);
+
+      items.forEach(function (item) {
+        var option = document.createElement("option");
+        option.value = item.id;
+        option.textContent = item.label;
+        if (selectedValue && selectedValue === item.id) {
+          option.selected = true;
+        }
+        selectEl.appendChild(option);
+      });
+    }
+
+    function fetchJson(url) {
+      return fetch(url, { headers: { Accept: "application/json" } })
+        .then(function (response) {
+          if (!response.ok) {
+            throw new Error("Request failed: " + response.status);
+          }
+          return response.json();
+        });
+    }
+
+    function loadMakes(selectedValue) {
+      resetSelect(makeSelect, "Loading makes...", true);
+      resetSelect(modelSelect, "Select a make first", true);
+      resetSelect(variantSelect, "Select a model first", true);
+
+      if (!categorySelect.value) {
+        resetSelect(makeSelect, "Select a category first", true);
+        return Promise.resolve();
+      }
+
+      return fetchJson(
+        form.dataset.makesUrl + "?category_id=" + encodeURIComponent(categorySelect.value)
+      ).then(function (items) {
+        fillSelect(makeSelect, items, selectedValue, "Select a make");
+      }).catch(function () {
+        resetSelect(makeSelect, "Unable to load makes", true);
+      });
+    }
+
+    function loadModels(selectedValue) {
+      resetSelect(modelSelect, "Loading models...", true);
+      resetSelect(variantSelect, "Select a model first", true);
+
+      if (!makeSelect.value) {
+        resetSelect(modelSelect, "Select a make first", true);
+        return Promise.resolve();
+      }
+
+      return fetchJson(
+        form.dataset.modelsUrl + "?make_id=" + encodeURIComponent(makeSelect.value)
+      ).then(function (items) {
+        fillSelect(modelSelect, items, selectedValue, "Select a model");
+      }).catch(function () {
+        resetSelect(modelSelect, "Unable to load models", true);
+      });
+    }
+
+    function loadVariants(selectedValue) {
+      resetSelect(variantSelect, "Loading variants...", true);
+
+      if (!modelSelect.value) {
+        resetSelect(variantSelect, "Select a model first", true);
+        return Promise.resolve();
+      }
+
+      return fetchJson(
+        form.dataset.variantsUrl + "?model_id=" + encodeURIComponent(modelSelect.value)
+      ).then(function (items) {
+        fillSelect(variantSelect, items, selectedValue, "Select a variant");
+      }).catch(function () {
+        resetSelect(variantSelect, "Unable to load variants", true);
+      });
+    }
+
+    categorySelect.addEventListener("change", function () {
+      loadMakes("");
+    });
+
+    makeSelect.addEventListener("change", function () {
+      loadModels("");
+    });
+
+    modelSelect.addEventListener("change", function () {
+      loadVariants("");
+    });
+  });
+</script>
+{% endblock %}

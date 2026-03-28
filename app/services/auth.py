@@ -1,4 +1,5 @@
 from werkzeug.security import check_password_hash
+from flask import request
 
 from app.db import auth as auth_db
 
@@ -41,3 +42,8 @@ def verify_admin_gate(name: str, password: str) -> bool:
         return False
 
     return check_password_hash(row["password_hash"], password)
+
+
+def is_settings_admin_unlocked(req=None) -> bool:
+    req = req or request
+    return req.cookies.get(SETTINGS_ADMIN_GATE_COOKIE_NAME) == "1"

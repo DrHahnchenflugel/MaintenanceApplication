@@ -1,0 +1,23 @@
+<nav class="settings-nav" aria-label="Settings sections">
+  <a href="{{ url_for('app.settings') }}" class="{% if settings_active_tab == 'home' %}is-active{% endif %}">
+    Overview
+  </a>
+  <a href="{{ url_for('app.settings_sites') }}" class="{% if settings_active_tab == 'sites' %}is-active{% endif %}">
+    Sites
+  </a>
+  <a href="{{ url_for('app.settings_categories') }}" class="{% if settings_active_tab == 'categories' %}is-active{% endif %}">
+    Categories
+  </a>
+  <a href="{{ url_for('app.settings_makes') }}" class="{% if settings_active_tab == 'makes' %}is-active{% endif %}">
+    Makes
+  </a>
+  <a href="{{ url_for('app.settings_models') }}" class="{% if settings_active_tab == 'models' %}is-active{% endif %}">
+    Models
+  </a>
+  <a href="{{ url_for('app.settings_variants') }}" class="{% if settings_active_tab == 'variants' %}is-active{% endif %}">
+    Variants
+  </a>
+  <a href="{{ url_for('app.settings_new_asset') }}" class="{% if settings_active_tab == 'assets' %}is-active{% endif %}">
+    Add Asset
+  </a>
+</nav>

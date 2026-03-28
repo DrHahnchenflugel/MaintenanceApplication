@@ -1,10 +1,10 @@
 .settings-page {
   display: grid;
   gap: 16px;
-  max-width: 720px;
 }
 
-.settings-card {
+.settings-card,
+.settings-panel {
   display: grid;
   gap: 16px;
 }
@@ -35,10 +35,128 @@
   display: flex;
   align-items: center;
   gap: 12px;
+  flex-wrap: wrap;
 }
 
 .settings-error {
   margin: 0;
   color: var(--bad);
   font-weight: 700;
+}
+
+.settings-nav {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.settings-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 38px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  background: rgba(255,255,255,0.02);
+  text-decoration: none;
+  font-weight: 700;
+}
+
+.settings-nav a:hover {
+  color: var(--text);
+  border-color: var(--line-strong);
+}
+
+.settings-nav a.is-active {
+  color: var(--text);
+  border-color: rgba(255,102,0,0.28);
+  background: var(--brand-mid);
+}
+
+.settings-links {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
+.settings-link-card {
+  color: inherit;
+  text-decoration: none;
+  min-height: 140px;
+}
+
+.settings-link-card:hover {
+  transform: translateY(-1px);
+}
+
+.settings-split {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.9fr);
+  align-items: start;
+}
+
+.settings-panel__header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.settings-form-card {
+  align-content: start;
+}
+
+.settings-form-stack {
+  gap: 16px;
+}
+
+.settings-fieldset {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.settings-fieldset:disabled {
+  opacity: 0.7;
+}
+
+.settings-feedback {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+}
+
+.settings-feedback--success {
+  color: var(--text);
+  background: rgba(17, 107, 62, 0.22);
+  border-color: rgba(17, 107, 62, 0.55);
+}
+
+.settings-feedback--error {
+  color: var(--text);
+  background: rgba(178, 34, 34, 0.22);
+  border-color: rgba(178, 34, 34, 0.55);
+}
+
+.settings-table-sub {
+  margin-top: 4px;
+  font-size: 12px;
+  color: rgba(231,235,241,0.70);
+}
+
+.settings-page .table-scroll {
+  max-height: 60vh;
+}
+
+@media (max-width: 1024px) {
+  .settings-split {
+    grid-template-columns: 1fr;
+  }
 }

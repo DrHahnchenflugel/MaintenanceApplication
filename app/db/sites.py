@@ -33,3 +33,45 @@ def get_site_row(site_id):
         return None
 
     return dict(row)
+
+def site_shorthand_exists(shorthand: str) -> bool:
+    sql = text("""
+        SELECT 1
+        FROM site
+        WHERE UPPER(shorthand) = :shorthand
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(sql, {"shorthand": shorthand}).mappings().first()
+
+    return row is not None
+
+def create_site_row(*, shorthand: str, fullname: str):
+    sql = text("""
+        INSERT INTO site (
+            shorthand,
+            fullname
+        )
+        VALUES (
+            :shorthand,
+            :fullname
+        )
+        RETURNING
+            id,
+            shorthand,
+            fullname
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(
+            sql,
+            {
+                "shorthand": shorthand,
+                "fullname": fullname,
+            },
+        ).mappings().first()
+
+    if row is None:
+        raise RuntimeError("Failed to insert site")
+
+    return dict(row)

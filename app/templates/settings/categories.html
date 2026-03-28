@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+
+{% block title %}Maintenance - Settings - Categories{% endblock %}
+{% block page_title %}Settings - Categories{% endblock %}
+
+{% block page_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/settings.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="settings-page">
+  {% include "_partials/_settings_nav.html" %}
+
+  <div class="settings-split">
+    <section class="card settings-panel">
+      <div class="settings-panel__header">
+        <h2 class="card-title">Existing Categories</h2>
+        <p class="settings-copy">{{ categories|length }} total</p>
+      </div>
+
+      <div class="table">
+        <div class="table-head table-head--2">
+          <div>Category</div>
+          <div>Stored Name</div>
+        </div>
+        <div class="table-scroll">
+          {% for category in categories %}
+            <div class="table-row table-row--2">
+              <div><strong>{{ category.label }}</strong></div>
+              <div>{{ category.name or category.label }}</div>
+            </div>
+          {% else %}
+            <div class="table-row table-row--2">
+              <div>No categories found.</div>
+              <div></div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <section class="card settings-panel settings-form-card">
+      <h2 class="card-title">Add Category</h2>
+      <p class="settings-copy">This minimal flow stores the same value for display and name.</p>
+
+      {% if created %}
+        <p class="settings-feedback settings-feedback--success">Category created.</p>
+      {% endif %}
+      {% if form_error %}
+        <p class="settings-feedback settings-feedback--error">{{ form_error }}</p>
+      {% endif %}
+      {% if not settings_unlocked %}
+        <p class="settings-copy">Unlock settings on the overview page before submitting changes.</p>
+      {% endif %}
+
+      <form method="post" class="issue-form--update settings-form-stack">
+        <fieldset class="settings-fieldset" {% if not settings_unlocked %}disabled{% endif %}>
+          <div class="field">
+            <label class="issue-label" for="category_name">Category Name</label>
+            <input id="category_name" name="name" value="{{ form_values.name }}" required>
+          </div>
+        </fieldset>
+
+        <div class="issue-form-actions">
+          <button class="btn btn--ok" type="submit" {% if not settings_unlocked %}disabled{% endif %}>Add Category</button>
+          <a class="btn btn-secondary" href="{{ url_for('app.settings') }}">Back to Settings</a>
+        </div>
+      </form>
+    </section>
+  </div>
+</div>
+{% endblock %}

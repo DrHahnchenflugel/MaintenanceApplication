@@ -18,6 +18,6 @@
         <a href="{{ url_for('app.assets_index') }}" 
             {% if request.endpoint == 'app.assets_index' %}class="is-active"{% endif %}>Inventory</a>
         <a href="{{ url_for('app.settings') }}" 
-            {% if request.endpoint == 'app.settings' %}class="is-active"{% endif %}>Settings</a>
+            {% if request.endpoint and request.endpoint.startswith('app.settings') %}class="is-active"{% endif %}>Settings</a>
     </nav>
 </aside>

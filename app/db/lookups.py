@@ -1,5 +1,7 @@
 from sqlalchemy import text
+
 from app.db.connection import get_connection
+
 
 def list_asset_status_rows():
     sql = text("""
@@ -17,6 +19,24 @@ def list_asset_status_rows():
 
     return [dict(r) for r in rows]
 
+
+def get_asset_status_row(status_id):
+    sql = text("""
+        SELECT
+            id,
+            code,
+            label,
+            display_order
+        FROM asset_status
+        WHERE id = :id
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(sql, {"id": status_id}).mappings().first()
+
+    return None if row is None else dict(row)
+
+
 def list_category_rows():
     sql = text("""
         SELECT
@@ -32,56 +52,416 @@ def list_category_rows():
 
     return [dict(r) for r in rows]
 
+
+def get_category_row(category_id):
+    sql = text("""
+        SELECT
+            id,
+            name,
+            label
+        FROM category
+        WHERE id = :id
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(sql, {"id": category_id}).mappings().first()
+
+    return None if row is None else dict(row)
+
+
+def category_name_exists(name: str) -> bool:
+    sql = text("""
+        SELECT 1
+        FROM category
+        WHERE LOWER(name) = LOWER(:name)
+           OR LOWER(label) = LOWER(:name)
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(sql, {"name": name}).mappings().first()
+
+    return row is not None
+
+
+def create_category_row(*, name: str, label: str):
+    sql = text("""
+        INSERT INTO category (
+            name,
+            label
+        )
+        VALUES (
+            :name,
+            :label
+        )
+        RETURNING
+            id,
+            name,
+            label
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(sql, {"name": name, "label": label}).mappings().first()
+
+    if row is None:
+        raise RuntimeError("Failed to insert category")
+
+    return dict(row)
+
+
 def list_makes(category_id=None):
     sql = """
-    SELECT id, label, category_id
-    FROM make
+        SELECT
+            make.id,
+            make.name,
+            make.label,
+            make.category_id,
+            category.name AS category_name,
+            category.label AS category_label
+        FROM make
+        LEFT JOIN category
+          ON make.category_id = category.id
     """
 
     params = {}
     if category_id:
-        sql += " WHERE category_id = :category_id"
+        sql += " WHERE make.category_id = :category_id"
         params["category_id"] = category_id
 
-    sql += " ORDER BY label ASC"
-    
+    sql += """
+        ORDER BY
+            COALESCE(category.label, category.name, '') ASC,
+            COALESCE(make.label, make.name, '') ASC,
+            make.name ASC
+    """
+
     with get_connection() as conn:
-        rows = conn.execute(
-            text(sql),
-            {"category_id": category_id}
-        ).mappings().all()
+        rows = conn.execute(text(sql), params).mappings().all()
+
     return [dict(r) for r in rows]
+
+
+def get_make_row(make_id):
+    sql = text("""
+        SELECT
+            make.id,
+            make.name,
+            make.label,
+            make.category_id,
+            category.name AS category_name,
+            category.label AS category_label
+        FROM make
+        LEFT JOIN category
+          ON make.category_id = category.id
+        WHERE make.id = :id
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(sql, {"id": make_id}).mappings().first()
+
+    return None if row is None else dict(row)
+
+
+def make_name_exists(name: str) -> bool:
+    sql = text("""
+        SELECT 1
+        FROM make
+        WHERE LOWER(name) = LOWER(:name)
+           OR LOWER(label) = LOWER(:name)
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(sql, {"name": name}).mappings().first()
+
+    return row is not None
+
+
+def create_make_row(*, category_id, name: str, label: str):
+    sql = text("""
+        INSERT INTO make (
+            category_id,
+            name,
+            label
+        )
+        VALUES (
+            :category_id,
+            :name,
+            :label
+        )
+        RETURNING
+            id,
+            category_id,
+            name,
+            label
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(
+            sql,
+            {
+                "category_id": category_id,
+                "name": name,
+                "label": label,
+            },
+        ).mappings().first()
+
+    if row is None:
+        raise RuntimeError("Failed to insert make")
+
+    return dict(row)
+
 
 def list_models(make_id=None):
     sql = """
-      SELECT id, label
-      FROM model
+        SELECT
+            model.id,
+            model.name,
+            model.label,
+            model.make_id,
+            make.name AS make_name,
+            make.label AS make_label,
+            make.category_id AS category_id,
+            category.name AS category_name,
+            category.label AS category_label
+        FROM model
+        LEFT JOIN make
+          ON model.make_id = make.id
+        LEFT JOIN category
+          ON make.category_id = category.id
     """
-    
-    if (make_id):
-      sql += " WHERE make_id = :make_id"
-    
-    sql += " ORDER BY label ASC"
-    
+
+    params = {}
+    if make_id:
+        sql += " WHERE model.make_id = :make_id"
+        params["make_id"] = make_id
+
+    sql += """
+        ORDER BY
+            COALESCE(make.label, make.name, '') ASC,
+            COALESCE(model.label, model.name, '') ASC,
+            model.name ASC
+    """
+
     with get_connection() as conn:
-        rows = conn.execute(text(sql), {"make_id": make_id}).mappings().all()
-    
+        rows = conn.execute(text(sql), params).mappings().all()
+
     return [dict(r) for r in rows]
+
+
+def get_model_row(model_id):
+    sql = text("""
+        SELECT
+            model.id,
+            model.name,
+            model.label,
+            model.make_id,
+            make.name AS make_name,
+            make.label AS make_label,
+            make.category_id AS category_id,
+            category.name AS category_name,
+            category.label AS category_label
+        FROM model
+        LEFT JOIN make
+          ON model.make_id = make.id
+        LEFT JOIN category
+          ON make.category_id = category.id
+        WHERE model.id = :id
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(sql, {"id": model_id}).mappings().first()
+
+    return None if row is None else dict(row)
+
+
+def model_name_exists_in_make(name: str, make_id) -> bool:
+    sql = text("""
+        SELECT 1
+        FROM model
+        WHERE make_id = :make_id
+          AND (
+            LOWER(name) = LOWER(:name)
+            OR LOWER(label) = LOWER(:name)
+          )
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(
+            sql,
+            {
+                "make_id": make_id,
+                "name": name,
+            },
+        ).mappings().first()
+
+    return row is not None
+
+
+def create_model_row(*, make_id, name: str, label: str):
+    sql = text("""
+        INSERT INTO model (
+            make_id,
+            name,
+            label
+        )
+        VALUES (
+            :make_id,
+            :name,
+            :label
+        )
+        RETURNING
+            id,
+            make_id,
+            name,
+            label
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(
+            sql,
+            {
+                "make_id": make_id,
+                "name": name,
+                "label": label,
+            },
+        ).mappings().first()
+
+    if row is None:
+        raise RuntimeError("Failed to insert model")
+
+    return dict(row)
+
 
 def list_variants(model_id=None):
     sql = """
-      SELECT id, label
-      FROM variant
+        SELECT
+            variant.id,
+            variant.name,
+            variant.label,
+            variant.model_id,
+            model.name AS model_name,
+            model.label AS model_label,
+            model.make_id AS make_id,
+            make.name AS make_name,
+            make.label AS make_label,
+            make.category_id AS category_id,
+            category.name AS category_name,
+            category.label AS category_label
+        FROM variant
+        LEFT JOIN model
+          ON variant.model_id = model.id
+        LEFT JOIN make
+          ON model.make_id = make.id
+        LEFT JOIN category
+          ON make.category_id = category.id
     """
 
-    if (model_id):
-        sql += " WHERE model_id = :model_id"
-    
-    sql += " ORDER BY label ASC"
+    params = {}
+    if model_id:
+        sql += " WHERE variant.model_id = :model_id"
+        params["model_id"] = model_id
+
+    sql += """
+        ORDER BY
+            COALESCE(make.label, make.name, '') ASC,
+            COALESCE(model.label, model.name, '') ASC,
+            COALESCE(variant.label, variant.name, '') ASC,
+            variant.name ASC
+    """
 
     with get_connection() as conn:
-        rows = conn.execute(text(sql), {"model_id": model_id}).mappings().all()
+        rows = conn.execute(text(sql), params).mappings().all()
+
     return [dict(r) for r in rows]
+
+
+def get_variant_row(variant_id):
+    sql = text("""
+        SELECT
+            variant.id,
+            variant.name,
+            variant.label,
+            variant.model_id,
+            model.name AS model_name,
+            model.label AS model_label,
+            model.make_id AS make_id,
+            make.name AS make_name,
+            make.label AS make_label,
+            make.category_id AS category_id,
+            category.name AS category_name,
+            category.label AS category_label
+        FROM variant
+        LEFT JOIN model
+          ON variant.model_id = model.id
+        LEFT JOIN make
+          ON model.make_id = make.id
+        LEFT JOIN category
+          ON make.category_id = category.id
+        WHERE variant.id = :id
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(sql, {"id": variant_id}).mappings().first()
+
+    return None if row is None else dict(row)
+
+
+def variant_name_exists_in_model(name: str, model_id) -> bool:
+    sql = text("""
+        SELECT 1
+        FROM variant
+        WHERE model_id = :model_id
+          AND (
+            LOWER(name) = LOWER(:name)
+            OR LOWER(label) = LOWER(:name)
+          )
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(
+            sql,
+            {
+                "model_id": model_id,
+                "name": name,
+            },
+        ).mappings().first()
+
+    return row is not None
+
+
+def create_variant_row(*, model_id, name: str, label: str):
+    sql = text("""
+        INSERT INTO variant (
+            model_id,
+            name,
+            label
+        )
+        VALUES (
+            :model_id,
+            :name,
+            :label
+        )
+        RETURNING
+            id,
+            model_id,
+            name,
+            label
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(
+            sql,
+            {
+                "model_id": model_id,
+                "name": name,
+                "label": label,
+            },
+        ).mappings().first()
+
+    if row is None:
+        raise RuntimeError("Failed to insert variant")
+
+    return dict(row)
+
 
 def list_issue_status_rows():
     sql = text("""
