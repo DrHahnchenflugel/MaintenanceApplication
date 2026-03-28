@@ -8,7 +8,7 @@ from sqlalchemy.exc import IntegrityError
 from app.services import lookups
 from app.services import sites as site_service
 
-DEFAULT_PUBLIC_BASE_URL = "http://maintenance"
+DEFAULT_PUBLIC_BASE_URL = "http://server2-ubuntu"
 QR_BOX_SIZE = 8
 QR_BORDER = 4
 
