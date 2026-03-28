@@ -1,9 +1,16 @@
+import io
+from flask import current_app
+import qrcode
 from app.db import assets as assets_repo
 from uuid import UUID
 from sqlalchemy.exc import IntegrityError
 
 from app.services import lookups
 from app.services import sites as site_service
+
+DEFAULT_PUBLIC_BASE_URL = "http://maintenance"
+QR_BOX_SIZE = 8
+QR_BORDER = 4
 
 def _parse_uuid_field(payload, field_name: str, required: bool = True):
     value = payload.get(field_name)
@@ -31,6 +38,29 @@ def _normalize_asset_tag(value) -> str:
     if not asset_tag:
         raise ValueError("asset_tag is required and must be a string")
     return asset_tag
+
+
+def _get_public_base_url() -> str:
+    base_url = (current_app.config.get("MAINTENANCE_PUBLIC_BASE_URL") or DEFAULT_PUBLIC_BASE_URL).strip()
+    if not base_url:
+        return DEFAULT_PUBLIC_BASE_URL
+    return base_url.rstrip("/")
+
+
+def _build_qr_png_bytes(payload: str) -> bytes:
+    qr = qrcode.QRCode(
+        version=None,
+        error_correction=qrcode.constants.ERROR_CORRECT_M,
+        box_size=QR_BOX_SIZE,
+        border=QR_BORDER,
+    )
+    qr.add_data(payload)
+    qr.make(fit=True)
+
+    image = qr.make_image(fill_color="black", back_color="white").convert("RGB")
+    buffer = io.BytesIO()
+    image.save(buffer, format="PNG")
+    return buffer.getvalue()
 
 
 def _validate_asset_relationships(payload: dict) -> tuple[str, str, str, str]:
@@ -125,6 +155,22 @@ def get_asset_service(asset_id, include=None):
     #     asset["variant"] = variant
 
     return asset
+
+
+def get_asset_qr_target_url_service(asset_id) -> str | None:
+    asset = get_asset_service(asset_id)
+    if asset is None:
+        return None
+
+    return f"{_get_public_base_url()}/assets/{asset['asset_id']}"
+
+
+def get_asset_qr_png_service(asset_id) -> bytes | None:
+    target_url = get_asset_qr_target_url_service(asset_id)
+    if target_url is None:
+        return None
+
+    return _build_qr_png_bytes(target_url)
 
 def list_assets_service(
     filters,

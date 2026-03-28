@@ -42,7 +42,8 @@ def initialise_application():
 
     app.config.update(
         {
-            "ATTACHMENT_ROOT": os.environ.get("ATTACHMENT_ROOT", "/tmp/attachments")
+            "ATTACHMENT_ROOT": os.environ.get("ATTACHMENT_ROOT", "/tmp/attachments"),
+            "MAINTENANCE_PUBLIC_BASE_URL": os.environ.get("MAINTENANCE_PUBLIC_BASE_URL", "http://maintenance"),
         }
     )
 

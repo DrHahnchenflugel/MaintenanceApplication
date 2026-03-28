@@ -27,6 +27,29 @@
       </p>
     </div>
     <span class="asset-pill">{{ asset.status_label or asset.status_code or 'UNKNOWN' }}</span>
+
+    <a
+      class="asset-qr-button"
+      href="{{ asset_qr_image_url }}"
+      target="_blank"
+      rel="noopener"
+      aria-label="Open printable QR code"
+      title="Open printable QR code"
+    >
+      <span class="asset-qr-button__icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" focusable="false">
+          <rect x="3" y="3" width="7" height="7" rx="1.5"></rect>
+          <rect x="14" y="3" width="7" height="7" rx="1.5"></rect>
+          <rect x="3" y="14" width="7" height="7" rx="1.5"></rect>
+          <path d="M14 14h3v3h-3z"></path>
+          <path d="M20 14h1v1h-1z"></path>
+          <path d="M17 17h1v1h-1z"></path>
+          <path d="M20 17h1v4h-4v-1"></path>
+          <path d="M14 20h2"></path>
+        </svg>
+      </span>
+      <span class="asset-qr-button__label">QR</span>
+    </a>
   </section>
 
   <section class="asset-dashboard">

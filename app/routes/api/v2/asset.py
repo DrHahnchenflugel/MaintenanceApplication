@@ -1,4 +1,5 @@
-from flask import abort, request, jsonify
+import io
+from flask import abort, request, jsonify, send_file
 from . import bp
 from app.services import assets as asset_service
 from app.services import sites as site_service
@@ -25,6 +26,14 @@ def parse_site_arg(name: str = "site_id"):
         return site_service.validate_site_id(value, required=True, field_name=name)
     except ValueError as exc:
         abort(400, description=str(exc))
+
+
+def validate_uuid_path(value: str, field_name: str):
+    try:
+        return str(UUID(value))
+    except ValueError:
+        abort(400, description=f"Invalid {field_name}, must be UUID")
+
 
 @bp.route("/assets", methods=["GET"])
 def list_assets():
@@ -99,6 +108,22 @@ def create_asset():
 
     # TODO: add return location header
     return jsonify(asset), 201
+
+
+@bp.route("/assets/<asset_id>/qr", methods=["GET"])
+def get_asset_qr_png(asset_id: str):
+    asset_id = validate_uuid_path(asset_id, "asset_id")
+
+    qr_png = asset_service.get_asset_qr_png_service(asset_id)
+    if qr_png is None:
+        abort(404, description="Asset not found")
+
+    return send_file(
+        io.BytesIO(qr_png),
+        mimetype="image/png",
+        as_attachment=False,
+        download_name=f"asset-{asset_id}-qr.png",
+    )
 
 @bp.route("/assets/<uuid:asset_id>", methods=["GET"])
 def get_asset(asset_id:UUID):

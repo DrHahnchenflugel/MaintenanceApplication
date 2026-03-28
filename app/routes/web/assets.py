@@ -248,4 +248,5 @@ def view_asset(asset_id):
         asset=asset,
         asset_age=asset_age,
         past_actions=past_actions,
+        asset_qr_image_url=url_for("api_v2.get_asset_qr_png", asset_id=asset["asset_id"]),
     )
