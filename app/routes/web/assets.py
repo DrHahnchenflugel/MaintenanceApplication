@@ -1,12 +1,12 @@
-from datetime import datetime, timezone
-from flask import render_template, request, abort, redirect, url_for
+from urllib.parse import urlencode
+
+from flask import current_app, render_template, request, abort, redirect, url_for
 from . import bp as web_bp
 from uuid import UUID
 from app.services import assets as asset_service
 from app.services import lookups
 from app.services import sites as site_service
 from app.services import issues as issue_service
-from app.helpers import human_delta_2_times
 
 
 def parse_uuid_arg(name: str):
@@ -74,6 +74,16 @@ def _build_asset_filter_query_params(
         params["asset_tag"] = asset_tag
 
     return params
+
+
+def _build_external_issue_list_url(*, asset_tag: str | None) -> str:
+    public_base_url = (
+        current_app.config.get("MAINTENANCE_PUBLIC_BASE_URL")
+        or asset_service.DEFAULT_PUBLIC_BASE_URL
+    )
+    public_base_url = (public_base_url or asset_service.DEFAULT_PUBLIC_BASE_URL).strip().rstrip("/")
+    query_string = urlencode({"status": "ACTIVE", "q": asset_tag or ""})
+    return f"{public_base_url}/maintenance/issues/?{query_string}"
 
 
 @web_bp.get("/assets", strict_slashes=False)
@@ -217,36 +227,75 @@ def view_asset(asset_id):
     if asset is None:
         abort(404)
 
-    acquired_at = asset.get("acquired_at")
-    asset_age = "-"
-    if acquired_at:
-        asset_age = human_delta_2_times(acquired_at, datetime.now(timezone.utc).date())
+    issue_statuses = issue_service.list_issue_statuses()
+    issue_status_ids_by_code = {status["code"]: status["id"] for status in issue_statuses}
+    active_issue_status_ids = tuple(
+        issue_status_ids_by_code[code]
+        for code in ("OPEN", "IN_PROGRESS")
+        if code in issue_status_ids_by_code
+    )
+
+    past_issue_filters = {
+        "site_id": None,
+        "asset_id": str(asset_id),
+        "status_id": None,
+        "reported_by": None,
+        "created_from": None,
+        "created_to": None,
+        "search": None,
+        "category_id": None,
+        "make_id": None,
+        "model_id": None,
+        "variant_id": None,
+        "active_status_ids": None,
+    }
 
     issue_result = issue_service.list_issues(
         page=1,
-        page_size=10,
-        filters={
-            "site_id": None,
-            "asset_id": str(asset_id),
-            "status_id": None,
-            "reported_by": None,
-            "created_from": None,
-            "created_to": None,
-            "search": None,
-            "category_id": None,
-            "make_id": None,
-            "model_id": None,
-            "variant_id": None,
-            "active_status_ids": None,
-        },
+        page_size=200,
+        filters=past_issue_filters,
     )
 
-    past_actions = issue_result["items"]
+    past_issues = issue_result["items"]
+    open_issue_count = 0
+    if len(active_issue_status_ids) == 1:
+        open_issue_result = issue_service.list_issues(
+            page=1,
+            page_size=1,
+            filters={
+                **past_issue_filters,
+                "status_id": active_issue_status_ids[0],
+            },
+        )
+        open_issue_count = open_issue_result["total"]
+    elif len(active_issue_status_ids) > 1:
+        open_issue_result = issue_service.list_issues(
+            page=1,
+            page_size=1,
+            filters={
+                **past_issue_filters,
+                "status_id": "00000000-0000-0000-0000-000000000000",
+                "active_status_ids": active_issue_status_ids,
+            },
+        )
+        open_issue_count = open_issue_result["total"]
+
+    asset_edit_url = None
+    for endpoint_name in ("app.edit_asset", "app.asset_edit", "app.settings_edit_asset"):
+        if endpoint_name not in current_app.view_functions:
+            continue
+        try:
+            asset_edit_url = url_for(endpoint_name, asset_id=asset["asset_id"])
+            break
+        except Exception:
+            continue
 
     return render_template(
         "assets/specific_asset.html",
         asset=asset,
-        asset_age=asset_age,
-        past_actions=past_actions,
+        past_issues=past_issues,
+        open_issue_count=open_issue_count,
+        open_issues_url=_build_external_issue_list_url(asset_tag=asset.get("asset_tag")),
+        asset_edit_url=asset_edit_url,
         asset_qr_image_url=url_for("api_v2.get_asset_qr_png", asset_id=asset["asset_id"]),
     )
