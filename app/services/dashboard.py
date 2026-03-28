@@ -1,3 +1,4 @@
+import logging
 from datetime import datetime, timedelta, timezone
 
 from app.db import dashboard as dashboard_db
@@ -6,6 +7,7 @@ from app.helpers import human_delta_2_times, human_delta_to_now
 
 DOWN_ASSET_STATUS_CODE = "DOWN"
 TREND_ROLLING_AVERAGE_DAYS = 14
+logger = logging.getLogger(__name__)
 
 
 def _pick_label(*values):
@@ -100,24 +102,69 @@ def _serialize_problem_model(row):
     }
 
 
+def _safe_bounds():
+    fallback_today = datetime.now(timezone.utc).date()
+    fallback_week_start = fallback_today - timedelta(days=fallback_today.weekday())
+    fallback_week_end = fallback_week_start + timedelta(days=7)
+    fallback_trend_start = fallback_today - timedelta(days=90)
+
+    try:
+        bounds = dashboard_db.get_dashboard_time_bounds() or {}
+    except Exception:
+        logger.exception("Dashboard time-bounds query failed; using fallback bounds.")
+        bounds = {}
+
+    return {
+        "today": bounds.get("today") or fallback_today,
+        "trend_start": bounds.get("trend_start") or fallback_trend_start,
+        "week_start": bounds.get("week_start") or fallback_week_start,
+        "week_end": bounds.get("week_end") or fallback_week_end,
+    }
+
+
 def get_dashboard_data():
-    bounds = dashboard_db.get_dashboard_time_bounds()
-    overview = dashboard_db.get_dashboard_overview(
-        week_start=bounds["week_start"],
-        week_end=bounds["week_end"],
-        down_asset_status_code=DOWN_ASSET_STATUS_CODE,
-    )
-    repeat_all_time = dashboard_db.get_repeat_offender()
-    repeat_recent = dashboard_db.get_repeat_offender(
-        window_start=bounds["trend_start"],
-    )
-    problem_models = dashboard_db.get_top_models_by_issue_rate(
-        window_start=bounds["trend_start"],
-    )
-    trend_rows = dashboard_db.get_issue_trend_rows(
-        trend_start=bounds["trend_start"],
-        trend_end=bounds["today"],
-    )
+    bounds = _safe_bounds()
+
+    try:
+        overview = dashboard_db.get_dashboard_overview(
+            week_start=bounds["week_start"],
+            week_end=bounds["week_end"],
+            down_asset_status_code=DOWN_ASSET_STATUS_CODE,
+        ) or {}
+    except Exception:
+        logger.exception("Dashboard overview query failed; returning default summary values.")
+        overview = {}
+
+    try:
+        repeat_all_time = dashboard_db.get_repeat_offender()
+    except Exception:
+        logger.exception("Dashboard repeat-offender all-time query failed.")
+        repeat_all_time = None
+
+    try:
+        repeat_recent = dashboard_db.get_repeat_offender(
+            window_start=bounds["trend_start"],
+        )
+    except Exception:
+        logger.exception("Dashboard repeat-offender recent query failed.")
+        repeat_recent = None
+
+    try:
+        problem_models = dashboard_db.get_top_models_by_issue_rate(
+            window_start=bounds["trend_start"],
+        )
+    except Exception:
+        logger.exception("Dashboard top-models query failed; returning empty list.")
+        problem_models = []
+
+    try:
+        trend_rows = dashboard_db.get_issue_trend_rows(
+            trend_start=bounds["trend_start"],
+            trend_end=bounds["today"],
+        )
+    except Exception:
+        logger.exception("Dashboard trend query failed; returning empty trend data.")
+        trend_rows = []
 
     avg_resolution_seconds = overview.get("avg_resolution_seconds")
 

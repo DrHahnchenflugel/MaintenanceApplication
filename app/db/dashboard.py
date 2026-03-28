@@ -118,12 +118,16 @@ def get_dashboard_overview(*, week_start, week_end, down_asset_status_code="DOWN
 
 
 def get_repeat_offender(*, window_start=None):
-    where_sql = ""
+    where_clauses = [
+        "(asset_status.code IS NULL OR asset_status.code <> 'RETIRED')",
+    ]
     params = {}
 
     if window_start is not None:
-        where_sql = "WHERE issue.created_at >= :window_start"
+        where_clauses.append("issue.created_at >= :window_start")
         params["window_start"] = window_start
+
+    where_sql = f"WHERE {' AND '.join(where_clauses)}"
 
     sql = text(f"""
         SELECT
@@ -141,6 +145,8 @@ def get_repeat_offender(*, window_start=None):
         FROM issue
         JOIN asset
           ON asset.id = issue.asset_id
+        LEFT JOIN asset_status
+          ON asset_status.id = asset.status_id
         LEFT JOIN site
           ON site.id = asset.site_id
         LEFT JOIN variant

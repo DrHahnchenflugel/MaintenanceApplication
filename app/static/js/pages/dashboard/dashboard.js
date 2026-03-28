@@ -307,29 +307,65 @@
       + '</svg>';
   }
 
+  function buildFallbackDashboardData() {
+    return {
+      summary: {
+        open_issues: 0,
+        blocked_issues: 0,
+        assets_down: 0,
+        oldest_open_issue: null
+      },
+      throughput: {
+        week_start: null,
+        week_end_exclusive: null,
+        opened_this_week: 0,
+        closed_this_week: 0
+      },
+      resolution: {
+        average_resolution_seconds: null,
+        average_resolution_display: null,
+        resolved_issue_count: 0
+      },
+      repeat_offenders: {
+        all_time: null,
+        last_3_months: null
+      },
+      problem_models: [],
+      trend: {
+        points: []
+      }
+    };
+  }
+
   function renderDashboard(data) {
-    setText("metric-open-issues", formatInteger(data.summary.open_issues || 0));
-    setText("metric-blocked-issues", formatInteger(data.summary.blocked_issues || 0));
-    setText("metric-assets-down", formatInteger(data.summary.assets_down || 0));
+    data = data || {};
+    var summary = data.summary || {};
+    var throughput = data.throughput || {};
+    var resolution = data.resolution || {};
+    var repeatOffenders = data.repeat_offenders || {};
 
-    renderOldestOpenIssue(data.summary.oldest_open_issue);
+    setText("metric-open-issues", formatInteger(summary.open_issues || 0));
+    setText("metric-blocked-issues", formatInteger(summary.blocked_issues || 0));
+    setText("metric-assets-down", formatInteger(summary.assets_down || 0));
 
-    setText("metric-opened-this-week", formatInteger(data.throughput.opened_this_week || 0));
-    setText("metric-closed-this-week", formatInteger(data.throughput.closed_this_week || 0));
+    renderOldestOpenIssue(summary.oldest_open_issue);
+
+    setText("metric-opened-this-week", formatInteger(throughput.opened_this_week || 0));
+    setText("metric-closed-this-week", formatInteger(throughput.closed_this_week || 0));
     setText(
       "metric-week-range",
-      formatWeekRange(data.throughput.week_start, data.throughput.week_end_exclusive)
+      formatWeekRange(throughput.week_start, throughput.week_end_exclusive)
     );
 
-    renderResolutionCard(data.resolution || {});
+    renderResolutionCard(resolution);
     renderRepeatOffender(
       "repeat-offender-all-time",
-      data.repeat_offenders ? data.repeat_offenders.all_time : null,
+      repeatOffenders.all_time,
       "No issue history yet."
     );
     renderRepeatOffender(
       "repeat-offender-recent",
-      data.repeat_offenders ? data.repeat_offenders.last_3_months : null,
+      repeatOffenders.last_3_months,
       "No issues have been opened in the last 3 months."
     );
     renderProblemModels(data.problem_models || []);
@@ -352,13 +388,10 @@
     .catch(function (error) {
       console.error("Failed to load dashboard data:", error);
 
-      if (errorBox) {
-        errorBox.hidden = false;
-      }
+      renderDashboard(buildFallbackDashboardData());
 
-      var chart = document.getElementById("trend-chart");
-      if (chart) {
-        chart.innerHTML = '<div class="dashboard-chart__empty">Trend data failed to load.</div>';
+      if (errorBox) {
+        errorBox.hidden = true;
       }
     });
 })();

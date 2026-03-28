@@ -9,11 +9,6 @@
 
 {% block content %}
 <div class="dashboard-page" data-dashboard-url="{{ api_dashboard_url }}">
-  <div id="dashboard-error" class="card dashboard-alert" hidden>
-    <strong>Dashboard unavailable.</strong>
-    <span>We could not load the maintenance metrics right now.</span>
-  </div>
-
   <section class="dashboard-grid dashboard-grid--metrics">
     <a href="{{ url_for('app.issues_list', status='ACTIVE') }}">
       <article class="card metric-card">
@@ -41,30 +36,6 @@
       <div id="metric-oldest-open-meta" class="metric-card__meta">Loading oldest active issue...</div>
       <a id="metric-oldest-open-link" class="metric-card__link" href="#" hidden>View issue</a>
     </article>
-  </section>
-
-  <section class="card dashboard-panel">
-    <div class="dashboard-panel__header">
-      <div>
-        <h2 class="dashboard-panel__title">Open vs Blocked Trend</h2>
-        <p class="dashboard-panel__subtitle">Last 3 months, 14-day rolling average</p>
-      </div>
-
-      <div class="dashboard-legend" aria-hidden="true">
-        <span class="dashboard-legend__item">
-          <span class="dashboard-legend__swatch dashboard-legend__swatch--open"></span>
-          Open
-        </span>
-        <span class="dashboard-legend__item">
-          <span class="dashboard-legend__swatch dashboard-legend__swatch--blocked"></span>
-          Blocked
-        </span>
-      </div>
-    </div>
-
-    <div id="trend-chart" class="dashboard-chart__frame">
-      <div class="dashboard-chart__empty">Loading trend...</div>
-    </div>
   </section>
 
   <section class="dashboard-grid dashboard-grid--bottom">
@@ -128,6 +99,12 @@
       <div class="dashboard-empty">Loading model rankings...</div>
     </div>
   </section>
+</div>
+
+<div class="fab-container">
+  {% with label="New Issue", href=url_for("app.new_issue_form"), icon="+" %}
+    {% include "_partials/_primary_action_button.html" %}
+  {% endwith %}
 </div>
 {% endblock %}
 
