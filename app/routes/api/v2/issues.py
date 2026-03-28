@@ -66,7 +66,16 @@ def parse_uuid_path(value: str, name: str):
 
 
 def require_settings_admin_gate():
-    if request.cookies.get(auth_service.SETTINGS_ADMIN_GATE_COOKIE_NAME) != "1":
+    cookie_value = request.cookies.get(auth_service.SETTINGS_ADMIN_GATE_COOKIE_NAME)
+    print(
+        "[admin_gate.guard] settings gate check"
+        f" | path={request.path!r},"
+        f" cookie_name={auth_service.SETTINGS_ADMIN_GATE_COOKIE_NAME!r},"
+        f" cookie_value={cookie_value!r}",
+        flush=True,
+    )
+    if cookie_value != "1":
+        print("[admin_gate.guard] settings gate blocked request", flush=True)
         abort(403, description="Settings admin gate is locked")
 
 @bp.route("/issues", methods=["GET"])
