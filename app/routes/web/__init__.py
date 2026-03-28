@@ -7,3 +7,4 @@ from . import issues        # noqa: F401
 from . import files         # noqa: F401
 from . import assets        # noqa: F401
 from . import sites         # noqa: F401
+from . import settings      # noqa: F401
