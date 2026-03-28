@@ -1,9 +1,8 @@
 import os
-from werkzeug.utils import secure_filename
 from flask import current_app
 import app.db.helpers as helpers
 from app.db import issues as issue_db
-from datetime import datetime as dt
+from app.services import assets as asset_service
 
 def list_issues(page: int, page_size: int, filters: dict):
     offset = (page - 1) * page_size
@@ -191,18 +190,33 @@ def create_issue(data: dict):
       - asset_id    (UUID string, required)
       - title       (str, required)
       - description (str, required)
+      - asset_status_id (UUID string, required)
       - reported_by (str, optional)
+      - created_by  (str, optional)
       - status_id   (UUID string, optional; default status 'OPEN')
     """
 
     asset_id = data.get("asset_id")
-    title = data.get("title")
-    description = data.get("description") if data.get("description") != "" else None 
+    title = (data.get("title") or "").strip()
+    description = (data.get("description") or "").strip()
+    asset_status_id = data.get("asset_status_id")
     reported_by = data.get("reported_by")
+    created_by = data.get("created_by")
     status_id = data.get("status_id")
+    changed_by = reported_by or created_by or None
 
-    if not asset_id or not title or not description:
+    if not asset_id or not title or not description or not asset_status_id:
         raise ValueError("Missing required fields for issue creation")
+
+    if asset_service.get_asset(asset_id) is None:
+        raise ValueError("Unknown asset_id")
+
+    try:
+        target_asset_status = asset_service.get_asset_status(asset_status_id)
+    except ValueError as exc:
+        raise ValueError(str(exc).replace("status_id", "asset_status_id")) from exc
+    if target_asset_status is None:
+        raise ValueError("Unknown asset_status_id")
 
     if not status_id:
         status_id = issue_db.get_issue_status_id_by_code("OPEN")
@@ -224,7 +238,7 @@ def create_issue(data: dict):
         issue_id=issue_id,
         from_status_id=status_id,
         to_status_id=status_id,
-        changed_by=reported_by,  # string
+        changed_by=changed_by,
     )
 
     # 3) initial action (CREATED)
@@ -238,7 +252,13 @@ def create_issue(data: dict):
         issue_id=issue_id,
         action_type_id=created_type_id,
         body=initial_body,
-        created_by=reported_by,  # string
+        created_by=changed_by,
+    )
+
+    asset_service.set_asset_status(
+        asset_id=asset_id,
+        to_status_id=target_asset_status["id"],
+        changed_by=changed_by,
     )
 
     return {"id": issue_id}
@@ -252,20 +272,33 @@ def add_issue_action(issue_id: str, data: dict):
       - body             (str, required)
       - created_by       (str, optional, default "-")
       - new_status_id    (UUID string, optional)
+      - new_asset_status_id (UUID string, optional)
     """
 
     action_type_code = data.get("action_type_code")
     body = data.get("body")
     created_by = data.get("created_by") or "SYSTEM"
     new_status_id = data.get("new_status_id")
+    new_asset_status_id = data.get("new_asset_status_id")
 
     if not action_type_code or not body:
         raise ValueError("Missing required fields for issue action")
 
-    # confirm issue exists + get current status
-    current_status_id = issue_db.get_issue_status_id(issue_id)
-    if current_status_id is None:
+    issue_row = issue_db.get_issue_row(issue_id)
+    if issue_row is None:
         return None  # route will turn into 404
+
+    if new_asset_status_id:
+        try:
+            target_asset_status = asset_service.get_asset_status(new_asset_status_id)
+        except ValueError as exc:
+            raise ValueError(str(exc).replace("status_id", "new_asset_status_id")) from exc
+        if target_asset_status is None:
+            raise ValueError("Unknown new_asset_status_id")
+    else:
+        target_asset_status = None
+
+    current_status_id = issue_row["status_id"]
 
     # look up action_type.id by code
     action_type_id = issue_db.get_action_type_id_by_code(action_type_code)
@@ -295,6 +328,13 @@ def add_issue_action(issue_id: str, data: dict):
     else:
         issue_db.update_issue_row(
             issue_id
+        )
+
+    if target_asset_status is not None:
+        asset_service.set_asset_status(
+            asset_id=issue_row["asset_id"],
+            to_status_id=target_asset_status["id"],
+            changed_by=created_by,
         )
 
     return {"issue_id": issue_id}
@@ -514,68 +554,3 @@ def delete_accepted_attachment_content_type(content_type: str):
     ok = issue_db.delete_accepted_attachment_content_type(content_type)
     if not ok:
         raise ValueError("Content type not found")
-
-def list_categories():
-    rows = issue_db.list_category_rows()
-    return [{"id": r["id"], "label": r["label"], "name": r.get("name")} for r in rows]
-
-def list_makes(category_id: str):
-    rows = issue_db.list_make_rows(category_id=category_id)
-    return [{"id": r["id"], "label": r["label"], "name": r.get("name")} for r in rows]
-
-def list_models(make_id: str):
-    rows = issue_db.list_model_rows(make_id=make_id)
-    return [{"id": r["id"], "label": r["label"], "name": r.get("name")} for r in rows]
-
-def list_variants(model_id: str):
-    rows = issue_db.list_variant_rows(model_id=model_id)
-    return [{"id": r["id"], "label": r["label"], "name": r.get("name")} for r in rows]
-
-def get_asset(asset_id: str):
-    r = issue_db.get_asset_row(asset_id)
-    if r is None:
-        return None
-    return {
-        "id": r["id"],
-        "asset_tag": r["asset_tag"],
-        "site_id": r["site_id"],
-        "site_shorthand": r.get("site_shorthand"),
-        "site_fullname": r.get("site_fullname"),
-        "make_label": r.get("make_label"),
-        "model_label": r.get("model_label"),
-        "variant_label": r.get("variant_label"),
-    }
-
-def get_asset_by_tag(asset_tag: str):
-    tag = (asset_tag or "").strip()
-    if not tag:
-        return None
-    r = issue_db.get_asset_row_by_tag(tag)
-    if r is None:
-        return None
-    return {
-        "id": r["id"],
-        "asset_tag": r["asset_tag"],
-        "site_id": r["site_id"],
-        "site_shorthand": r.get("site_shorthand"),
-        "site_fullname": r.get("site_fullname"),
-        "make_label": r.get("make_label"),
-        "model_label": r.get("model_label"),
-        "variant_label": r.get("variant_label"),
-    }
-
-    tag = (asset_tag or "").strip()
-    if not tag:
-        return None
-    r = issue_db.get_asset_row_by_tag(tag)
-    if r is None:
-        return None
-    return {
-        "id": r["id"],
-        "asset_tag": r["asset_tag"],
-        "site_id": r.get("site_id"),
-        "site_shorthand": r.get("site_shorthand"),
-        "make_label": r.get("make_label"),
-        "model_label": r.get("model_label"),
-        "variant_label": r.get("variant_label"),
-    }

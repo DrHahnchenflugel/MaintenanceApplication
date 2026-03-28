@@ -2,6 +2,7 @@ from uuid import UUID
 
 from sqlalchemy.exc import IntegrityError
 
+from app.db import assets as assets_db
 from app.db import lookups as lookups_db
 
 
@@ -41,7 +42,7 @@ def _normalize_uuid(value, *, field_name: str, required: bool = False) -> str | 
 
 
 def list_asset_statuses():
-    return _serialize_lookup_rows(lookups_db.list_asset_status_rows(), "id")
+    return _serialize_lookup_rows(assets_db.list_asset_status_rows(), "id")
 
 
 def get_asset_status(status_id):
@@ -51,7 +52,7 @@ def get_asset_status(status_id):
         required=True,
     )
     return _serialize_lookup_row(
-        lookups_db.get_asset_status_row(normalized_status_id),
+        assets_db.get_asset_status_row(normalized_status_id),
         "id",
     )
 

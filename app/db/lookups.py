@@ -3,40 +3,6 @@ from sqlalchemy import text
 from app.db.connection import get_connection
 
 
-def list_asset_status_rows():
-    sql = text("""
-        SELECT
-            id,
-            code,
-            label,
-            display_order
-        FROM asset_status
-        ORDER BY display_order ASC, code ASC
-    """)
-
-    with get_connection() as conn:
-        rows = conn.execute(sql).mappings().all()
-
-    return [dict(r) for r in rows]
-
-
-def get_asset_status_row(status_id):
-    sql = text("""
-        SELECT
-            id,
-            code,
-            label,
-            display_order
-        FROM asset_status
-        WHERE id = :id
-    """)
-
-    with get_connection() as conn:
-        row = conn.execute(sql, {"id": status_id}).mappings().first()
-
-    return None if row is None else dict(row)
-
-
 def list_category_rows():
     sql = text("""
         SELECT

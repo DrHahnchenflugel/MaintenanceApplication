@@ -176,6 +176,7 @@ def create_issue():
     data = request.get_json(silent=True) or {}
 
     asset_id = parse_uuid_field(data, "asset_id", required=True)
+    asset_status_id = parse_uuid_field(data, "asset_status_id", required=True)
     reported_by = data.get("reported_by")
     created_by = data.get("created_by")
     status_id = parse_uuid_field(data, "status_id", required=False)
@@ -183,11 +184,12 @@ def create_issue():
     title = data.get("title")
     description = data.get("description")
 
-    if not asset_id or not title or not description:
-        abort(400, description="Missing required fields: asset_id, title, description")
+    if not asset_id or not title or not description or not asset_status_id:
+        abort(400, description="Missing required fields: asset_id, title, description, asset_status_id")
 
     payload = {
         "asset_id": asset_id,
+        "asset_status_id": asset_status_id,
         "reported_by": reported_by,
         "created_by": created_by,
         "status_id": status_id,
@@ -214,6 +216,7 @@ def create_issue_action(issue_id):
 
     # optional status change
     new_status_id = parse_uuid_field(data, "new_status_id", required=False)
+    new_asset_status_id = parse_uuid_field(data, "new_asset_status_id", required=False)
 
     action_type_code = data.get("action_type_code")
     body = data.get("body")
@@ -226,6 +229,7 @@ def create_issue_action(issue_id):
         "body": body,
         "created_by": created_by,
         "new_status_id": new_status_id,
+        "new_asset_status_id": new_asset_status_id,
     }
 
     try:

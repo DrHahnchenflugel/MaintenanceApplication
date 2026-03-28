@@ -1,7 +1,7 @@
 {# new_issue.html #}
 {% extends "base.html" %}
 
-{% block title %}Maintenance – New Issue{% endblock %}
+{% block title %}Maintenance - New Issue{% endblock %}
 {% block page_title %}New Issue{% endblock %}
 
 {% block page_css %}
@@ -10,7 +10,6 @@
 
 {% block content %}
 
-  {# Optional server-side error box #}
   {% if form_error %}
     <div class="card new-issue-error">
       <strong>Error:</strong> {{ form_error }}
@@ -19,7 +18,6 @@
 
   <div class="new-issue-layout">
 
-    {# Asset lock / selector #}
     <section class="card new-issue-asset">
       <div class="new-issue-asset__top">
         <div class="new-issue-asset__title">
@@ -28,8 +26,11 @@
             <p class="new-issue-asset__tag">
               <strong>{{ asset.asset_tag }}</strong>
               <span class="muted">
-                {% if asset.site_shorthand %} · {{ asset.site_shorthand }}{% endif %}
-                {% if asset.make and asset.model %} · {{ asset.make }} {{ asset.model }}{% endif %}
+                {% if asset.site_shorthand %} - {{ asset.site_shorthand }}{% endif %}
+                {% if asset.make_label or asset.make_name %}
+                  - {{ asset.make_label or asset.make_name }}
+                  {% if asset.model_label or asset.model_name %} {{ asset.model_label or asset.model_name }}{% endif %}
+                {% endif %}
               </span>
             </p>
           {% else %}
@@ -52,7 +53,6 @@
         data-models-url="/maintenance/api/v2/assets/models"
         data-variants-url="/maintenance/api/v2/assets/variants"
         data-asset-categories-url="/maintenance/api/v2/asset-categories">
-
 
         <div class="asset-picker__filters">
           <label class="asset-picker__field">
@@ -130,16 +130,13 @@
       </div>
     </section>
 
-    {# Form #}
     <form class="card new-issue-form"
           method="post"
           enctype="multipart/form-data"
           action="{{ url_for('app.create_issue_web') }}">
 
-      <input type="hidden" name="asset_id" id="assetId"
-       value="{{ request.form.get('asset_id', asset_id or '') }}">
+      <input type="hidden" name="asset_id" id="assetId" value="{{ form_values.asset_id }}">
 
-      
       <div class="new-issue-grid">
 
         <div class="new-issue-field">
@@ -150,28 +147,39 @@
                  maxlength="50"
                  required
                  placeholder="Short + specific (max 50 chars)"
-                 value="{{ request.form.get('title','') }}">
+                 value="{{ form_values.title }}">
           <div class="new-issue-hint muted">Max 50 characters.</div>
         </div>
 
+        <div class="new-issue-field">
+          <label class="new-issue-label" for="asset_status_id">Asset Status</label>
+          <select class="new-issue-input" id="asset_status_id" name="asset_status_id" required>
+            {% for status in asset_status_options %}
+              <option value="{{ status.id }}" {% if form_values.asset_status_id == status.id %}selected{% endif %}>
+                {{ status.label }}
+              </option>
+            {% endfor %}
+          </select>
+        </div>
+
         <div class="new-issue-field new-issue-wide">
-          <label class="new-issue-label" for="description">Issue Description<span class="muted">(optional)</span></label>
+          <label class="new-issue-label" for="description">Issue Description</label>
           <textarea class="new-issue-textarea"
                     id="description"
                     name="description"
                     rows="6"
-                    placeholder="What happened? What did you try?">{{ request.form.get('description','') }}</textarea>
+                    required
+                    placeholder="What happened? What did you try?">{{ form_values.description }}</textarea>
         </div>
 
         <div class="new-issue-field">
-        <label class="new-issue-label" for="title">Reported by <span class="muted">(optional)</span></label>
-        <input class="new-issue-input"
+          <label class="new-issue-label" for="reported_by">Reported by <span class="muted">(optional)</span></label>
+          <input class="new-issue-input"
                 id="reported_by"
                 name="reported_by"
                 placeholder="Name"
-                value="{{ request.form.get('reported_by','') }}">
-      </div>
-       
+                value="{{ form_values.reported_by }}">
+        </div>
 
         <div class="new-issue-field new-issue-wide">
           <label class="new-issue-label" for="photo">Photo (optional)</label>

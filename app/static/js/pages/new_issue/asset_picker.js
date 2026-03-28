@@ -125,7 +125,8 @@
     const alreadyHasOptions = (el.status.options?.length || 0) > 1;
 
     try {
-      const statuses = await fetchJson(URLS.statuses);
+      const response = await fetchJson(URLS.statuses);
+      const statuses = Array.isArray(response) ? response : (response.items || []);
       statuses.forEach((s) => statusLabelById.set(String(s.id), String(s.label)));
 
       if (alreadyHasOptions) return;

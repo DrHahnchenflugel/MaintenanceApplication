@@ -174,7 +174,7 @@ def assets_index():
     ):
         return redirect(url_for("app.assets_index", **effective_params))
 
-    status_options = _normalize_uuid_rows(lookups.list_asset_statuses(), "id")
+    status_options = _normalize_uuid_rows(asset_service.list_asset_statuses(), "id")
 
     filters = {
         "site_id": site_id,

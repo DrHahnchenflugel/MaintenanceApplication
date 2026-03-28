@@ -76,6 +76,106 @@ def get_asset_row(asset_id):
 
     return dict(row)
 
+
+def get_asset_row_by_tag(asset_tag: str):
+    sql = text("""
+        SELECT
+            asset.id,
+            asset.variant_id,
+            asset.category_id,
+            asset.site_id,
+            asset.status_id,
+            asset.serial_num,
+            asset.asset_tag,
+            asset.acquired_at,
+            asset.retired_at,
+            asset.retire_reason,
+            asset.created_at,
+            asset.updated_at,
+            site.shorthand AS site_shorthand,
+            site.fullname AS site_fullname,
+            category.name AS category_name,
+            category.label AS category_label,
+            asset_status.code AS status_code,
+            asset_status.label AS status_label,
+            variant.name AS variant_name,
+            variant.label AS variant_label,
+            model.name AS model_name,
+            model.label AS model_label,
+            make.name AS make_name,
+            make.label AS make_label
+        FROM asset
+        LEFT JOIN site ON asset.site_id = site.id
+        LEFT JOIN category ON asset.category_id = category.id
+        LEFT JOIN asset_status ON asset.status_id = asset_status.id
+        LEFT JOIN variant ON asset.variant_id = variant.id
+        LEFT JOIN model ON variant.model_id = model.id
+        LEFT JOIN make ON model.make_id = make.id
+        WHERE asset.asset_tag = :asset_tag
+        LIMIT 1
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(sql, {"asset_tag": asset_tag}).mappings().first()
+
+    if row is None:
+        return None
+
+    return dict(row)
+
+
+def list_asset_status_rows():
+    sql = text("""
+        SELECT
+            id,
+            code,
+            label,
+            display_order
+        FROM asset_status
+        ORDER BY display_order ASC, label ASC, code ASC
+    """)
+
+    with get_connection() as conn:
+        rows = conn.execute(sql).mappings().all()
+
+    return [dict(r) for r in rows]
+
+
+def get_asset_status_row(status_id: str):
+    sql = text("""
+        SELECT
+            id,
+            code,
+            label,
+            display_order
+        FROM asset_status
+        WHERE id = :id
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(sql, {"id": status_id}).mappings().first()
+
+    if row is None:
+        return None
+
+    return dict(row)
+
+
+def get_asset_status_id(asset_id: str):
+    sql = text("""
+        SELECT status_id
+        FROM asset
+        WHERE id = :id
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(sql, {"id": asset_id}).mappings().first()
+
+    if row is None:
+        return None
+
+    return row["status_id"]
+
 def list_asset_rows(
     site_id=None,
     category_id=None,
@@ -397,6 +497,41 @@ def update_asset_row(asset_id, fields: dict):
         return None
 
     return dict(row)
+
+
+def create_asset_status_history_row(
+    asset_id,
+    from_status_id,
+    to_status_id,
+    changed_by,
+):
+    sql = text("""
+        INSERT INTO asset_status_history (
+            asset_id,
+            from_status_id,
+            to_status_id,
+            changed_at,
+            changed_by
+        )
+        VALUES (
+            :asset_id,
+            :from_status_id,
+            :to_status_id,
+            NOW(),
+            :changed_by
+        )
+    """)
+
+    with get_connection() as conn:
+        conn.execute(
+            sql,
+            {
+                "asset_id": asset_id,
+                "from_status_id": from_status_id,
+                "to_status_id": to_status_id,
+                "changed_by": changed_by,
+            },
+        )
 
 def retire_asset_row(asset_id, retire_reason=None):
     """

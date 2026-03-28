@@ -1,9 +1,8 @@
-{# specific_issue.html #}
 {% extends "base.html" %}
 
 {% from "_macros/dropdown.html" import dropdown %}
 
-{% block title %}Maintenance – Issue{% endblock %}
+{% block title %}Maintenance - Issue{% endblock %}
 {% block page_title %}Issue{% endblock %}
 
 {% block page_css %}
@@ -18,14 +17,9 @@
   {% endif %}
 
   <div class="issue-layout">
-
-    {# ─────────────────────────────
-       A/B/C: Issue card
-       ───────────────────────────── #}
     <div class="card issue-main card--accent">
       {% set code = issue.status.code if issue.status else 'UNKNOWN' %}
 
-      {# A: title + status #}
       <div class="issue-main-header">
         <h2 class="issue-title">{{ issue.title }}</h2>
         <span class="issue-status status-{{ code|lower|replace('_','-') }}">
@@ -33,7 +27,6 @@
         </span>
       </div>
 
-      {# B: description + meta (scrolls) #}
       <div class="issue-main-body">
         <div class="field issue-block">
           <button
@@ -50,12 +43,10 @@
             {{ issue.description or "-" }}
           </div>
 
-          {# Full issue info for modal (cloned into modal on click) #}
           <div id="issueModalFull" hidden>
             {% set code = issue.status.code if issue.status else 'UNKNOWN' %}
 
             <div class="issue-modal">
-
               <div class="issue-modal__top">
                 <div class="issue-modal__title">{{ issue.title }}</div>
 
@@ -88,14 +79,14 @@
                     {% set _, date = issue.closed_at | format_dt %}
                     <div class="meta__v">{{ date }}</div>
                   {% else %}
-                    <div class="meta__v muted">–</div>
+                    <div class="meta__v muted">-</div>
                   {% endif %}
                 </div>
               </div>
 
               <div class="issue-modal__desc">
                 <div class="issue-modal__descTitle"><b>Description</b></div>
-                <div class="issue-modal__descBody">{{ issue.description or "—" }}</div>
+                <div class="issue-modal__descBody">{{ issue.description or "-" }}</div>
               </div>
             </div>
           </div>
@@ -135,7 +126,6 @@
         </div>
       </div>
 
-      {# C: robot info (fixed at bottom) #}
       <div class="issue-asset-strip">
         <div class="issue-asset-left">
           <div class="field">
@@ -163,9 +153,6 @@
       </div>
     </div>
 
-    {# ─────────────────────────────
-       Photo
-       ───────────────────────────── #}
     <div class="card issue-image">
       <h3 class="card-title">Photo (Click to expand)</h3>
 
@@ -190,9 +177,6 @@
       </div>
     </div>
 
-    {# ─────────────────────────────
-       Status Changes
-       ───────────────────────────── #}
     <div class="status-col">
       <div class="card status-card status-changes">
         <h3 class="card-title">Status Changes</h3>
@@ -224,9 +208,6 @@
       </div>
     </div>
 
-    {# ─────────────────────────────
-       Add update
-       ───────────────────────────── #}
     {% if issue.closed_at == None %}
       <div class="card update-form update-slot">
         <h3 class="card-title">Add update</h3>
@@ -236,8 +217,6 @@
           action="{{ url_for('app.add_issue_action', issue_id=issue.id) }}"
           class="issue-form issue-form--update"
         >
-
-          {# Build dropdown options in Jinja (no list unpacking) #}
           {% set action_type_opts = [] %}
           {% for at in action_types %}
             {% if at.code != "CREATED" %}
@@ -251,24 +230,37 @@
             {% set _ = status_opts.append({"value": st.id, "label": st.label}) %}
           {% endfor %}
 
-          {# Action type (required) #}
+          {% set asset_status_opts = [] %}
+          {% set _ = asset_status_opts.append({"value": "", "label": "Leave unchanged"}) %}
+          {% for st in asset_status_options %}
+            {% set _ = asset_status_opts.append({"value": st.id, "label": st.label}) %}
+          {% endfor %}
+
           {{ dropdown(
             name="action_type_code",
             id="action_type_code",
             label="Action type",
             options=action_type_opts,
-            selected_value="",
-            placeholder="Select action type…"
+            selected_value=form_values.action_type_code,
+            placeholder="Select action type..."
           ) }}
 
-          {# New status (optional) #}
           {{ dropdown(
             name="new_status_id",
             id="new_status_id",
             label="New status (optional)",
             options=status_opts,
-            selected_value="",
+            selected_value=form_values.new_status_id,
             placeholder="(no status change)"
+          ) }}
+
+          {{ dropdown(
+            name="new_asset_status_id",
+            id="new_asset_status_id",
+            label="Change Asset Status",
+            options=asset_status_opts,
+            selected_value=form_values.new_asset_status_id,
+            placeholder="Leave unchanged"
           ) }}
 
           <div class="field">
@@ -277,6 +269,7 @@
               type="text"
               name="created_by"
               placeholder="Your name or initials (optional)"
+              value="{{ form_values.created_by }}"
             >
           </div>
 
@@ -287,7 +280,7 @@
               rows="3"
               required
               placeholder="What did you do / what happened?"
-            ></textarea>
+            >{{ form_values.body }}</textarea>
           </div>
 
           <div class="issue-form-actions">
@@ -300,9 +293,6 @@
       </div>
     {% endif %}
 
-    {# ─────────────────────────────
-       Activity
-       ───────────────────────────── #}
     <div class="card actions-card activity">
       <h3 class="card-title">Activity</h3>
 

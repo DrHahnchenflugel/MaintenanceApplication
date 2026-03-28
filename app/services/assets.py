@@ -33,11 +33,30 @@ def _parse_site_id_field(payload, field_name: str = "site_id", required: bool = 
     return UUID(normalized_site_id) if normalized_site_id else None
 
 
+def _normalize_uuid_value(value, field_name: str, required: bool = True) -> str | None:
+    if value is None or str(value).strip() == "":
+        if required:
+            raise ValueError(f"Missing required field: {field_name}")
+        return None
+
+    try:
+        return str(UUID(str(value).strip()))
+    except ValueError:
+        raise ValueError(f"Invalid {field_name}, must be a UUID string")
+
+
 def _normalize_asset_tag(value) -> str:
     asset_tag = (value or "").strip()
     if not asset_tag:
         raise ValueError("asset_tag is required and must be a string")
     return asset_tag
+
+
+def _normalize_changed_by(value) -> str | None:
+    normalized = (value or "").strip()
+    if not normalized:
+        return None
+    return normalized
 
 
 def _get_public_base_url() -> str:
@@ -104,6 +123,119 @@ def _validate_asset_relationships(payload: dict) -> tuple[str, str, str, str]:
 
     return category_id, make_id, model_id, variant_id
 
+
+def _serialize_asset_row(row: dict | None) -> dict | None:
+    if row is None:
+        return None
+
+    asset = dict(row)
+
+    if "id" in asset and asset["id"] is not None:
+        asset["id"] = str(asset["id"])
+        asset["asset_id"] = asset["id"]
+    elif "asset_id" in asset and asset["asset_id"] is not None:
+        asset["asset_id"] = str(asset["asset_id"])
+        asset["id"] = asset["asset_id"]
+
+    for field_name in ("variant_id", "category_id", "site_id", "status_id"):
+        if field_name in asset and asset[field_name] is not None:
+            asset[field_name] = str(asset[field_name])
+
+    if "serial_num" in asset:
+        asset["serial_number"] = asset.pop("serial_num")
+
+    return asset
+
+
+def get_asset(asset_id, include=None):
+    if include is None:
+        include = []
+
+    row = assets_repo.get_asset_row(_normalize_uuid_value(asset_id, "asset_id", required=True))
+    return _serialize_asset_row(row)
+
+
+def get_asset_by_tag(asset_tag: str):
+    tag = (asset_tag or "").strip()
+    if not tag:
+        return None
+
+    row = assets_repo.get_asset_row_by_tag(tag)
+    return _serialize_asset_row(row)
+
+
+def list_asset_statuses():
+    rows = assets_repo.list_asset_status_rows()
+    items = []
+    for row in rows:
+        items.append(
+            {
+                "id": str(row["id"]),
+                "code": row["code"],
+                "label": row["label"],
+                "display_order": row["display_order"],
+            }
+        )
+    return items
+
+
+def get_asset_status(status_id):
+    normalized_status_id = _normalize_uuid_value(status_id, "status_id", required=True)
+    row = assets_repo.get_asset_status_row(normalized_status_id)
+    if row is None:
+        return None
+
+    return {
+        "id": str(row["id"]),
+        "code": row["code"],
+        "label": row["label"],
+        "display_order": row["display_order"],
+    }
+
+
+def set_asset_status(asset_id: str, to_status_id: str, changed_by: str | None = None):
+    normalized_asset_id = _normalize_uuid_value(asset_id, "asset_id", required=True)
+    normalized_to_status_id = _normalize_uuid_value(to_status_id, "to_status_id", required=True)
+
+    asset = assets_repo.get_asset_row(normalized_asset_id)
+    if asset is None:
+        raise ValueError("Unknown asset_id")
+
+    if assets_repo.get_asset_status_row(normalized_to_status_id) is None:
+        raise ValueError("Unknown to_status_id")
+
+    current_status_id = assets_repo.get_asset_status_id(normalized_asset_id)
+    normalized_from_status_id = None if current_status_id is None else str(current_status_id)
+
+    if normalized_from_status_id == normalized_to_status_id:
+        return {
+            "asset_id": normalized_asset_id,
+            "changed": False,
+            "from_status_id": normalized_from_status_id,
+            "to_status_id": normalized_to_status_id,
+        }
+
+    updated = assets_repo.update_asset_row(
+        asset_id=normalized_asset_id,
+        fields={"status_id": normalized_to_status_id},
+    )
+    if updated is None:
+        raise ValueError("Unknown asset_id")
+
+    assets_repo.create_asset_status_history_row(
+        asset_id=normalized_asset_id,
+        from_status_id=normalized_from_status_id,
+        to_status_id=normalized_to_status_id,
+        changed_by=_normalize_changed_by(changed_by),
+    )
+
+    return {
+        "asset_id": normalized_asset_id,
+        "changed": True,
+        "from_status_id": normalized_from_status_id,
+        "to_status_id": normalized_to_status_id,
+    }
+
 def get_asset_service(asset_id, include=None):
     """
     Get a single asset by id, with optional expansions.
@@ -119,22 +251,9 @@ def get_asset_service(asset_id, include=None):
         Nothing. If not found, returns None and the route layer decides it's a 404.
     """
 
-    if include is None:
-        include = []
-
-    include_set = set(include)
-
-    # Base row from L3
-    row = assets_repo.get_asset_row(asset_id)
-    if row is None:
+    asset = get_asset(asset_id, include=include)
+    if asset is None:
         return None
-
-    # Right now row is just the asset table columns.
-    asset = dict(row)
-
-    # normalize names
-    asset["asset_id"] = asset.pop("id")
-    asset["serial_number"] = asset.pop("serial_num")
 
     # --- Includes (commented out until db.lookups ready) ---
 
@@ -218,8 +337,6 @@ def list_assets_service(
     if include is None:
         include = []
 
-    include_set = set(include)
-
     # Translate page/page_size into limit/offset for L3
     if page < 1:
         page = 1
@@ -246,12 +363,7 @@ def list_assets_service(
 
     # For now, we just return the rows as-is.
     # Later we can add include expansions similar to get_asset_service.
-    items = []
-    for row in rows:
-        asset = dict(row)
-        asset["asset_id"] = asset.pop("id")
-        asset["serial_number"] = asset.pop("serial_num")
-        items.append(asset)
+    items = [_serialize_asset_row(row) for row in rows]
 
 
     # --- Includes (optional future step) ---
@@ -365,7 +477,11 @@ def patch_asset_service(asset_id: UUID, payload: dict) -> dict | None:
         update_fields["category_id"] = _parse_uuid_field(payload, "category_id", required=False)
 
     if "status_id" in payload:
-        update_fields["status_id"] = _parse_uuid_field(payload, "status_id", required=False)
+        update_fields["status_id"] = lookups.validate_asset_status_id(
+            payload.get("status_id"),
+            required=False,
+            field_name="status_id",
+        )
 
     if "variant_id" in payload:
         update_fields["variant_id"] = _parse_uuid_field(payload, "variant_id", required=False)

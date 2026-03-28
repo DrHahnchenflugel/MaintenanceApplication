@@ -66,7 +66,7 @@ def _build_asset_form_context(form_values: dict | None = None) -> dict:
 
     site_options = site_service.list_sites()
     category_options = lookups.list_asset_categories()
-    status_options = lookups.list_asset_statuses()
+    status_options = asset_service.list_asset_statuses()
 
     try:
         make_options = lookups.list_makes(category_id=selected_category_id) if selected_category_id else []
