@@ -6,6 +6,7 @@ bp = Blueprint("api_v2", __name__, url_prefix="/maintenance/api/v2")
 
 # Import modules so they register routes on this blueprint
 from . import asset     # noqa: F401
+from . import auth      # noqa: F401
 from . import issues    # noqa: F401
 from . import health    # noqa: F401
 from . import sites     # noqa: F401
@@ -21,6 +22,7 @@ def api_v2_root():
         "resources": {
             "health": "/health",
             "assets": "/assets",
+            "auth": "/auth/admin-gate/status",
             "issues": "/issues",
             "sites": "/sites",
             "dashboard": "/dashboard",

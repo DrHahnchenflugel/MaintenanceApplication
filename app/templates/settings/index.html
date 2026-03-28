@@ -3,5 +3,164 @@
 {% block title %}Maintenance - Settings{% endblock %}
 {% block page_title %}Settings{% endblock %}
 
+{% block page_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/settings.css') }}">
+{% endblock %}
+
 {% block content %}
+<div class="settings-page">
+  <section class="card settings-card">
+    <div class="settings-state">
+      <h2 class="card-title">Settings Access</h2>
+      <span class="issue-status {{ 'status-closed' if settings_unlocked else 'status-blocked' }}">
+        {{ "Unlocked" if settings_unlocked else "Locked" }}
+      </span>
+    </div>
+
+    {% if settings_unlocked %}
+      <p class="settings-copy">
+        This browser is currently allowed to use protected settings endpoints. Lock it again to remove access.
+      </p>
+
+      <div class="settings-actions">
+        <button id="settingsLockButton" class="btn btn-secondary" type="button">Lock Settings</button>
+      </div>
+
+      <p id="settingsLockError" class="settings-error" hidden></p>
+    {% else %}
+      <p class="settings-copy">
+        Enter the shared admin password to unlock settings edits in this browser.
+      </p>
+
+      <form id="settingsUnlockForm" class="issue-form--update settings-form">
+        <div class="field">
+          <label class="issue-label" for="settingsPassword">Admin password</label>
+          <input
+            id="settingsPassword"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            required
+          >
+        </div>
+
+        <div class="issue-form-actions">
+          <button class="btn btn--ok" type="submit">Unlock Settings</button>
+        </div>
+      </form>
+
+      <p id="settingsUnlockError" class="settings-error" hidden></p>
+    {% endif %}
+  </section>
+
+  <section class="card settings-card">
+    <h2 class="card-title">Notes</h2>
+    <p class="settings-copy">
+      Unlocking only sets a simple browser cookie flag. The password itself is never stored in the cookie.
+    </p>
+  </section>
+</div>
+{% endblock %}
+
+{% block page_js %}
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var unlockForm = document.getElementById("settingsUnlockForm");
+    var lockButton = document.getElementById("settingsLockButton");
+    var unlockError = document.getElementById("settingsUnlockError");
+    var lockError = document.getElementById("settingsLockError");
+
+    function clearError(target) {
+      if (!target) return;
+      target.textContent = "";
+      target.hidden = true;
+    }
+
+    function showError(target, message) {
+      if (!target) return;
+      target.textContent = message;
+      target.hidden = false;
+    }
+
+    function readErrorMessage(response, data, fallback) {
+      if (data && data.error) return data.error;
+      if (response.status === 403) return "Settings admin gate is disabled or locked.";
+      if (response.status === 404) return "Settings admin gate is not configured.";
+      return fallback;
+    }
+
+    if (unlockForm) {
+      unlockForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        clearError(unlockError);
+
+        var passwordInput = document.getElementById("settingsPassword");
+        var password = passwordInput ? passwordInput.value : "";
+
+        fetch("/maintenance/api/v2/auth/admin-gate/unlock", {
+          method: "POST",
+          credentials: "same-origin",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            name: "settings",
+            password: password
+          })
+        })
+          .then(function (response) {
+            return response.json()
+              .catch(function () {
+                return {};
+              })
+              .then(function (data) {
+                if (response.ok && data.ok) {
+                  window.location.reload();
+                  return;
+                }
+
+                showError(
+                  unlockError,
+                  readErrorMessage(response, data, "Unable to unlock settings.")
+                );
+              });
+          })
+          .catch(function () {
+            showError(unlockError, "Unable to unlock settings.");
+          });
+      });
+    }
+
+    if (lockButton) {
+      lockButton.addEventListener("click", function () {
+        clearError(lockError);
+
+        fetch("/maintenance/api/v2/auth/admin-gate/lock", {
+          method: "POST",
+          credentials: "same-origin"
+        })
+          .then(function (response) {
+            return response.json()
+              .catch(function () {
+                return {};
+              })
+              .then(function (data) {
+                if (response.ok && data.ok) {
+                  window.location.reload();
+                  return;
+                }
+
+                showError(
+                  lockError,
+                  readErrorMessage(response, data, "Unable to lock settings.")
+                );
+              });
+          })
+          .catch(function () {
+            showError(lockError, "Unable to lock settings.");
+          });
+      });
+    }
+  });
+</script>
 {% endblock %}

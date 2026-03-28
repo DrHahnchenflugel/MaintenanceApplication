@@ -1,0 +1,44 @@
+.settings-page {
+  display: grid;
+  gap: 16px;
+  max-width: 720px;
+}
+
+.settings-card {
+  display: grid;
+  gap: 16px;
+}
+
+.settings-state {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.settings-copy {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.settings-form {
+  max-width: 460px;
+}
+
+.settings-form .issue-form-actions {
+  padding-top: 0;
+}
+
+.settings-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.settings-error {
+  margin: 0;
+  color: var(--bad);
+  font-weight: 700;
+}

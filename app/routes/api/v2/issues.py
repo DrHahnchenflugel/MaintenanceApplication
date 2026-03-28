@@ -1,6 +1,7 @@
 import os
 from flask import request, jsonify, abort, send_file, current_app
 from . import bp
+from app.services import auth as auth_service
 from app.services import issues as issue_service
 from app.services import sites as site_service
 from uuid import UUID
@@ -62,6 +63,11 @@ def parse_uuid_path(value: str, name: str):
         return(value)
     except ValueError:
         abort(400, description=f"Invalid {name}, must be UUID")
+
+
+def require_settings_admin_gate():
+    if request.cookies.get(auth_service.SETTINGS_ADMIN_GATE_COOKIE_NAME) != "1":
+        abort(403, description="Settings admin gate is locked")
 
 @bp.route("/issues", methods=["GET"])
 def list_issues():
@@ -140,6 +146,8 @@ def list_attachment_content_types():
 
 @bp.route("/attachment-content-types", methods=["POST"])
 def create_attachment_content_type():
+    require_settings_admin_gate()
+
     data = request.get_json(silent=True) or {}
 
     try:
@@ -154,6 +162,8 @@ def create_attachment_content_type():
 
 @bp.route("/attachment-content-types/<content_type>", methods=["DELETE"])
 def delete_attachment_content_type(content_type):
+    require_settings_admin_gate()
+
     try:
         issue_service.delete_accepted_attachment_content_type(content_type)
     except ValueError as e:
@@ -274,6 +284,8 @@ def get_action_types():
 
 @bp.route("/issue-statuses", methods=["POST"])
 def create_issue_status():
+    require_settings_admin_gate()
+
     data = request.get_json(silent=True) or {}
 
     try:
@@ -288,6 +300,8 @@ def create_issue_status():
 
 @bp.route("/action-types", methods=["POST"])
 def create_action_type():
+    require_settings_admin_gate()
+
     data = request.get_json(silent=True) or {}
 
     try:
