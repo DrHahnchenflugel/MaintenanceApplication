@@ -61,6 +61,22 @@
   gap: 10px;
 }
 
+.metric-card--action {
+  color: inherit;
+  text-decoration: none;
+  transition: transform 120ms ease, border-color 120ms ease;
+}
+
+.metric-card--action:hover {
+  color: inherit;
+  transform: translateY(-1px);
+}
+
+.metric-card--action:focus-visible {
+  outline: 2px solid rgba(255, 102, 0, 0.45);
+  outline-offset: 3px;
+}
+
 .metric-card__label,
 .dashboard-card__eyebrow {
   position: relative;
