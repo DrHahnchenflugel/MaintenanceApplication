@@ -1,3 +1,4 @@
+{% from "_macros/dropdown.html" import dropdown %}
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -21,6 +22,13 @@
   </head>
 
   <body>
+    {% set preferred_site_options = [{"value": "", "label": "All Sites"}] %}
+    {% for site in available_sites %}
+      {% if site.code %}
+        {% set _ = preferred_site_options.append({"value": site.code, "label": site.fullname ~ " (" ~ site.code ~ ")"}) %}
+      {% endif %}
+    {% endfor %}
+
     <div class="layout">
       {% include "_partials/_sidebar.html" %}
 
@@ -31,12 +39,28 @@
           </button>
           <div class="top">
             <span id="clock" class="badge badge--xs badge--mono">00:00 AM</span>
-            <span class="badge badge--xs">THO</span>
+            <span class="badge badge--xs">
+              {{ current_site.code if current_site else "ALL" }}
+            </span>
           </div>
 
           <h1 class="header-title">{% block page_title %}MAINTENANCE{% endblock %}</h1>
 
           <div class="meta">
+            <form method="post" action="{{ url_for('app.set_preferred_site') }}" class="header-site-form">
+              <input type="hidden" name="next" value="{{ preferred_site_return_to }}">
+              {{ dropdown(
+                name="site_code",
+                id="preferred_site",
+                label="Site",
+                options=preferred_site_options,
+                selected_value=current_site.code if current_site else "",
+                placeholder="All Sites",
+                field_class="header-site-field",
+                label_class="header-site-label",
+                native_onchange="this.form.submit()"
+              ) }}
+            </form>
             <span id="date" class="badge">
               {% block header_right %} Monday, September 1 {% endblock %}
             </span>

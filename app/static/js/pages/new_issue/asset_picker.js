@@ -58,6 +58,7 @@
     models: panel.dataset.modelsUrl || "/maintenance/api/v2/assets/models",
     variants: panel.dataset.variantsUrl || "/maintenance/api/v2/assets/variants",
   };
+  const defaultSiteId = panel.dataset.defaultSiteId || "";
 
   // status_id(UUID) -> label (fallback if assets don't include status fields)
   const statusLabelById = new Map();
@@ -363,7 +364,7 @@
   function clearAll() {
     if (el.input) el.input.value = "";
 
-    if (el.site) el.site.value = "";
+    if (el.site) el.site.value = defaultSiteId;
     if (el.status) el.status.value = "";
     if (el.category) el.category.value = "";
 

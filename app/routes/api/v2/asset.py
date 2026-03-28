@@ -1,8 +1,9 @@
 from flask import abort, request, jsonify
 from . import bp
 from app.services import assets as asset_service
+from app.services import sites as site_service
 from uuid import UUID
-from app.services import lookups 
+from app.services import lookups
 
 def parse_uuid_arg(name: str):
     value = request.args.get(name)
@@ -14,6 +15,17 @@ def parse_uuid_arg(name: str):
         abort(400, description=f"Invalid {name}, must be UUID")
     return value
 
+
+def parse_site_arg(name: str = "site_id"):
+    value = request.args.get(name)
+    if value is None or value == "":
+        return None
+
+    try:
+        return site_service.validate_site_id(value, required=True, field_name=name)
+    except ValueError as exc:
+        abort(400, description=str(exc))
+
 @bp.route("/assets", methods=["GET"])
 def list_assets():
     page = request.args.get("page", default=1, type=int)
@@ -21,7 +33,7 @@ def list_assets():
     retired_param = request.args.get("retired", default="active", type=str).lower()
 
     filters = {
-        "site_id": parse_uuid_arg("site_id"),
+        "site_id": parse_site_arg("site_id"),
         "category_id": parse_uuid_arg("category_id"),
         "status_id": parse_uuid_arg("status_id"),
         "make_id": parse_uuid_arg("make_id"),

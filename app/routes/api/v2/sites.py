@@ -1,4 +1,4 @@
-from flask import jsonify
+from flask import abort, jsonify
 from uuid import UUID
 from . import bp
 from app.services import sites as site_service

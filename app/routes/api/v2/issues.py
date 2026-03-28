@@ -2,6 +2,7 @@ import os
 from flask import request, jsonify, abort, send_file, current_app
 from . import bp
 from app.services import issues as issue_service
+from app.services import sites as site_service
 from uuid import UUID
 
 def parse_uuid_arg(name: str):
@@ -13,6 +14,17 @@ def parse_uuid_arg(name: str):
     except ValueError:
         abort(400, f"Invalid {name}, must be UUID")
     return v
+
+
+def parse_site_arg(name: str = "site_id"):
+    value = request.args.get(name)
+    if value is None or value == "":
+        return None
+
+    try:
+        return site_service.validate_site_id(value, required=True, field_name=name)
+    except ValueError as exc:
+        abort(400, description=str(exc))
 
 def parse_uuid_field(data: dict, name: str, required: bool = False):
     """
@@ -57,7 +69,7 @@ def list_issues():
     page_size = request.args.get("page_size", default=50, type=int)
 
     filters = {
-        "site_id": parse_uuid_arg("site_id"),
+        "site_id": parse_site_arg("site_id"),
         "asset_id": parse_uuid_arg("asset_id"),
         "status_id": parse_uuid_arg("status_id"),
         "reported_by": request.args.get("reported_by"),

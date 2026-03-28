@@ -1,6 +1,7 @@
 from flask import render_template, request, redirect, url_for, abort
 from . import bp
-from app.services import lookups 
+from app.services import lookups
+from app.services import sites as site_service
 
 from app.services import issues as issue_service
 from uuid import UUID
@@ -25,6 +26,20 @@ def parse_uuid_form(name: str):
         abort(400, description=f"Invalid {name}, must be UUID")
     return v
 
+
+def parse_site_filter_arg(name: str = "site_id"):
+    if name not in request.args:
+        return False, None
+
+    raw_value = (request.args.get(name) or "").strip()
+    if not raw_value:
+        return True, None
+
+    try:
+        return True, site_service.validate_site_id(raw_value, required=True, field_name=name)
+    except ValueError as exc:
+        abort(400, description=str(exc))
+
 @bp.route("/issues")
 @bp.route("/issues/")
 def issues_list():
@@ -34,6 +49,10 @@ def issues_list():
       - status: optional status code (OPEN, IN_PROGRESS, BLOCKED, CLOSED)
       - q:      optional search text (title/description)
     """
+
+    site_filter_was_explicit, requested_site_id = parse_site_filter_arg("site_id")
+    current_site = site_service.get_current_site()
+    site_id = requested_site_id if site_filter_was_explicit else ((current_site or {}).get("id"))
 
     raw_category = request.args.get("category_id", None)  # None = not present
     category_id = parse_uuid_arg("category_id")
@@ -101,7 +120,7 @@ def issues_list():
 
     # Build filters for the service layer
     filters = {
-        "site_id": None,
+        "site_id": site_id,
         "asset_id": None,
         "status_id": None,
         "reported_by": None,
@@ -128,6 +147,7 @@ def issues_list():
         "issues/list_issues.html",
         issues=result["items"],
         status_options=status_options,
+        cur_site_id=site_id,
         cur_status=status_code,
         search=search or "",
 

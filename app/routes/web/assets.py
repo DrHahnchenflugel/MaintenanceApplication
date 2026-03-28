@@ -19,6 +19,20 @@ def parse_uuid_arg(name: str):
         abort(400, description=f"Invalid {name}, must be UUID")
 
 
+def parse_site_filter_arg(name: str = "site_id"):
+    if name not in request.args:
+        return False, None
+
+    raw_value = (request.args.get(name) or "").strip()
+    if not raw_value:
+        return True, None
+
+    try:
+        return True, site_service.validate_site_id(raw_value, required=True, field_name=name)
+    except ValueError as exc:
+        abort(400, description=str(exc))
+
+
 def _normalize_uuid_rows(rows, *field_names):
     normalized_rows = []
     for row in rows:
@@ -33,6 +47,7 @@ def _normalize_uuid_rows(rows, *field_names):
 def _build_asset_filter_query_params(
     *,
     site_id=None,
+    include_site=False,
     category_id=None,
     make_id=None,
     model_id=None,
@@ -43,8 +58,8 @@ def _build_asset_filter_query_params(
 ):
     params = {}
 
-    if site_id:
-        params["site_id"] = site_id
+    if include_site:
+        params["site_id"] = site_id or ""
     if category_id:
         params["category_id"] = category_id
     if make_id:
@@ -63,13 +78,14 @@ def _build_asset_filter_query_params(
 
 @web_bp.get("/assets", strict_slashes=False)
 def assets_index():
-    requested_site_id = parse_uuid_arg("site_id")
+    site_filter_was_explicit, requested_site_id = parse_site_filter_arg("site_id")
     requested_category_id = parse_uuid_arg("category_id")
     requested_make_id = parse_uuid_arg("make_id")
     requested_model_id = parse_uuid_arg("model_id")
     requested_variant_id = parse_uuid_arg("variant_id")
 
-    site_id = requested_site_id
+    current_site = site_service.get_current_site()
+    site_id = requested_site_id if site_filter_was_explicit else ((current_site or {}).get("id"))
     category_id = requested_category_id
     make_id = requested_make_id
     model_id = requested_model_id
@@ -117,6 +133,7 @@ def assets_index():
     include_active_param = "active" in request.args or "retired" in request.args
     requested_params = _build_asset_filter_query_params(
         site_id=requested_site_id,
+        include_site=site_filter_was_explicit,
         category_id=requested_category_id,
         make_id=requested_make_id,
         model_id=requested_model_id,
@@ -126,7 +143,8 @@ def assets_index():
         include_active="active" in request.args,
     )
     effective_params = _build_asset_filter_query_params(
-        site_id=site_id,
+        site_id=requested_site_id,
+        include_site=site_filter_was_explicit,
         category_id=category_id,
         make_id=make_id,
         model_id=model_id,
@@ -147,7 +165,6 @@ def assets_index():
         return redirect(url_for("app.assets_index", **effective_params))
 
     status_options = _normalize_uuid_rows(lookups.list_asset_statuses(), "id")
-    sites = _normalize_uuid_rows(site_service.list_sites(), "id")
 
     filters = {
         "site_id": site_id,
@@ -184,7 +201,6 @@ def assets_index():
         models=models,
         variants=variants,
         status_options=status_options,
-        sites=sites,
         cur_site_id=site_id,
         cur_category_id=category_id,
         cur_make_id=make_id,

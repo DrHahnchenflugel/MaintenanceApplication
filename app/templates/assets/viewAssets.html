@@ -9,8 +9,8 @@
 
 {% block content %}
 {% set site_opts = [{"value": "", "label": "All"}] %}
-{% for s in sites %}
-  {% set _ = site_opts.append({"value": s.id, "label": s.fullname ~ " (" ~ s.shorthand ~ ")"}) %}
+{% for s in available_sites %}
+  {% set _ = site_opts.append({"value": s.id, "label": s.fullname ~ " (" ~ s.code ~ ")"}) %}
 {% endfor %}
 
 {% set category_opts = [{"value": "", "label": "All"}] %}
@@ -166,7 +166,7 @@
               {% set time, date = asset.acquired_at | format_dt %}
               <div>
                 {{ date if date else '-' }}<br>
-                <span class="issue-sub">{{ (sites | selectattr('id', 'equalto', asset.site_id) | map(attribute='fullname') | first) or '-' }}</span>
+                <span class="issue-sub">{{ (available_sites | selectattr('id', 'equalto', asset.site_id) | map(attribute='fullname') | first) or '-' }}</span>
               </div>
             </div>
 

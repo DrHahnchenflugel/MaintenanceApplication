@@ -94,6 +94,11 @@ body { overflow: hidden; }
 .header .meta {
   grid-area: right;
   justify-self: end;
+
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
 }
 
 .header .top .badge {
@@ -107,6 +112,35 @@ body { overflow: hidden; }
 .header .pill {
   border: 1px solid rgba(255,255,255,0.16);
   background: rgba(0,0,0,0.18);
+}
+
+.header-site-form {
+  min-width: 240px;
+}
+
+.header-site-field {
+  display: grid;
+  gap: 6px;
+  min-width: 240px;
+}
+
+.header-site-label {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+.header-site-field .select--native,
+.header-site-field .dropdown__btn {
+  min-height: 40px;
+}
+
+.header-site-field .dropdown__value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 @media (min-width: 1201px){
@@ -155,6 +189,15 @@ body { overflow: hidden; }
   .header {
     position: relative;
     padding-left: 56px;
+  }
+
+  .header .meta {
+    gap: 8px;
+  }
+
+  .header-site-form,
+  .header-site-field {
+    min-width: 180px;
   }
 
   .sidebar-toggle {
@@ -222,4 +265,38 @@ body { overflow: hidden; }
   }
 
   body.sidebar-open .sidebar-overlay { display: block; }
+}
+
+@media (max-width: 768px) {
+  .header {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "left"
+      "center"
+      "right";
+    gap: 10px;
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+
+  .header .top,
+  .header-title,
+  .header .meta {
+    justify-self: stretch;
+  }
+
+  .header-title {
+    text-align: left;
+  }
+
+  .header .meta {
+    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+
+  .header-site-form,
+  .header-site-field {
+    min-width: min(100%, 240px);
+    flex: 1 1 220px;
+  }
 }

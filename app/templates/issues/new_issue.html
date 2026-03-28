@@ -45,6 +45,7 @@
       <div class="new-issue-asset__picker asset-picker"
         id="assetPicker"
         hidden
+        data-default-site-id="{{ current_site.id if current_site else '' }}"
         data-assets-url="/maintenance/api/v2/assets"
         data-asset-statuses-url="/maintenance/api/v2/asset-statuses"
         data-makes-url="/maintenance/api/v2/assets/makes"
@@ -58,8 +59,10 @@
             <span class="asset-picker__label">Site</span>
             <select class="asset-picker__select" id="apSite">
               <option value="">All</option>
-              {% for s in site_options|default([]) %}
-                <option value="{{ s.id }}">{{ s.shorthand }}</option>
+              {% for s in available_sites %}
+                <option value="{{ s.id }}" {% if current_site and s.id == current_site.id %}selected{% endif %}>
+                  {{ s.fullname }} ({{ s.code }})
+                </option>
               {% endfor %}
             </select>
           </label>

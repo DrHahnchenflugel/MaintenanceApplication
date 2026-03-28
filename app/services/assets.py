@@ -1,5 +1,6 @@
 from app.db import assets as assets_repo
 from uuid import UUID
+from app.services import sites as site_service
 
 def _parse_uuid_field(payload, field_name: str, required: bool = True):
     value = payload.get(field_name)
@@ -11,6 +12,15 @@ def _parse_uuid_field(payload, field_name: str, required: bool = True):
         return UUID(value)
     except ValueError:
         raise ValueError(f"Invalid {field_name}, must be a UUID string")
+
+
+def _parse_site_id_field(payload, field_name: str = "site_id", required: bool = True):
+    normalized_site_id = site_service.validate_site_id(
+        payload.get(field_name),
+        required=required,
+        field_name=field_name,
+    )
+    return UUID(normalized_site_id) if normalized_site_id else None
 
 def get_asset_service(asset_id, include=None):
     """
@@ -182,7 +192,7 @@ def create_asset_service(payload: dict) -> dict:
         raise ValueError("asset_tag is required and must be a string")
 
     # UUID fields
-    site_id = _parse_uuid_field(payload, "site_id", required=True)
+    site_id = _parse_site_id_field(payload, "site_id", required=True)
     category_id = _parse_uuid_field(payload, "category_id", required=True)
     status_id = _parse_uuid_field(payload, "status_id", required=True)
     variant_id = _parse_uuid_field(payload, "variant_id", required=True)
@@ -241,7 +251,7 @@ def patch_asset_service(asset_id: UUID, payload: dict) -> dict | None:
 
     # UUID fields (optional; only parsed if present)
     if "site_id" in payload:
-        update_fields["site_id"] = _parse_uuid_field(payload, "site_id", required=False)
+        update_fields["site_id"] = _parse_site_id_field(payload, "site_id", required=False)
 
     if "category_id" in payload:
         update_fields["category_id"] = _parse_uuid_field(payload, "category_id", required=False)

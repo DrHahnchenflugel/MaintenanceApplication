@@ -16,6 +16,11 @@
   {% set _ = status_opts.append({"value": st.code, "label": st.label}) %}
 {% endfor %}
 
+{% set site_opts = [{"value": "", "label": "All"}] %}
+{% for s in available_sites %}
+  {% set _ = site_opts.append({"value": s.id, "label": s.fullname ~ " (" ~ s.code ~ ")"}) %}
+{% endfor %}
+
 {% set category_opts = [{"value": "", "label": "All"}] %}
 {% for c in categories %}
   {% set _ = category_opts.append({"value": c.id, "label": c.label}) %}
@@ -40,6 +45,17 @@
   <form method="get" class="issues-toolbar">
 
     <div class="issues-toolbar__row">
+
+      {{ dropdown(
+        name="site_id",
+        id="issues_site",
+        label="Site",
+        options=site_opts,
+        selected_value=cur_site_id or "",
+        field_class="issues-field",
+        label_class="issues-label",
+        native_onchange="this.form.submit()"
+      ) }}
 
       {{ dropdown(
         name="status",
