@@ -7,3 +7,4 @@ gunicorn
 python-dateutil
 SQLAlchemy>=2.0
 pillow-heif
+qrcode[pil]
