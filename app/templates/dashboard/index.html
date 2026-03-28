@@ -15,11 +15,13 @@
   </div>
 
   <section class="dashboard-grid dashboard-grid--metrics">
-    <article class="card metric-card">
-      <div class="metric-card__label">Open Issues</div>
-      <div id="metric-open-issues" class="metric-card__value">-</div>
-      <div class="metric-card__meta">Current open and in-progress issues</div>
-    </article>
+    <a href="{{ url_for('app.issues_list', status='ACTIVE') }}">
+      <article class="card metric-card">
+        <div class="metric-card__label">Open Issues</div>
+        <div id="metric-open-issues" class="metric-card__value">-</div>
+        <div class="metric-card__meta">Current open and in-progress issues</div>
+      </article>
+    </a>
 
     <article class="card metric-card">
       <div class="metric-card__label">Blocked Issues</div>
