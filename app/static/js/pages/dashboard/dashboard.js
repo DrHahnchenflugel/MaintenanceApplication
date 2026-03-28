@@ -23,6 +23,24 @@
     }
   }
 
+  function setCardAction(cardId, url) {
+    var card = document.getElementById(cardId);
+    if (!card) {
+      return;
+    }
+
+    if (url) {
+      card.setAttribute("href", url);
+      card.classList.remove("card--action-disabled");
+      card.removeAttribute("aria-disabled");
+      return;
+    }
+
+    card.removeAttribute("href");
+    card.classList.add("card--action-disabled");
+    card.setAttribute("aria-disabled", "true");
+  }
+
   function formatInteger(value) {
     if (typeof value !== "number" || !isFinite(value)) {
       return "-";
@@ -67,16 +85,10 @@
   }
 
   function renderOldestOpenIssue(oldestIssue) {
-    var link = document.getElementById("metric-oldest-open-link");
-
     if (!oldestIssue || !oldestIssue.id) {
       setText("metric-oldest-open-age", "None");
       setText("metric-oldest-open-meta", "No currently open or in-progress issues.");
-      if (link) {
-        link.hidden = true;
-        link.removeAttribute("href");
-        link.textContent = "";
-      }
+      setCardAction("metric-oldest-open-card", null);
       return;
     }
 
@@ -89,13 +101,8 @@
     if (oldestIssue.title) {
       descriptor.push(oldestIssue.title);
     }
-    setText("metric-oldest-open-meta", descriptor.join(" - ") || "Issue #" + oldestIssue.id);
-
-    if (link && oldestIssue.issue_url) {
-      link.hidden = false;
-      link.setAttribute("href", oldestIssue.issue_url);
-      link.textContent = "Issue #" + oldestIssue.id;
-    }
+    setText("metric-oldest-open-meta", descriptor.join(" - ") || "Issue details unavailable.");
+    setCardAction("metric-oldest-open-card", oldestIssue.issue_url || null);
   }
 
   function renderResolutionCard(resolution) {
@@ -118,8 +125,11 @@
       return;
     }
 
+    var cardId = targetId + "-card";
+
     if (!offender || !offender.asset_id) {
       container.innerHTML = '<div class="dashboard-empty">' + escapeHtml(emptyMessage) + "</div>";
+      setCardAction(cardId, null);
       return;
     }
 
@@ -131,16 +141,11 @@
       metaParts.push(offender.site_shorthand);
     }
 
-    var linkHtml = "";
-    if (offender.asset_url) {
-      linkHtml = '<a class="dashboard-link" href="' + escapeHtml(offender.asset_url) + '">View asset</a>';
-    }
-
     container.innerHTML = ''
       + '<div class="offender-card__name">' + escapeHtml(offender.asset_display || "Unknown Asset") + '</div>'
       + '<div class="offender-card__stat">' + escapeHtml(formatInteger(offender.issue_count || 0)) + ' issues</div>'
-      + '<div class="offender-card__meta">' + escapeHtml(metaParts.join(" - ") || "No asset details available.") + '</div>'
-      + linkHtml;
+      + '<div class="offender-card__meta">' + escapeHtml(metaParts.join(" - ") || "No asset details available.") + '</div>';
+    setCardAction(cardId, offender.asset_url || null);
   }
 
   function renderProblemModels(models) {

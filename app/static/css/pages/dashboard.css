@@ -61,20 +61,30 @@
   gap: 10px;
 }
 
-.metric-card--action {
+.card--action {
   color: inherit;
   text-decoration: none;
+  cursor: pointer;
   transition: transform 120ms ease, border-color 120ms ease;
 }
 
-.metric-card--action:hover {
+.card--action:hover {
   color: inherit;
   transform: translateY(-1px);
 }
 
-.metric-card--action:focus-visible {
+.card--action:focus-visible {
   outline: 2px solid rgba(255, 102, 0, 0.45);
   outline-offset: 3px;
+}
+
+.card--action.card--action-disabled {
+  cursor: default;
+}
+
+.card--action.card--action-disabled:hover {
+  border-color: var(--line);
+  transform: none;
 }
 
 .metric-card__label,

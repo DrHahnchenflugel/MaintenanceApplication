@@ -11,7 +11,7 @@
 <div class="dashboard-page" data-dashboard-url="{{ api_dashboard_url }}">
   <section class="dashboard-grid dashboard-grid--metrics">
     <a
-      class="card metric-card metric-card--action"
+      class="card metric-card card--action"
       href="{{ url_for('app.issues_list', status='ACTIVE') }}"
     >
       <div class="metric-card__label">Open Issues</div>
@@ -19,11 +19,14 @@
       <div class="metric-card__meta">Current open and in-progress issues</div>
     </a>
 
-    <article class="card metric-card">
+    <a
+      class="card metric-card card--action"
+      href="{{ url_for('app.issues_list', status='BLOCKED') }}"
+    >
       <div class="metric-card__label">Blocked Issues</div>
       <div id="metric-blocked-issues" class="metric-card__value">-</div>
       <div class="metric-card__meta">Issues waiting on an unblock</div>
-    </article>
+    </a>
 
     <article class="card metric-card">
       <div class="metric-card__label">Assets Down</div>
@@ -31,12 +34,15 @@
       <div class="metric-card__meta">Non-retired assets currently marked down</div>
     </article>
 
-    <article class="card metric-card">
+    <a
+      id="metric-oldest-open-card"
+      class="card metric-card card--action card--action-disabled"
+      aria-disabled="true"
+    >
       <div class="metric-card__label">Oldest Open Issue</div>
       <div id="metric-oldest-open-age" class="metric-card__value">-</div>
       <div id="metric-oldest-open-meta" class="metric-card__meta">Loading oldest active issue...</div>
-      <a id="metric-oldest-open-link" class="metric-card__link" href="#" hidden>View issue</a>
-    </article>
+    </a>
   </section>
 
   <section class="dashboard-grid dashboard-grid--bottom">
@@ -69,23 +75,31 @@
       </div>
     </article>
 
-    <article class="card dashboard-card">
+    <a
+      id="repeat-offender-all-time-card"
+      class="card dashboard-card card--action card--action-disabled"
+      aria-disabled="true"
+    >
       <div class="dashboard-card__eyebrow">Repeat Offender</div>
       <h2 class="dashboard-card__title">All Time</h2>
 
       <div id="repeat-offender-all-time" class="offender-card__body">
         <div class="dashboard-empty">Loading repeat offender...</div>
       </div>
-    </article>
+    </a>
 
-    <article class="card dashboard-card">
+    <a
+      id="repeat-offender-recent-card"
+      class="card dashboard-card card--action card--action-disabled"
+      aria-disabled="true"
+    >
       <div class="dashboard-card__eyebrow">Repeat Offender</div>
       <h2 class="dashboard-card__title">Last 3 Months</h2>
 
       <div id="repeat-offender-recent" class="offender-card__body">
         <div class="dashboard-empty">Loading repeat offender...</div>
       </div>
-    </article>
+    </a>
   </section>
 
   <section class="card dashboard-panel">
