@@ -1,4 +1,5 @@
 import os
+from uuid import UUID
 from flask import current_app
 import app.db.helpers as helpers
 from app.db import issues as issue_db
@@ -373,6 +374,44 @@ def update_issue(issue_id: str, data: dict):
 
     # Return full issue view (with actions/history)
     return get_issue(issue_id)
+
+def delete_issue(issue_id: str) -> bool:
+    try:
+        normalized_issue_id = str(UUID(str(issue_id)))
+    except (TypeError, ValueError):
+        raise ValueError("Invalid issue_id, must be UUID")
+
+    if issue_db.get_issue_row(normalized_issue_id) is None:
+        raise ValueError("Unknown issue_id")
+
+    attachment_rows = issue_db.list_issue_attachment_rows(normalized_issue_id)
+    deleted = issue_db.delete_issue_row(normalized_issue_id)
+    if not deleted:
+        raise ValueError("Unknown issue_id")
+
+    attachment_root = current_app.config.get("ATTACHMENT_ROOT", "/tmp/attachments")
+
+    for row in attachment_rows:
+        rel_path = (row.get("filepath") or "").strip()
+        rel_norm = rel_path.replace("\\", "/")
+        if not rel_norm or rel_norm.startswith("/") or ".." in rel_norm:
+            continue
+
+        abs_path = os.path.join(attachment_root, rel_norm)
+        try:
+            if os.path.isfile(abs_path):
+                os.remove(abs_path)
+        except OSError:
+            pass
+
+        abs_dir = os.path.dirname(abs_path)
+        try:
+            if os.path.isdir(abs_dir) and not os.listdir(abs_dir):
+                os.rmdir(abs_dir)
+        except OSError:
+            pass
+
+    return True
 
 def list_issue_statuses():
     rows = issue_db.list_issue_status_rows()

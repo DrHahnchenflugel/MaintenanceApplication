@@ -567,6 +567,37 @@ def update_issue_row(issue_id, fields: dict = None):
 
     return dict(row)
 
+def delete_issue_row(issue_id) -> bool:
+    delete_attachment_sql = text("""
+        DELETE FROM issue_attachment
+        WHERE issue_id = :issue_id
+    """)
+
+    delete_action_sql = text("""
+        DELETE FROM issue_action
+        WHERE issue_id = :issue_id
+    """)
+
+    delete_status_history_sql = text("""
+        DELETE FROM issue_status_history
+        WHERE issue_id = :issue_id
+    """)
+
+    delete_issue_sql = text("""
+        DELETE FROM issue
+        WHERE id = :issue_id
+    """)
+
+    params = {"issue_id": issue_id}
+
+    with get_connection() as conn:
+        conn.execute(delete_attachment_sql, params)
+        conn.execute(delete_action_sql, params)
+        conn.execute(delete_status_history_sql, params)
+        result = conn.execute(delete_issue_sql, params)
+
+    return result.rowcount > 0
+
 def list_issue_status_history(issue_id):
     """
     Return all status history entries for a given issue, oldest first.
@@ -747,6 +778,23 @@ def get_issue_attachment_by_issue_id(issue_id: str):
         return None
 
     return dict(row)
+
+def list_issue_attachment_rows(issue_id: str):
+    sql = text("""
+        SELECT
+            id,
+            issue_id,
+            filepath,
+            content_type
+        FROM issue_attachment
+        WHERE issue_id = :issue_id
+        ORDER BY id ASC
+    """)
+
+    with get_connection() as conn:
+        rows = conn.execute(sql, {"issue_id": issue_id}).mappings().all()
+
+    return [dict(r) for r in rows]
 
 def create_issue_attachment(
     issue_id: str,

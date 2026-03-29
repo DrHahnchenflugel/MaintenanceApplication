@@ -3,6 +3,7 @@ from uuid import UUID
 
 from app.services import assets as asset_service
 from app.services import auth as auth_service
+from app.services import issues as issue_service
 from app.services import lookups
 from app.services import sites as site_service
 
@@ -650,5 +651,63 @@ def settings_new_asset():
         saved_asset=saved_asset,
         **_success_context(),
         **_build_asset_form_context(form_values),
+    )
+    return response, status_code
+
+
+@web_bp.route("/settings/issues", methods=["GET", "POST"], strict_slashes=False)
+def settings_issues():
+    form_values = {
+        "item_id": "",
+    } if request.method == "GET" else {
+        "item_id": _clean_form_value("item_id"),
+    }
+
+    form_error = None
+    status_code = 200
+
+    if request.method == "POST":
+        intent = _clean_intent("delete")
+
+        try:
+            form_values["item_id"] = _normalize_uuid_text(
+                form_values["item_id"],
+                "item_id",
+                required=True,
+            ) or ""
+        except ValueError as exc:
+            form_error = str(exc)
+            status_code = 400
+
+        if form_error is None:
+            if not _settings_unlocked():
+                form_error = _unlock_error(intent, "an issue")
+                status_code = 403
+            else:
+                try:
+                    if intent != "delete":
+                        raise ValueError("Unsupported settings action for issues")
+
+                    issue_service.delete_issue(form_values["item_id"])
+                    return redirect(url_for("app.settings_issues", deleted="1"))
+                except ValueError as exc:
+                    form_error = str(exc)
+                    status_code = 400
+
+    issue_result = issue_service.list_issues(
+        page=1,
+        page_size=200,
+        filters={},
+    )
+
+    response = _render_settings(
+        "settings/issues.html",
+        active_tab="issues",
+        issues=issue_result["items"],
+        total_issues=issue_result["total"],
+        displayed_issue_count=len(issue_result["items"]),
+        form_error=form_error,
+        form_values=form_values,
+        **_success_context(),
     )
     return response, status_code

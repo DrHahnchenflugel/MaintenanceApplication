@@ -17,6 +17,9 @@
   <a href="{{ url_for('app.settings_variants') }}" class="{% if settings_active_tab == 'variants' %}is-active{% endif %}">
     Variants
   </a>
+  <a href="{{ url_for('app.settings_issues') }}" class="{% if settings_active_tab == 'issues' %}is-active{% endif %}">
+    Issues
+  </a>
   <a href="{{ url_for('app.settings_new_asset') }}" class="{% if settings_active_tab == 'assets' %}is-active{% endif %}">
     Add Asset
   </a>

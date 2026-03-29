@@ -16,7 +16,7 @@
       <div>
         <h2 class="card-title">Settings Access</h2>
         <p class="settings-copy">
-          This area only supports adding new sites, asset types, and assets right now.
+          Manage sites, asset lookups, assets, and issue cleanup from these settings pages.
         </p>
       </div>
       <span class="issue-status {{ 'status-closed' if settings_unlocked else 'status-blocked' }}">
@@ -83,12 +83,17 @@
 
     <a class="card settings-link-card" href="{{ url_for('app.settings_variants') }}">
       <h2 class="card-title">Variants</h2>
-      <p class="settings-copy">List variants and add a new variant.</p>
+      <p class="settings-copy">List, update, delete, and add variants.</p>
+    </a>
+
+    <a class="card settings-link-card" href="{{ url_for('app.settings_issues') }}">
+      <h2 class="card-title">Issues</h2>
+      <p class="settings-copy">Review issues and delete records when needed.</p>
     </a>
 
     <a class="card settings-link-card" href="{{ url_for('app.settings_new_asset') }}">
       <h2 class="card-title">Assets</h2>
-      <p class="settings-copy">Add a new asset from existing controlled values.</p>
+      <p class="settings-copy">List, update, delete, and add assets from controlled values.</p>
     </a>
   </section>
 </div>

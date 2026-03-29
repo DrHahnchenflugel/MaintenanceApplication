@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block title %}Maintenance - Settings - Issues{% endblock %}
+{% block page_title %}Settings - Issues{% endblock %}
+
+{% block page_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/settings.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="settings-page">
+  {% include "_partials/_settings_nav.html" %}
+
+  <div class="settings-split">
+    <section class="card settings-panel">
+      <div class="settings-panel__header">
+        <h2 class="card-title">Existing Issues</h2>
+        <p class="settings-copy">
+          {% if total_issues > displayed_issue_count %}
+            Showing the newest {{ displayed_issue_count }} of {{ total_issues }} total.
+          {% else %}
+            {{ total_issues }} total.
+          {% endif %}
+        </p>
+      </div>
+
+      <div class="table settings-table--actions-4">
+        <div class="table-head table-head--4">
+          <div>Title</div>
+          <div>Asset</div>
+          <div>Status</div>
+          <div>Actions</div>
+        </div>
+        <div class="table-scroll">
+          {% for issue in issues %}
+            {% set time, date = issue.created_at | format_dt %}
+            {% set code = issue.status.code %}
+            <div class="table-row table-row--4">
+              <div>
+                <strong>{{ issue.title }}</strong>
+                <div class="settings-table-sub">
+                  Opened {{ date }} at {{ time }}
+                </div>
+              </div>
+              <div>
+                {{ issue.asset.asset_tag or "-" }}
+                <div class="settings-table-sub">
+                  {{ issue.asset.make.label or "-" }} / {{ issue.asset.model.label or "-" }} / {{ issue.asset.variant.label or "-" }}
+                </div>
+              </div>
+              <div>
+                <span class="issue-status {{
+                  'status-open' if code == 'OPEN'
+                  else 'status-in-progress' if code == 'IN_PROGRESS'
+                  else 'status-blocked' if code == 'BLOCKED'
+                  else 'status-closed' if code == 'CLOSED'
+                  else 'status-unknown'
+                }}">
+                  {{ issue.status.label }}
+                </span>
+                <div class="settings-table-sub">
+                  {{ ("Reported by " ~ issue.reported_by) if issue.reported_by else "Reporter not recorded" }}
+                </div>
+              </div>
+              <div class="settings-row-actions">
+                <form method="post">
+                  <input type="hidden" name="intent" value="delete">
+                  <input type="hidden" name="item_id" value="{{ issue.id }}">
+                  <button class="settings-action-btn settings-action-btn--danger" type="submit" {% if not settings_unlocked %}disabled{% endif %}>Delete</button>
+                </form>
+              </div>
+            </div>
+          {% else %}
+            <div class="table-row table-row--4">
+              <div>No issues found.</div>
+              <div></div>
+              <div></div>
+              <div></div>
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+    </section>
+
+    <section class="card settings-panel settings-form-card">
+      <h2 class="card-title">Delete Issues</h2>
+      <p class="settings-copy">
+        Use this page to permanently remove bad test issues, duplicates, or other records you do not want to keep.
+      </p>
+      <p class="settings-copy">
+        There is no edit flow here. Deleting an issue also removes its activity log, issue status history, and any stored attachment record.
+      </p>
+
+      {% if deleted %}
+        <p class="settings-feedback settings-feedback--success">Issue deleted.</p>
+      {% endif %}
+      {% if form_error %}
+        <p class="settings-feedback settings-feedback--error">{{ form_error }}</p>
+      {% endif %}
+      {% if not settings_unlocked %}
+        <p class="settings-copy">Unlock settings on the overview page before deleting issues.</p>
+      {% endif %}
+
+      <div class="issue-form-actions">
+        <a class="btn btn-secondary" href="{{ url_for('app.settings') }}">Back to Settings</a>
+      </div>
+    </section>
+  </div>
+</div>
+{% endblock %}
