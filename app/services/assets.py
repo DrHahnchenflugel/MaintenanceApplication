@@ -281,7 +281,7 @@ def get_asset_qr_target_url_service(asset_id) -> str | None:
     if asset is None:
         return None
 
-    return f"{_get_public_base_url()}/assets/{asset['asset_id']}"
+    return f"{_get_public_base_url()}/maintenance/assets/{asset['asset_id']}"
 
 
 def get_asset_qr_png_service(asset_id) -> bytes | None:
