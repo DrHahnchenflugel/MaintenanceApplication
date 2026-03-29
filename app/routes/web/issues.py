@@ -225,7 +225,7 @@ def add_issue_action(issue_id):
             issue = issue_service.get_issue(issue_id)
             if issue is None:
                 abort(404)
-            return _render_issue_detail(issue=issue, form_error="New status must be a valid UUID."), 400
+            return _render_issue_detail(issue=issue, form_error="Issue Status must be a valid UUID."), 400
     else:
         new_status_id = None
 
@@ -239,7 +239,7 @@ def add_issue_action(issue_id):
                 abort(404)
             return _render_issue_detail(
                 issue=issue,
-                form_error="Change Asset Status must be a valid UUID.",
+                form_error="Asset Status must be a valid UUID.",
             ), 400
     else:
         new_asset_status_id = None

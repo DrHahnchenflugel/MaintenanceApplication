@@ -5,7 +5,6 @@ from app.db import dashboard as dashboard_db
 from app.helpers import human_delta_2_times, human_delta_to_now
 
 
-DOWN_ASSET_STATUS_CODE = "DOWN"
 TREND_ROLLING_AVERAGE_DAYS = 14
 logger = logging.getLogger(__name__)
 
@@ -122,21 +121,21 @@ def _safe_bounds():
     }
 
 
-def get_dashboard_data():
+def get_dashboard_data(site_id: str | None = None):
     bounds = _safe_bounds()
 
     try:
         overview = dashboard_db.get_dashboard_overview(
             week_start=bounds["week_start"],
             week_end=bounds["week_end"],
-            down_asset_status_code=DOWN_ASSET_STATUS_CODE,
+            site_id=site_id,
         ) or {}
     except Exception:
         logger.exception("Dashboard overview query failed; returning default summary values.")
         overview = {}
 
     try:
-        repeat_all_time = dashboard_db.get_repeat_offender()
+        repeat_all_time = dashboard_db.get_repeat_offender(site_id=site_id)
     except Exception:
         logger.exception("Dashboard repeat-offender all-time query failed.")
         repeat_all_time = None
@@ -144,6 +143,7 @@ def get_dashboard_data():
     try:
         repeat_recent = dashboard_db.get_repeat_offender(
             window_start=bounds["trend_start"],
+            site_id=site_id,
         )
     except Exception:
         logger.exception("Dashboard repeat-offender recent query failed.")
@@ -152,6 +152,7 @@ def get_dashboard_data():
     try:
         problem_models = dashboard_db.get_top_models_by_issue_rate(
             window_start=bounds["trend_start"],
+            site_id=site_id,
         )
     except Exception:
         logger.exception("Dashboard top-models query failed; returning empty list.")
@@ -161,6 +162,7 @@ def get_dashboard_data():
         trend_rows = dashboard_db.get_issue_trend_rows(
             trend_start=bounds["trend_start"],
             trend_end=bounds["today"],
+            site_id=site_id,
         )
     except Exception:
         logger.exception("Dashboard trend query failed; returning empty trend data.")

@@ -3,6 +3,7 @@ import logging
 from flask import jsonify, url_for
 
 from app.services import dashboard as dashboard_service
+from app.services import sites as site_service
 
 from . import bp
 
@@ -78,8 +79,11 @@ def _add_dashboard_links(payload):
 
 @bp.get("/dashboard", strict_slashes=False)
 def dashboard_data():
+    current_site = site_service.get_current_site() or {}
+    site_id = current_site.get("id")
+
     try:
-        payload = dashboard_service.get_dashboard_data()
+        payload = dashboard_service.get_dashboard_data(site_id=site_id)
     except Exception:
         logger.exception("Dashboard API failed building dashboard payload; returning fallback payload.")
         payload = _fallback_dashboard_payload()

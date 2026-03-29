@@ -2,12 +2,13 @@
 */
 
 .issues-wrap{
-  max-height: calc(100vh - 64px); /* header/topbar */
+  min-height: 0;
+  padding-bottom: 24px;
 }
 
 .issues-wrap .table-scroll{
-  max-height: calc(100vh - 64px - 14px); /* leaves room for toolbar already inside */
-  overflow-y: auto;
+  max-height: none;
+  overflow-y: visible;
 }
 
 .issues-toolbar {

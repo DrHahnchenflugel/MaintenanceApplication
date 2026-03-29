@@ -3,6 +3,10 @@ from sqlalchemy import text
 from app.db.connection import get_connection
 
 
+def _site_filter_clause(column_name: str = "asset.site_id") -> str:
+    return f"(:site_id IS NULL OR {column_name} = :site_id)"
+
+
 def get_dashboard_time_bounds():
     sql = text("""
         SELECT
@@ -26,8 +30,10 @@ def get_dashboard_time_bounds():
     return dict(row)
 
 
-def get_dashboard_overview(*, week_start, week_end, down_asset_status_code="DOWN"):
-    sql = text("""
+def get_dashboard_overview(*, week_start, week_end, site_id=None):
+    site_filter = _site_filter_clause()
+
+    sql = text(f"""
         WITH issue_counts AS (
             SELECT
                 COUNT(*) FILTER (
@@ -56,6 +62,9 @@ def get_dashboard_overview(*, week_start, week_end, down_asset_status_code="DOWN
             FROM issue
             LEFT JOIN issue_status
               ON issue_status.id = issue.status_id
+            LEFT JOIN asset
+              ON asset.id = issue.asset_id
+            WHERE {site_filter}
         ),
         oldest_open_issue AS (
             SELECT
@@ -70,6 +79,7 @@ def get_dashboard_overview(*, week_start, week_end, down_asset_status_code="DOWN
             LEFT JOIN asset
               ON asset.id = issue.asset_id
             WHERE issue_status.code IN ('OPEN', 'IN_PROGRESS')
+              AND {site_filter}
             ORDER BY issue.created_at ASC
             LIMIT 1
         ),
@@ -77,11 +87,15 @@ def get_dashboard_overview(*, week_start, week_end, down_asset_status_code="DOWN
             SELECT
                 COUNT(*) FILTER (
                     WHERE asset.retired_at IS NULL
-                      AND asset_status.code = :down_asset_status_code
+                      AND (
+                            UPPER(COALESCE(asset_status.code, '')) LIKE '%MAINTEN%'
+                         OR UPPER(COALESCE(asset_status.label, '')) LIKE '%MAINTEN%'
+                      )
                 )::int AS assets_down
             FROM asset
             LEFT JOIN asset_status
               ON asset_status.id = asset.status_id
+            WHERE {site_filter}
         )
         SELECT
             issue_counts.open_issues,
@@ -107,7 +121,7 @@ def get_dashboard_overview(*, week_start, week_end, down_asset_status_code="DOWN
             {
                 "week_start": week_start,
                 "week_end": week_end,
-                "down_asset_status_code": down_asset_status_code,
+                "site_id": site_id,
             },
         ).mappings().first()
 
@@ -117,7 +131,7 @@ def get_dashboard_overview(*, week_start, week_end, down_asset_status_code="DOWN
     return dict(row)
 
 
-def get_repeat_offender(*, window_start=None):
+def get_repeat_offender(*, window_start=None, site_id=None):
     where_clauses = [
         "(asset_status.code IS NULL OR asset_status.code <> 'RETIRED')",
     ]
@@ -126,6 +140,10 @@ def get_repeat_offender(*, window_start=None):
     if window_start is not None:
         where_clauses.append("issue.created_at >= :window_start")
         params["window_start"] = window_start
+
+    if site_id is not None:
+        where_clauses.append("asset.site_id = :site_id")
+        params["site_id"] = site_id
 
     where_sql = f"WHERE {' AND '.join(where_clauses)}"
 
@@ -182,7 +200,7 @@ def get_repeat_offender(*, window_start=None):
     return dict(row)
 
 
-def get_top_models_by_issue_rate(*, window_start):
+def get_top_models_by_issue_rate(*, window_start, site_id=None):
     sql = text("""
         WITH active_asset_counts AS (
             SELECT
@@ -200,6 +218,7 @@ def get_top_models_by_issue_rate(*, window_start):
             LEFT JOIN asset
               ON asset.variant_id = variant.id
              AND asset.retired_at IS NULL
+             AND (:site_id IS NULL OR asset.site_id = :site_id)
             GROUP BY
                 model.id,
                 make.label,
@@ -217,6 +236,7 @@ def get_top_models_by_issue_rate(*, window_start):
             LEFT JOIN variant
               ON variant.id = asset.variant_id
             WHERE issue.created_at >= :window_start
+              AND (:site_id IS NULL OR asset.site_id = :site_id)
             GROUP BY variant.model_id
         )
         SELECT
@@ -250,25 +270,41 @@ def get_top_models_by_issue_rate(*, window_start):
     """)
 
     with get_connection() as conn:
-        rows = conn.execute(sql, {"window_start": window_start}).mappings().all()
+        rows = conn.execute(
+            sql,
+            {
+                "window_start": window_start,
+                "site_id": site_id,
+            },
+        ).mappings().all()
 
     return [dict(row) for row in rows]
 
 
-def get_issue_trend_rows(*, trend_start, trend_end):
+def get_issue_trend_rows(*, trend_start, trend_end, site_id=None):
     sql = text("""
         WITH daily AS (
             SELECT generate_series(:trend_start::date, :trend_end::date, INTERVAL '1 day')::date AS day
         ),
-        initial_events AS (
+        scoped_issues AS (
             SELECT
                 issue.id AS issue_id,
-                issue.created_at AS changed_at,
+                issue.created_at,
+                issue.status_id
+            FROM issue
+            JOIN asset
+              ON asset.id = issue.asset_id
+            WHERE (:site_id IS NULL OR asset.site_id = :site_id)
+        ),
+        initial_events AS (
+            SELECT
+                scoped_issues.issue_id,
+                scoped_issues.created_at AS changed_at,
                 COALESCE(
                     (
                         SELECT ish.from_status_id
                         FROM issue_status_history ish
-                        WHERE ish.issue_id = issue.id
+                        WHERE ish.issue_id = scoped_issues.issue_id
                           AND ish.from_status_id IS NOT NULL
                         ORDER BY ish.changed_at ASC
                         LIMIT 1
@@ -276,20 +312,22 @@ def get_issue_trend_rows(*, trend_start, trend_end):
                     (
                         SELECT ish.to_status_id
                         FROM issue_status_history ish
-                        WHERE ish.issue_id = issue.id
+                        WHERE ish.issue_id = scoped_issues.issue_id
                         ORDER BY ish.changed_at ASC
                         LIMIT 1
                     ),
-                    issue.status_id
+                    scoped_issues.status_id
                 ) AS status_id
-            FROM issue
+            FROM scoped_issues
         ),
         history_events AS (
             SELECT
-                issue_id,
-                changed_at,
-                to_status_id AS status_id
+                issue_status_history.issue_id,
+                issue_status_history.changed_at,
+                issue_status_history.to_status_id AS status_id
             FROM issue_status_history
+            JOIN scoped_issues
+              ON scoped_issues.issue_id = issue_status_history.issue_id
         ),
         all_events AS (
             SELECT issue_id, changed_at, status_id
@@ -370,6 +408,7 @@ def get_issue_trend_rows(*, trend_start, trend_end):
             {
                 "trend_start": trend_start,
                 "trend_end": trend_end,
+                "site_id": site_id,
             },
         ).mappings().all()
 
