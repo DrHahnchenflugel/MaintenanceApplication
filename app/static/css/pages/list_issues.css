@@ -2,8 +2,15 @@
 */
 
 .issues-wrap{
+  display: grid;
+  gap: 14px;
+  align-content: start;
   min-height: 0;
-  padding-bottom: 24px;
+  padding-bottom: 16px;
+}
+
+.issues-wrap .table{
+  min-height: 0;
 }
 
 .issues-wrap .table-scroll{
@@ -153,6 +160,14 @@
 
 .issue-asset .muted{
   font-weight: 650;
+}
+
+@media (min-width: 1201px){
+  .issues-wrap .table-scroll{
+    max-height: clamp(320px, 50vh, 620px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
 }
 
 /* Tablet/phone: allow horizontal scroll instead of crushing */
