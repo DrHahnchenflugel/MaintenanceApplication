@@ -432,6 +432,59 @@ def create_asset_service(payload: dict) -> dict:
 
     return row
 
+
+def update_asset_for_settings_service(asset_id, payload: dict) -> dict | None:
+    normalized_asset_id = _normalize_uuid_value(asset_id, "asset_id", required=True)
+    existing_asset = get_asset_service(normalized_asset_id)
+    if existing_asset is None:
+        return None
+
+    existing_variant = lookups.get_variant(existing_asset["variant_id"])
+    if existing_variant is None:
+        raise ValueError("Existing asset variant is invalid")
+
+    asset_tag = _normalize_asset_tag(payload.get("asset_tag"))
+    if assets_repo.asset_tag_exists(asset_tag, exclude_asset_id=normalized_asset_id):
+        raise ValueError("asset_tag already exists")
+
+    site_id = site_service.validate_site_id(
+        payload.get("site_id"),
+        required=True,
+        field_name="site_id",
+    )
+    status_id = lookups.validate_asset_status_id(
+        payload.get("status_id"),
+        required=True,
+        field_name="status_id",
+    )
+
+    relationship_payload = {
+        "category_id": payload.get("category_id") or existing_asset.get("category_id"),
+        "make_id": payload.get("make_id") or existing_variant.get("make_id"),
+        "model_id": payload.get("model_id") or existing_variant.get("model_id"),
+        "variant_id": payload.get("variant_id") or existing_asset.get("variant_id"),
+    }
+    category_id, _make_id, _model_id, variant_id = _validate_asset_relationships(relationship_payload)
+
+    update_fields = {
+        "asset_tag": asset_tag,
+        "site_id": site_id,
+        "category_id": category_id,
+        "variant_id": variant_id,
+    }
+
+    row = assets_repo.update_asset_row(asset_id=normalized_asset_id, fields=update_fields)
+    if row is None:
+        return None
+
+    set_asset_status(
+        asset_id=normalized_asset_id,
+        to_status_id=status_id,
+        changed_by=payload.get("changed_by"),
+    )
+
+    return get_asset_service(normalized_asset_id)
+
 def patch_asset_service(asset_id: UUID, payload: dict) -> dict | None:
     """
     Partially update an asset.
@@ -518,6 +571,17 @@ def patch_asset_service(asset_id: UUID, payload: dict) -> dict | None:
         )
 
     return get_asset_service(normalized_asset_id)
+
+
+def delete_asset_service(asset_id) -> bool:
+    normalized_asset_id = _normalize_uuid_value(asset_id, "asset_id", required=True)
+    if assets_repo.get_asset_row(normalized_asset_id) is None:
+        raise ValueError("Unknown asset_id")
+
+    try:
+        return assets_repo.delete_asset_row(normalized_asset_id)
+    except IntegrityError as exc:
+        raise ValueError("Asset cannot be deleted because it is in use") from exc
 
 def retire_asset_service(asset_id: UUID, retire_reason: str | None = None) -> bool:
     """

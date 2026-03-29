@@ -124,6 +124,44 @@ def create_category(*, name: str) -> dict:
     return _serialize_lookup_row(row, "id")
 
 
+def update_category(*, category_id, name: str) -> dict:
+    normalized_category_id = validate_category_id(
+        category_id,
+        required=True,
+        field_name="category_id",
+    )
+    normalized_name = _normalize_name(name, "Category name")
+
+    if lookups_db.category_name_exists(normalized_name, exclude_id=normalized_category_id):
+        raise ValueError("Category already exists")
+
+    try:
+        row = lookups_db.update_category_row(
+            normalized_category_id,
+            name=normalized_name,
+            label=normalized_name,
+        )
+    except IntegrityError as exc:
+        raise ValueError("Category already exists") from exc
+
+    if row is None:
+        raise ValueError("Unknown category_id")
+
+    return _serialize_lookup_row(row, "id")
+
+
+def delete_category(category_id) -> bool:
+    normalized_category_id = validate_category_id(
+        category_id,
+        required=True,
+        field_name="category_id",
+    )
+    try:
+        return lookups_db.delete_category_row(normalized_category_id)
+    except IntegrityError as exc:
+        raise ValueError("Category cannot be deleted because it is in use") from exc
+
+
 def list_makes(category_id=None):
     normalized_category_id = None
     if category_id is not None and str(category_id).strip():
@@ -185,6 +223,50 @@ def create_make(*, category_id, name: str) -> dict:
         raise ValueError("Make already exists") from exc
 
     return _serialize_lookup_row(row, "id", "category_id")
+
+
+def update_make(*, make_id, category_id, name: str) -> dict:
+    normalized_make_id = validate_make_id(
+        make_id,
+        required=True,
+        field_name="make_id",
+    )
+    normalized_category_id = validate_category_id(
+        category_id,
+        required=True,
+        field_name="category_id",
+    )
+    normalized_name = _normalize_name(name, "Make name")
+
+    if lookups_db.make_name_exists(normalized_name, exclude_id=normalized_make_id):
+        raise ValueError("Make already exists")
+
+    try:
+        row = lookups_db.update_make_row(
+            normalized_make_id,
+            category_id=normalized_category_id,
+            name=normalized_name,
+            label=normalized_name,
+        )
+    except IntegrityError as exc:
+        raise ValueError("Make already exists") from exc
+
+    if row is None:
+        raise ValueError("Unknown make_id")
+
+    return _serialize_lookup_row(row, "id", "category_id")
+
+
+def delete_make(make_id) -> bool:
+    normalized_make_id = validate_make_id(
+        make_id,
+        required=True,
+        field_name="make_id",
+    )
+    try:
+        return lookups_db.delete_make_row(normalized_make_id)
+    except IntegrityError as exc:
+        raise ValueError("Make cannot be deleted because it is in use") from exc
 
 
 def list_models(make_id=None):
@@ -250,6 +332,54 @@ def create_model(*, make_id, name: str) -> dict:
         raise ValueError("Model already exists for this make") from exc
 
     return _serialize_lookup_row(row, "id", "make_id")
+
+
+def update_model(*, model_id, make_id, name: str) -> dict:
+    normalized_model_id = validate_model_id(
+        model_id,
+        required=True,
+        field_name="model_id",
+    )
+    normalized_make_id = validate_make_id(
+        make_id,
+        required=True,
+        field_name="make_id",
+    )
+    normalized_name = _normalize_name(name, "Model name")
+
+    if lookups_db.model_name_exists_in_make(
+        normalized_name,
+        normalized_make_id,
+        exclude_id=normalized_model_id,
+    ):
+        raise ValueError("Model already exists for this make")
+
+    try:
+        row = lookups_db.update_model_row(
+            normalized_model_id,
+            make_id=normalized_make_id,
+            name=normalized_name,
+            label=normalized_name,
+        )
+    except IntegrityError as exc:
+        raise ValueError("Model already exists for this make") from exc
+
+    if row is None:
+        raise ValueError("Unknown model_id")
+
+    return _serialize_lookup_row(row, "id", "make_id")
+
+
+def delete_model(model_id) -> bool:
+    normalized_model_id = validate_model_id(
+        model_id,
+        required=True,
+        field_name="model_id",
+    )
+    try:
+        return lookups_db.delete_model_row(normalized_model_id)
+    except IntegrityError as exc:
+        raise ValueError("Model cannot be deleted because it is in use") from exc
 
 
 def list_variants(model_id=None):
@@ -321,3 +451,51 @@ def create_variant(*, model_id, name: str) -> dict:
         raise ValueError("Variant already exists for this model") from exc
 
     return _serialize_lookup_row(row, "id", "model_id")
+
+
+def update_variant(*, variant_id, model_id, name: str) -> dict:
+    normalized_variant_id = validate_variant_id(
+        variant_id,
+        required=True,
+        field_name="variant_id",
+    )
+    normalized_model_id = validate_model_id(
+        model_id,
+        required=True,
+        field_name="model_id",
+    )
+    normalized_name = _normalize_name(name, "Variant name")
+
+    if lookups_db.variant_name_exists_in_model(
+        normalized_name,
+        normalized_model_id,
+        exclude_id=normalized_variant_id,
+    ):
+        raise ValueError("Variant already exists for this model")
+
+    try:
+        row = lookups_db.update_variant_row(
+            normalized_variant_id,
+            model_id=normalized_model_id,
+            name=normalized_name,
+            label=normalized_name,
+        )
+    except IntegrityError as exc:
+        raise ValueError("Variant already exists for this model") from exc
+
+    if row is None:
+        raise ValueError("Unknown variant_id")
+
+    return _serialize_lookup_row(row, "id", "model_id")
+
+
+def delete_variant(variant_id) -> bool:
+    normalized_variant_id = validate_variant_id(
+        variant_id,
+        required=True,
+        field_name="variant_id",
+    )
+    try:
+        return lookups_db.delete_variant_row(normalized_variant_id)
+    except IntegrityError as exc:
+        raise ValueError("Variant cannot be deleted because it is in use") from exc

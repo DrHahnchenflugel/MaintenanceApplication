@@ -18,20 +18,30 @@
         <p class="settings-copy">{{ sites|length }} total</p>
       </div>
 
-      <div class="table">
-        <div class="table-head table-head--2">
+      <div class="table settings-table--actions-3">
+        <div class="table-head table-head--3">
           <div>Short Code</div>
           <div>Site</div>
+          <div>Actions</div>
         </div>
         <div class="table-scroll">
           {% for site in sites %}
-            <div class="table-row table-row--2">
+            <div class="table-row table-row--3">
               <div><strong>{{ site.code or "-" }}</strong></div>
               <div>{{ site.fullname }}</div>
+              <div class="settings-row-actions">
+                <a class="settings-action-link" href="{{ url_for('app.settings_sites', edit_id=site.id) }}">Edit</a>
+                <form method="post">
+                  <input type="hidden" name="intent" value="delete">
+                  <input type="hidden" name="item_id" value="{{ site.id }}">
+                  <button class="settings-action-btn settings-action-btn--danger" type="submit" {% if not settings_unlocked %}disabled{% endif %}>Delete (NOT RETIRE)</button>
+                </form>
+              </div>
             </div>
           {% else %}
-            <div class="table-row table-row--2">
+            <div class="table-row table-row--3">
               <div>No sites found.</div>
+              <div></div>
               <div></div>
             </div>
           {% endfor %}
@@ -40,11 +50,19 @@
     </section>
 
     <section class="card settings-panel settings-form-card">
-      <h2 class="card-title">Add Site</h2>
-      <p class="settings-copy">Create a site with a unique short code.</p>
+      <h2 class="card-title">{{ "Update Site" if editing_site else "Add Site" }}</h2>
+      <p class="settings-copy">
+        {{ "Edit the selected site details." if editing_site else "Create a site with a unique short code." }}
+      </p>
 
       {% if created %}
         <p class="settings-feedback settings-feedback--success">Site created.</p>
+      {% endif %}
+      {% if updated %}
+        <p class="settings-feedback settings-feedback--success">Site updated.</p>
+      {% endif %}
+      {% if deleted %}
+        <p class="settings-feedback settings-feedback--success">Site deleted.</p>
       {% endif %}
       {% if form_error %}
         <p class="settings-feedback settings-feedback--error">{{ form_error }}</p>
@@ -54,6 +72,8 @@
       {% endif %}
 
       <form method="post" class="issue-form--update settings-form-stack">
+        <input type="hidden" name="intent" value="{{ 'update' if editing_site else 'create' }}">
+        <input type="hidden" name="item_id" value="{{ form_values.item_id }}">
         <fieldset class="settings-fieldset" {% if not settings_unlocked %}disabled{% endif %}>
           <div class="field">
             <label class="issue-label" for="site_fullname">Site Name</label>
@@ -67,7 +87,12 @@
         </fieldset>
 
         <div class="issue-form-actions">
-          <button class="btn btn--ok" type="submit" {% if not settings_unlocked %}disabled{% endif %}>Add Site</button>
+          <button class="btn btn--ok" type="submit" {% if not settings_unlocked %}disabled{% endif %}>
+            {{ "Update Site" if editing_site else "Add Site" }}
+          </button>
+          {% if editing_site %}
+            <a class="btn btn-secondary" href="{{ url_for('app.settings_sites') }}">Cancel Edit</a>
+          {% endif %}
           <a class="btn btn-secondary" href="{{ url_for('app.settings') }}">Back to Settings</a>
         </div>
       </form>

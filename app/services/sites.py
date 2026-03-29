@@ -164,6 +164,52 @@ def create_site(*, shorthand: str, fullname: str) -> dict:
     return site
 
 
+def update_site(*, site_id, shorthand: str, fullname: str) -> dict:
+    normalized_site_id = validate_site_id(site_id, required=True, field_name="site_id")
+    normalized_shorthand = _normalize_site_code(shorthand)
+    normalized_fullname = _normalize_site_fullname(fullname)
+
+    if not normalized_shorthand:
+        raise ValueError("Site short code is required")
+
+    if sites_db.site_shorthand_exists_for_other_site(
+        normalized_shorthand,
+        exclude_site_id=normalized_site_id,
+    ):
+        raise ValueError("Site short code already exists")
+
+    try:
+        row = sites_db.update_site_row(
+            normalized_site_id,
+            shorthand=normalized_shorthand,
+            fullname=normalized_fullname,
+        )
+    except IntegrityError as exc:
+        raise ValueError("Site short code already exists") from exc
+
+    if row is None:
+        raise ValueError("Unknown site_id")
+
+    _get_site_snapshot(force_refresh=True)
+
+    site = dict(row)
+    site["id"] = str(site["id"])
+    site["code"] = _normalize_site_code(site.get("shorthand"))
+    return site
+
+
+def delete_site(site_id) -> bool:
+    normalized_site_id = validate_site_id(site_id, required=True, field_name="site_id")
+    try:
+        deleted = sites_db.delete_site_row(normalized_site_id)
+    except IntegrityError as exc:
+        raise ValueError("Site cannot be deleted because it is in use") from exc
+
+    if deleted:
+        _get_site_snapshot(force_refresh=True)
+    return deleted
+
+
 def _should_use_secure_cookie(req=None) -> bool:
     req = req or request
     if req.is_secure:

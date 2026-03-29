@@ -18,20 +18,30 @@
         <p class="settings-copy">{{ makes|length }} total</p>
       </div>
 
-      <div class="table">
-        <div class="table-head table-head--2">
+      <div class="table settings-table--actions-3">
+        <div class="table-head table-head--3">
           <div>Make</div>
           <div>Category</div>
+          <div>Actions</div>
         </div>
         <div class="table-scroll">
           {% for make in makes %}
-            <div class="table-row table-row--2">
+            <div class="table-row table-row--3">
               <div><strong>{{ make.label }}</strong></div>
               <div>{{ make.category_label or "-" }}</div>
+              <div class="settings-row-actions">
+                <a class="settings-action-link" href="{{ url_for('app.settings_makes', edit_id=make.id) }}">Edit</a>
+                <form method="post">
+                  <input type="hidden" name="intent" value="delete">
+                  <input type="hidden" name="item_id" value="{{ make.id }}">
+                  <button class="settings-action-btn settings-action-btn--danger" type="submit" {% if not settings_unlocked %}disabled{% endif %}>Delete (NOT RETIRE)</button>
+                </form>
+              </div>
             </div>
           {% else %}
-            <div class="table-row table-row--2">
+            <div class="table-row table-row--3">
               <div>No makes found.</div>
+              <div></div>
               <div></div>
             </div>
           {% endfor %}
@@ -40,11 +50,19 @@
     </section>
 
     <section class="card settings-panel settings-form-card">
-      <h2 class="card-title">Add Make</h2>
-      <p class="settings-copy">Makes are attached to an existing category in the current schema.</p>
+      <h2 class="card-title">{{ "Update Make" if editing_make else "Add Make" }}</h2>
+      <p class="settings-copy">
+        {{ "Edit the selected make and category." if editing_make else "Makes are attached to an existing category in the current schema." }}
+      </p>
 
       {% if created %}
         <p class="settings-feedback settings-feedback--success">Make created.</p>
+      {% endif %}
+      {% if updated %}
+        <p class="settings-feedback settings-feedback--success">Make updated.</p>
+      {% endif %}
+      {% if deleted %}
+        <p class="settings-feedback settings-feedback--success">Make deleted.</p>
       {% endif %}
       {% if form_error %}
         <p class="settings-feedback settings-feedback--error">{{ form_error }}</p>
@@ -54,6 +72,8 @@
       {% endif %}
 
       <form method="post" class="issue-form--update settings-form-stack">
+        <input type="hidden" name="intent" value="{{ 'update' if editing_make else 'create' }}">
+        <input type="hidden" name="item_id" value="{{ form_values.item_id }}">
         <fieldset class="settings-fieldset" {% if not settings_unlocked %}disabled{% endif %}>
           <div class="field">
             <label class="issue-label" for="make_category">Category</label>
@@ -74,7 +94,12 @@
         </fieldset>
 
         <div class="issue-form-actions">
-          <button class="btn btn--ok" type="submit" {% if not settings_unlocked %}disabled{% endif %}>Add Make</button>
+          <button class="btn btn--ok" type="submit" {% if not settings_unlocked %}disabled{% endif %}>
+            {{ "Update Make" if editing_make else "Add Make" }}
+          </button>
+          {% if editing_make %}
+            <a class="btn btn-secondary" href="{{ url_for('app.settings_makes') }}">Cancel Edit</a>
+          {% endif %}
           <a class="btn btn-secondary" href="{{ url_for('app.settings') }}">Back to Settings</a>
         </div>
       </form>

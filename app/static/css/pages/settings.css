@@ -10,6 +10,10 @@
   gap: 16px;
 }
 
+.settings-page .table {
+  min-width: 0;
+}
+
 .settings-state {
   display: flex;
   align-items: center;
@@ -152,6 +156,61 @@
   color: rgba(231,235,241,0.70);
 }
 
+.settings-table--actions-3 .table-head,
+.settings-table--actions-3 .table-row {
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.25fr) auto;
+}
+
+.settings-table--actions-4 .table-head,
+.settings-table--actions-4 .table-row {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) minmax(0, 1.2fr) auto;
+}
+
+.settings-row-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.settings-row-actions form {
+  margin: 0;
+}
+
+.settings-action-link,
+.settings-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: rgba(255,255,255,0.02);
+  color: var(--text);
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.settings-action-link:hover,
+.settings-action-btn:hover {
+  border-color: var(--line-strong);
+}
+
+.settings-action-btn--danger {
+  color: #ffd4d4;
+  border-color: rgba(178, 34, 34, 0.55);
+  background: rgba(178, 34, 34, 0.18);
+}
+
+.settings-action-btn--danger:hover {
+  border-color: rgba(220, 56, 56, 0.75);
+  background: rgba(178, 34, 34, 0.28);
+}
+
 .settings-page .table-scroll {
   max-height: 52vh;
 }
@@ -169,6 +228,16 @@
 }
 
 @media (max-width: 1024px) {
+  .settings-table--actions-3 .table-head,
+  .settings-table--actions-3 .table-row {
+    min-width: 620px;
+  }
+
+  .settings-table--actions-4 .table-head,
+  .settings-table--actions-4 .table-row {
+    min-width: 780px;
+  }
+
   .settings-split {
     grid-template-columns: 1fr;
   }

@@ -18,14 +18,15 @@
         <p class="settings-copy">{{ models|length }} total</p>
       </div>
 
-      <div class="table">
-        <div class="table-head table-head--2">
+      <div class="table settings-table--actions-3">
+        <div class="table-head table-head--3">
           <div>Model</div>
           <div>Make</div>
+          <div>Actions</div>
         </div>
         <div class="table-scroll">
           {% for model in models %}
-            <div class="table-row table-row--2">
+            <div class="table-row table-row--3">
               <div><strong>{{ model.label }}</strong></div>
               <div>
                 {{ model.make_label or "-" }}
@@ -33,10 +34,19 @@
                   <div class="settings-table-sub">{{ model.category_label }}</div>
                 {% endif %}
               </div>
+              <div class="settings-row-actions">
+                <a class="settings-action-link" href="{{ url_for('app.settings_models', edit_id=model.id) }}">Edit</a>
+                <form method="post">
+                  <input type="hidden" name="intent" value="delete">
+                  <input type="hidden" name="item_id" value="{{ model.id }}">
+                  <button class="settings-action-btn settings-action-btn--danger" type="submit" {% if not settings_unlocked %}disabled{% endif %}>Delete (NOT RETIRE)</button>
+                </form>
+              </div>
             </div>
           {% else %}
-            <div class="table-row table-row--2">
+            <div class="table-row table-row--3">
               <div>No models found.</div>
+              <div></div>
               <div></div>
             </div>
           {% endfor %}
@@ -45,11 +55,19 @@
     </section>
 
     <section class="card settings-panel settings-form-card">
-      <h2 class="card-title">Add Model</h2>
-      <p class="settings-copy">A model must belong to an existing make.</p>
+      <h2 class="card-title">{{ "Update Model" if editing_model else "Add Model" }}</h2>
+      <p class="settings-copy">
+        {{ "Edit the selected model and make." if editing_model else "A model must belong to an existing make." }}
+      </p>
 
       {% if created %}
         <p class="settings-feedback settings-feedback--success">Model created.</p>
+      {% endif %}
+      {% if updated %}
+        <p class="settings-feedback settings-feedback--success">Model updated.</p>
+      {% endif %}
+      {% if deleted %}
+        <p class="settings-feedback settings-feedback--success">Model deleted.</p>
       {% endif %}
       {% if form_error %}
         <p class="settings-feedback settings-feedback--error">{{ form_error }}</p>
@@ -59,6 +77,8 @@
       {% endif %}
 
       <form method="post" class="issue-form--update settings-form-stack">
+        <input type="hidden" name="intent" value="{{ 'update' if editing_model else 'create' }}">
+        <input type="hidden" name="item_id" value="{{ form_values.item_id }}">
         <fieldset class="settings-fieldset" {% if not settings_unlocked %}disabled{% endif %}>
           <div class="field">
             <label class="issue-label" for="model_make">Make</label>
@@ -79,7 +99,12 @@
         </fieldset>
 
         <div class="issue-form-actions">
-          <button class="btn btn--ok" type="submit" {% if not settings_unlocked %}disabled{% endif %}>Add Model</button>
+          <button class="btn btn--ok" type="submit" {% if not settings_unlocked %}disabled{% endif %}>
+            {{ "Update Model" if editing_model else "Add Model" }}
+          </button>
+          {% if editing_model %}
+            <a class="btn btn-secondary" href="{{ url_for('app.settings_models') }}">Cancel Edit</a>
+          {% endif %}
           <a class="btn btn-secondary" href="{{ url_for('app.settings') }}">Back to Settings</a>
         </div>
       </form>

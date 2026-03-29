@@ -359,15 +359,20 @@ def list_asset_rows(
     rows = [dict(row) for row in result]
     return rows, total
 
-def asset_tag_exists(asset_tag: str) -> bool:
-    sql = text("""
+def asset_tag_exists(asset_tag: str, *, exclude_asset_id=None) -> bool:
+    sql = """
         SELECT 1
         FROM asset
         WHERE LOWER(asset_tag) = LOWER(:asset_tag)
-    """)
+    """
+
+    params = {"asset_tag": asset_tag}
+    if exclude_asset_id is not None:
+        sql += " AND id <> :exclude_asset_id"
+        params["exclude_asset_id"] = exclude_asset_id
 
     with get_connection() as conn:
-        row = conn.execute(sql, {"asset_tag": asset_tag}).mappings().first()
+        row = conn.execute(text(sql), params).mappings().first()
 
     return row is not None
 
@@ -575,3 +580,15 @@ def retire_asset_row(asset_id, retire_reason=None):
         return None
 
     return dict(row)
+
+
+def delete_asset_row(asset_id) -> bool:
+    sql = text("""
+        DELETE FROM asset
+        WHERE id = :id
+    """)
+
+    with get_connection() as conn:
+        result = conn.execute(sql, {"id": asset_id})
+
+    return (result.rowcount or 0) > 0

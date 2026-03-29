@@ -35,16 +35,23 @@ def get_category_row(category_id):
     return None if row is None else dict(row)
 
 
-def category_name_exists(name: str) -> bool:
-    sql = text("""
+def category_name_exists(name: str, *, exclude_id=None) -> bool:
+    sql = """
         SELECT 1
         FROM category
-        WHERE LOWER(name) = LOWER(:name)
-           OR LOWER(label) = LOWER(:name)
-    """)
+        WHERE (
+            LOWER(name) = LOWER(:name)
+            OR LOWER(label) = LOWER(:name)
+        )
+    """
+
+    params = {"name": name}
+    if exclude_id is not None:
+        sql += " AND id <> :exclude_id"
+        params["exclude_id"] = exclude_id
 
     with get_connection() as conn:
-        row = conn.execute(sql, {"name": name}).mappings().first()
+        row = conn.execute(text(sql), params).mappings().first()
 
     return row is not None
 
@@ -72,6 +79,44 @@ def create_category_row(*, name: str, label: str):
         raise RuntimeError("Failed to insert category")
 
     return dict(row)
+
+
+def update_category_row(category_id, *, name: str, label: str):
+    sql = text("""
+        UPDATE category
+        SET
+            name = :name,
+            label = :label
+        WHERE id = :id
+        RETURNING
+            id,
+            name,
+            label
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(
+            sql,
+            {
+                "id": category_id,
+                "name": name,
+                "label": label,
+            },
+        ).mappings().first()
+
+    return None if row is None else dict(row)
+
+
+def delete_category_row(category_id) -> bool:
+    sql = text("""
+        DELETE FROM category
+        WHERE id = :id
+    """)
+
+    with get_connection() as conn:
+        result = conn.execute(sql, {"id": category_id})
+
+    return (result.rowcount or 0) > 0
 
 
 def list_makes(category_id=None):
@@ -127,16 +172,23 @@ def get_make_row(make_id):
     return None if row is None else dict(row)
 
 
-def make_name_exists(name: str) -> bool:
-    sql = text("""
+def make_name_exists(name: str, *, exclude_id=None) -> bool:
+    sql = """
         SELECT 1
         FROM make
-        WHERE LOWER(name) = LOWER(:name)
-           OR LOWER(label) = LOWER(:name)
-    """)
+        WHERE (
+            LOWER(name) = LOWER(:name)
+            OR LOWER(label) = LOWER(:name)
+        )
+    """
+
+    params = {"name": name}
+    if exclude_id is not None:
+        sql += " AND id <> :exclude_id"
+        params["exclude_id"] = exclude_id
 
     with get_connection() as conn:
-        row = conn.execute(sql, {"name": name}).mappings().first()
+        row = conn.execute(text(sql), params).mappings().first()
 
     return row is not None
 
@@ -174,6 +226,47 @@ def create_make_row(*, category_id, name: str, label: str):
         raise RuntimeError("Failed to insert make")
 
     return dict(row)
+
+
+def update_make_row(make_id, *, category_id, name: str, label: str):
+    sql = text("""
+        UPDATE make
+        SET
+            category_id = :category_id,
+            name = :name,
+            label = :label
+        WHERE id = :id
+        RETURNING
+            id,
+            category_id,
+            name,
+            label
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(
+            sql,
+            {
+                "id": make_id,
+                "category_id": category_id,
+                "name": name,
+                "label": label,
+            },
+        ).mappings().first()
+
+    return None if row is None else dict(row)
+
+
+def delete_make_row(make_id) -> bool:
+    sql = text("""
+        DELETE FROM make
+        WHERE id = :id
+    """)
+
+    with get_connection() as conn:
+        result = conn.execute(sql, {"id": make_id})
+
+    return (result.rowcount or 0) > 0
 
 
 def list_models(make_id=None):
@@ -239,8 +332,8 @@ def get_model_row(model_id):
     return None if row is None else dict(row)
 
 
-def model_name_exists_in_make(name: str, make_id) -> bool:
-    sql = text("""
+def model_name_exists_in_make(name: str, make_id, *, exclude_id=None) -> bool:
+    sql = """
         SELECT 1
         FROM model
         WHERE make_id = :make_id
@@ -248,16 +341,18 @@ def model_name_exists_in_make(name: str, make_id) -> bool:
             LOWER(name) = LOWER(:name)
             OR LOWER(label) = LOWER(:name)
           )
-    """)
+    """
+
+    params = {
+        "make_id": make_id,
+        "name": name,
+    }
+    if exclude_id is not None:
+        sql += " AND id <> :exclude_id"
+        params["exclude_id"] = exclude_id
 
     with get_connection() as conn:
-        row = conn.execute(
-            sql,
-            {
-                "make_id": make_id,
-                "name": name,
-            },
-        ).mappings().first()
+        row = conn.execute(text(sql), params).mappings().first()
 
     return row is not None
 
@@ -295,6 +390,47 @@ def create_model_row(*, make_id, name: str, label: str):
         raise RuntimeError("Failed to insert model")
 
     return dict(row)
+
+
+def update_model_row(model_id, *, make_id, name: str, label: str):
+    sql = text("""
+        UPDATE model
+        SET
+            make_id = :make_id,
+            name = :name,
+            label = :label
+        WHERE id = :id
+        RETURNING
+            id,
+            make_id,
+            name,
+            label
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(
+            sql,
+            {
+                "id": model_id,
+                "make_id": make_id,
+                "name": name,
+                "label": label,
+            },
+        ).mappings().first()
+
+    return None if row is None else dict(row)
+
+
+def delete_model_row(model_id) -> bool:
+    sql = text("""
+        DELETE FROM model
+        WHERE id = :id
+    """)
+
+    with get_connection() as conn:
+        result = conn.execute(sql, {"id": model_id})
+
+    return (result.rowcount or 0) > 0
 
 
 def list_variants(model_id=None):
@@ -371,8 +507,8 @@ def get_variant_row(variant_id):
     return None if row is None else dict(row)
 
 
-def variant_name_exists_in_model(name: str, model_id) -> bool:
-    sql = text("""
+def variant_name_exists_in_model(name: str, model_id, *, exclude_id=None) -> bool:
+    sql = """
         SELECT 1
         FROM variant
         WHERE model_id = :model_id
@@ -380,16 +516,18 @@ def variant_name_exists_in_model(name: str, model_id) -> bool:
             LOWER(name) = LOWER(:name)
             OR LOWER(label) = LOWER(:name)
           )
-    """)
+    """
+
+    params = {
+        "model_id": model_id,
+        "name": name,
+    }
+    if exclude_id is not None:
+        sql += " AND id <> :exclude_id"
+        params["exclude_id"] = exclude_id
 
     with get_connection() as conn:
-        row = conn.execute(
-            sql,
-            {
-                "model_id": model_id,
-                "name": name,
-            },
-        ).mappings().first()
+        row = conn.execute(text(sql), params).mappings().first()
 
     return row is not None
 
@@ -427,6 +565,47 @@ def create_variant_row(*, model_id, name: str, label: str):
         raise RuntimeError("Failed to insert variant")
 
     return dict(row)
+
+
+def update_variant_row(variant_id, *, model_id, name: str, label: str):
+    sql = text("""
+        UPDATE variant
+        SET
+            model_id = :model_id,
+            name = :name,
+            label = :label
+        WHERE id = :id
+        RETURNING
+            id,
+            model_id,
+            name,
+            label
+    """)
+
+    with get_connection() as conn:
+        row = conn.execute(
+            sql,
+            {
+                "id": variant_id,
+                "model_id": model_id,
+                "name": name,
+                "label": label,
+            },
+        ).mappings().first()
+
+    return None if row is None else dict(row)
+
+
+def delete_variant_row(variant_id) -> bool:
+    sql = text("""
+        DELETE FROM variant
+        WHERE id = :id
+    """)
+
+    with get_connection() as conn:
+        result = conn.execute(sql, {"id": variant_id})
+
+    return (result.rowcount or 0) > 0
 
 
 def list_issue_status_rows():

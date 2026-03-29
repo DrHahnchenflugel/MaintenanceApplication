@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
-{% block title %}Maintenance - Settings - Add Asset{% endblock %}
-{% block page_title %}Settings - Add Asset{% endblock %}
+{% block title %}Maintenance - Settings - Assets{% endblock %}
+{% block page_title %}Settings - Assets{% endblock %}
 
 {% block page_css %}
   <link rel="stylesheet" href="{{ url_for('static', filename='css/pages/settings.css') }}">
@@ -11,18 +11,18 @@
 <div class="settings-page">
   {% include "_partials/_settings_nav.html" %}
 
-  {% if created and created_asset %}
+  {% if (created or updated) and saved_asset %}
     <section class="card settings-card">
-      <h2 class="card-title">Asset Created</h2>
+      <h2 class="card-title">{{ "Asset Updated" if updated else "Asset Created" }}</h2>
       <p class="settings-copy">
-        <strong>{{ created_asset.asset_tag }}</strong>
-        {% if created_asset.site_shorthand %} at {{ created_asset.site_shorthand }}{% endif %}
-        {% if created_asset.make_name and created_asset.model_name %}
-          as {{ created_asset.make_name }} / {{ created_asset.model_name }}{% if created_asset.variant_name %} / {{ created_asset.variant_name }}{% endif %}
+        <strong>{{ saved_asset.asset_tag }}</strong>
+        {% if saved_asset.site_shorthand %} at {{ saved_asset.site_shorthand }}{% endif %}
+        {% if saved_asset.make_name and saved_asset.model_name %}
+          as {{ saved_asset.make_name }} / {{ saved_asset.model_name }}{% if saved_asset.variant_name %} / {{ saved_asset.variant_name }}{% endif %}
         {% endif %}
       </p>
       <div class="settings-actions">
-        <a class="btn" href="{{ url_for('app.view_asset', asset_id=created_asset.asset_id) }}">Open Asset</a>
+        <a class="btn" href="{{ url_for('app.view_asset', asset_id=saved_asset.asset_id) }}">Open Asset</a>
       </div>
     </section>
   {% endif %}
@@ -34,15 +34,16 @@
         <p class="settings-copy">Showing the first {{ assets|length }} by asset tag.</p>
       </div>
 
-      <div class="table">
-        <div class="table-head table-head--3">
+      <div class="table settings-table--actions-4">
+        <div class="table-head table-head--4">
           <div>Asset Tag</div>
           <div>Site</div>
           <div>Classification</div>
+          <div>Actions</div>
         </div>
         <div class="table-scroll">
           {% for asset in assets %}
-            <div class="table-row table-row--3">
+            <div class="table-row table-row--4">
               <div>
                 <strong>{{ asset.asset_tag }}</strong>
                 {% if status_by_id.get(asset.status_id) %}
@@ -61,10 +62,19 @@
                   {{ asset.make_name or "-" }} / {{ asset.model_name or "-" }} / {{ asset.variant_name or "-" }}
                 </div>
               </div>
+              <div class="settings-row-actions">
+                <a class="settings-action-link" href="{{ url_for('app.settings_new_asset', edit_id=asset.asset_id) }}">Edit</a>
+                <form method="post">
+                  <input type="hidden" name="intent" value="delete">
+                  <input type="hidden" name="item_id" value="{{ asset.asset_id }}">
+                  <button class="settings-action-btn settings-action-btn--danger" type="submit" {% if not settings_unlocked %}disabled{% endif %}>Delete (NOT RETIRE)</button>
+                </form>
+              </div>
             </div>
           {% else %}
-            <div class="table-row table-row--3">
+            <div class="table-row table-row--4">
               <div>No assets found.</div>
+              <div></div>
               <div></div>
               <div></div>
             </div>
@@ -74,9 +84,20 @@
     </section>
 
     <section class="card settings-panel settings-form-card">
-      <h2 class="card-title">Add Asset</h2>
-      <p class="settings-copy">Site, category, make, model, and variant must be chosen from existing records.</p>
+      <h2 class="card-title">{{ "Update Asset" if editing_asset else "Add Asset" }}</h2>
+      <p class="settings-copy">
+        {{ "Edit the selected asset details." if editing_asset else "Site, category, make, model, and variant must be chosen from existing records." }}
+      </p>
 
+      {% if created %}
+        <p class="settings-feedback settings-feedback--success">Asset created.</p>
+      {% endif %}
+      {% if updated %}
+        <p class="settings-feedback settings-feedback--success">Asset updated.</p>
+      {% endif %}
+      {% if deleted %}
+        <p class="settings-feedback settings-feedback--success">Asset deleted.</p>
+      {% endif %}
       {% if form_error %}
         <p class="settings-feedback settings-feedback--error">{{ form_error }}</p>
       {% endif %}
@@ -92,6 +113,8 @@
         data-models-url="/maintenance/api/v2/assets/models"
         data-variants-url="/maintenance/api/v2/assets/variants"
       >
+        <input type="hidden" name="intent" value="{{ 'update' if editing_asset else 'create' }}">
+        <input type="hidden" name="item_id" value="{{ form_values.item_id }}">
         <fieldset class="settings-fieldset" {% if not settings_unlocked %}disabled{% endif %}>
           <div class="field">
             <label class="issue-label" for="asset_tag">Asset Tag</label>
@@ -172,7 +195,12 @@
         </fieldset>
 
         <div class="issue-form-actions">
-          <button class="btn btn--ok" type="submit" {% if not settings_unlocked %}disabled{% endif %}>Add Asset</button>
+          <button class="btn btn--ok" type="submit" {% if not settings_unlocked %}disabled{% endif %}>
+            {{ "Update Asset" if editing_asset else "Add Asset" }}
+          </button>
+          {% if editing_asset %}
+            <a class="btn btn-secondary" href="{{ url_for('app.settings_new_asset') }}">Cancel Edit</a>
+          {% endif %}
           <a class="btn btn-secondary" href="{{ url_for('app.settings') }}">Back to Settings</a>
         </div>
       </form>
