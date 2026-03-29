@@ -449,6 +449,7 @@ def patch_asset_service(asset_id: UUID, payload: dict) -> dict | None:
     """
 
     update_fields: dict[str, object] = {}
+    requested_status_id = None
 
     # Simple string fields
     if "asset_tag" in payload:
@@ -477,11 +478,13 @@ def patch_asset_service(asset_id: UUID, payload: dict) -> dict | None:
         update_fields["category_id"] = _parse_uuid_field(payload, "category_id", required=False)
 
     if "status_id" in payload:
-        update_fields["status_id"] = lookups.validate_asset_status_id(
+        requested_status_id = lookups.validate_asset_status_id(
             payload.get("status_id"),
             required=False,
             field_name="status_id",
         )
+        if requested_status_id is None:
+            raise ValueError("status_id is required")
 
     if "variant_id" in payload:
         update_fields["variant_id"] = _parse_uuid_field(payload, "variant_id", required=False)
@@ -493,12 +496,28 @@ def patch_asset_service(asset_id: UUID, payload: dict) -> dict | None:
     if "retired_at" in payload:
         update_fields["retired_at"] = payload["retired_at"]
 
-    if not update_fields:
+    if not update_fields and "status_id" not in payload:
         raise ValueError("No valid fields to update")
 
-    row = assets_repo.update_asset_row(asset_id=asset_id, fields=update_fields)
-    # row is dict or None
-    return row
+    normalized_asset_id = str(asset_id)
+
+    if update_fields:
+        row = assets_repo.update_asset_row(asset_id=asset_id, fields=update_fields)
+        if row is None:
+            return None
+    else:
+        row = assets_repo.get_asset_row(normalized_asset_id)
+        if row is None:
+            return None
+
+    if "status_id" in payload:
+        set_asset_status(
+            asset_id=normalized_asset_id,
+            to_status_id=requested_status_id,
+            changed_by=payload.get("changed_by"),
+        )
+
+    return get_asset_service(normalized_asset_id)
 
 def retire_asset_service(asset_id: UUID, retire_reason: str | None = None) -> bool:
     """
