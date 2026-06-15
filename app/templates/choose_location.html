@@ -1,0 +1,241 @@
+{% extends "base.html" %}
+
+{% block title %}CHOOSE LOCATION{% endblock %}
+{% block page_title %}CHOOSE LOCATION{% endblock %}
+
+{% block content_header %}
+  <section class="page-intro">
+    <div class="page-intro__body">
+      <div class="eyebrow">Location Context</div>
+      <h2 class="page-intro__title">Choose a working location</h2>
+      <p class="page-intro__text">Pick whether this workstation is working at one site or viewing all sites.</p>
+    </div>
+
+    {% if current_site %}
+      <div class="page-intro__actions">
+        <span class="location-context-pill">Current Context: {{ current_site.code }} - {{ current_site.fullname }}</span>
+      </div>
+    {% elif site_context_confirmed %}
+      <div class="page-intro__actions">
+        <span class="location-context-pill">Current Context: All Sites</span>
+      </div>
+    {% endif %}
+  </section>
+{% endblock %}
+
+{% block content %}
+  <section class="card location-selection">
+    <form
+      id="locationSelectionForm"
+      class="location-selection__form"
+      action="{{ url_for('app.set_selected_location') }}"
+      method="post"
+    >
+      <input type="hidden" name="next" value="{{ next_url }}">
+      <input type="hidden" name="selection_mode" id="selectionModeInput" value="">
+
+      <section class="location-step-shell" id="locationTypeStep">
+        <div class="location-group__header">
+          <div>
+            <div class="form-section-heading">What are you working on?</div>
+            <p class="location-group__meta">Choose a context first, then confirm the site this workstation should use.</p>
+          </div>
+        </div>
+
+        <div class="selection-card-grid selection-card-grid--options">
+          <button type="button" class="selection-card-button" data-selection-mode="site">
+            <span class="selection-card-button__title">A maintenance site</span>
+            <span class="selection-card-button__meta">{{ available_sites | length }} available site{{ "" if available_sites | length == 1 else "s" }}</span>
+          </button>
+
+          <button type="button" class="selection-card-button" data-selection-mode="all">
+            <span class="selection-card-button__title">All sites / overview</span>
+            <span class="selection-card-button__meta">View maintenance activity across every site.</span>
+          </button>
+        </div>
+      </section>
+
+      <section class="location-step-shell" id="locationSiteStep" hidden>
+        <div class="location-group__header">
+          <div>
+            <div class="form-section-heading">Choose a maintenance site</div>
+            <p class="location-group__meta">Select the site this workstation should use for maintenance context.</p>
+          </div>
+
+          <button type="button" class="btn btn-secondary" id="locationBackButton">Nevermind</button>
+        </div>
+
+        <div id="locationSiteCards" class="selection-card-grid"></div>
+      </section>
+
+      <section class="location-step-shell" id="locationOverviewStep" hidden>
+        <div class="location-group__header">
+          <div>
+            <div class="form-section-heading">Use all sites</div>
+            <p class="location-group__meta">Continue without a site filter and keep the maintenance views in overview mode.</p>
+          </div>
+
+          <button type="button" class="btn btn-secondary" id="locationAllSitesBackButton">Nevermind</button>
+        </div>
+
+        <div class="selection-card selection-card--static">
+          <span class="selection-card__content">
+            <span class="selection-card__title">All Sites</span>
+            <span class="selection-card__meta">This clears the preferred site cookie and leaves dashboard, issue, and asset views in overview mode.</span>
+          </span>
+        </div>
+      </section>
+
+      <div class="location-selection__actions">
+        <button type="submit" class="btn btn--ok location-selection__submit" id="locationSubmitButton" hidden>Use Selected Site</button>
+      </div>
+    </form>
+  </section>
+{% endblock %}
+
+{% block page_js %}
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      var availableSites = {{ available_sites | tojson }};
+      var selectedSiteCode = {{ (current_site.code if current_site else "") | tojson }};
+      var form = document.getElementById("locationSelectionForm");
+      var selectionModeInput = document.getElementById("selectionModeInput");
+      var typeStep = document.getElementById("locationTypeStep");
+      var siteStep = document.getElementById("locationSiteStep");
+      var overviewStep = document.getElementById("locationOverviewStep");
+      var siteCards = document.getElementById("locationSiteCards");
+      var submitButton = document.getElementById("locationSubmitButton");
+      var typeButtons = Array.from(document.querySelectorAll("[data-selection-mode]"));
+      var siteBackButton = document.getElementById("locationBackButton");
+      var overviewBackButton = document.getElementById("locationAllSitesBackButton");
+
+      var updateSubmitState = function() {
+        var checkedSite = form.querySelector('input[name="site_code"]:checked');
+        submitButton.hidden = !(selectionModeInput.value === "all" || checkedSite);
+      };
+
+      var showTypeStep = function() {
+        selectionModeInput.value = "";
+        typeStep.hidden = false;
+        siteStep.hidden = true;
+        overviewStep.hidden = true;
+        submitButton.hidden = true;
+        submitButton.textContent = "Use Selected Site";
+        typeButtons.forEach(function(button) {
+          button.classList.remove("is-selected");
+        });
+      };
+
+      var renderSiteCards = function() {
+        siteCards.innerHTML = "";
+
+        if (!availableSites.length) {
+          siteCards.innerHTML = [
+            '<div class="selection-card selection-card--static">',
+            '  <span class="selection-card__content">',
+            '    <span class="selection-card__title">No sites available</span>',
+            '    <span class="selection-card__meta">Add sites in Settings before using site-specific maintenance views.</span>',
+            "  </span>",
+            "</div>"
+          ].join("");
+          updateSubmitState();
+          return;
+        }
+
+        availableSites.forEach(function(site) {
+          var card = document.createElement("label");
+          var shouldCheck = Boolean(selectedSiteCode) && String(site.code) === String(selectedSiteCode);
+          var input = document.createElement("input");
+          var content = document.createElement("span");
+          var title = document.createElement("span");
+          var meta = document.createElement("span");
+
+          card.className = "selection-card";
+          input.className = "selection-card__control";
+          input.type = "radio";
+          input.name = "site_code";
+          input.value = site.code;
+          input.checked = shouldCheck;
+
+          content.className = "selection-card__content";
+          title.className = "selection-card__title";
+          meta.className = "selection-card__meta";
+          title.textContent = site.fullname;
+          meta.textContent = site.code;
+
+          content.appendChild(title);
+          content.appendChild(meta);
+          card.appendChild(input);
+          card.appendChild(content);
+          siteCards.appendChild(card);
+        });
+
+        Array.from(siteCards.querySelectorAll('input[name="site_code"]')).forEach(function(input) {
+          input.addEventListener("change", updateSubmitState);
+        });
+
+        updateSubmitState();
+      };
+
+      var showSiteStep = function() {
+        selectionModeInput.value = "site";
+        typeStep.hidden = true;
+        overviewStep.hidden = true;
+        siteStep.hidden = false;
+        submitButton.textContent = "Use Selected Site";
+        typeButtons.forEach(function(button) {
+          button.classList.toggle("is-selected", button.dataset.selectionMode === "site");
+        });
+        renderSiteCards();
+      };
+
+      var showOverviewStep = function() {
+        selectionModeInput.value = "all";
+        typeStep.hidden = true;
+        siteStep.hidden = true;
+        overviewStep.hidden = false;
+        submitButton.textContent = "Continue with All Sites";
+        typeButtons.forEach(function(button) {
+          button.classList.toggle("is-selected", button.dataset.selectionMode === "all");
+        });
+        Array.from(form.querySelectorAll('input[name="site_code"]')).forEach(function(input) {
+          input.checked = false;
+        });
+        updateSubmitState();
+      };
+
+      typeButtons.forEach(function(button) {
+        button.addEventListener("click", function() {
+          if (button.dataset.selectionMode === "site") {
+            showSiteStep();
+            return;
+          }
+
+          showOverviewStep();
+        });
+      });
+
+      if (siteBackButton) {
+        siteBackButton.addEventListener("click", showTypeStep);
+      }
+
+      if (overviewBackButton) {
+        overviewBackButton.addEventListener("click", showTypeStep);
+      }
+
+      form.addEventListener("submit", function(event) {
+        if (selectionModeInput.value === "site" && !form.querySelector('input[name="site_code"]:checked')) {
+          event.preventDefault();
+        }
+
+        if (selectionModeInput.value === "all") {
+          Array.from(form.querySelectorAll('input[name="site_code"]')).forEach(function(input) {
+            input.checked = false;
+          });
+        }
+      });
+
+      showTypeStep();
+    });
+  </script>
+{% endblock %}

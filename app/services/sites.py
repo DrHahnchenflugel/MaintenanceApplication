@@ -9,9 +9,13 @@ from app.db import sites as sites_db
 
 PREFERRED_SITE_COOKIE_NAME = "preferred_site"
 PREFERRED_SITE_COOKIE_MAX_AGE = 180 * 24 * 60 * 60
+MAINTENANCE_SITE_CONTEXT_COOKIE_NAME = "maintenance_site_context"
+MAINTENANCE_SPLASH_COOKIE_NAME = "maintenance_welcome_seen"
+MAINTENANCE_SPLASH_STORAGE_KEY = "maintenanceWelcomeShown"
 _SITE_CACHE_TTL_SECONDS = 300
 _SITE_SNAPSHOT = None
 _SITE_SNAPSHOT_EXPIRES_AT = 0.0
+_MAINTENANCE_SPLASH_ENDPOINTS = {"app.dashboard"}
 
 
 def _normalize_site_code(site_code: str | None) -> str:
@@ -112,6 +116,22 @@ def get_current_site(site_code: str | None = None):
         site_code = request.cookies.get(PREFERRED_SITE_COOKIE_NAME)
 
     return get_site_by_code(site_code)
+
+
+def should_show_maintenance_splash(endpoint: str | None = None) -> bool:
+    return endpoint in _MAINTENANCE_SPLASH_ENDPOINTS
+
+
+def has_seen_maintenance_splash(req=None) -> bool:
+    req = req or request
+    return req.cookies.get(MAINTENANCE_SPLASH_COOKIE_NAME) == "1"
+
+
+def has_confirmed_site_context(req=None) -> bool:
+    req = req or request
+    if get_site_by_code(req.cookies.get(PREFERRED_SITE_COOKIE_NAME)) is not None:
+        return True
+    return req.cookies.get(MAINTENANCE_SITE_CONTEXT_COOKIE_NAME) == "1"
 
 
 def _normalize_site_fullname(fullname: str | None) -> str:
@@ -219,6 +239,44 @@ def _should_use_secure_cookie(req=None) -> bool:
     return any(part.strip().lower() == "https" for part in forwarded_proto.split(","))
 
 
+def mark_maintenance_splash_seen(response, req=None):
+    req = req or request
+    response.set_cookie(
+        MAINTENANCE_SPLASH_COOKIE_NAME,
+        "1",
+        samesite="Lax",
+        secure=_should_use_secure_cookie(req),
+        httponly=True,
+        path="/",
+    )
+    return response
+
+
+def _mark_site_context_confirmed(response, req=None):
+    req = req or request
+    response.set_cookie(
+        MAINTENANCE_SITE_CONTEXT_COOKIE_NAME,
+        "1",
+        max_age=PREFERRED_SITE_COOKIE_MAX_AGE,
+        samesite="Lax",
+        secure=_should_use_secure_cookie(req),
+        httponly=True,
+        path="/",
+    )
+    return response
+
+
+def clear_site_context(response, req=None):
+    req = req or request
+    response.delete_cookie(
+        MAINTENANCE_SITE_CONTEXT_COOKIE_NAME,
+        path="/",
+        samesite="Lax",
+        secure=_should_use_secure_cookie(req),
+    )
+    return response
+
+
 def set_preferred_site_cookie(response, site_code: str | None, req=None):
     req = req or request
     normalized_site_code = _normalize_site_code(site_code)
@@ -231,7 +289,7 @@ def set_preferred_site_cookie(response, site_code: str | None, req=None):
             samesite="Lax",
             secure=secure,
         )
-        return response
+        return _mark_site_context_confirmed(response, req)
 
     if get_site_by_code(normalized_site_code) is None:
         raise ValueError("Invalid site_code")
@@ -245,4 +303,11 @@ def set_preferred_site_cookie(response, site_code: str | None, req=None):
         httponly=False,
         path="/",
     )
+    return _mark_site_context_confirmed(response, req)
+
+
+def reset_preferred_site_selection(response, req=None):
+    req = req or request
+    set_preferred_site_cookie(response, None, req)
+    clear_site_context(response, req)
     return response
