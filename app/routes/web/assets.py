@@ -1,6 +1,6 @@
 from urllib.parse import urlencode
 
-from flask import current_app, render_template, request, abort, redirect, url_for
+from flask import current_app, make_response, render_template, request, abort, redirect, url_for
 from . import bp as web_bp
 from uuid import UUID
 from app.services import assets as asset_service
@@ -290,12 +290,20 @@ def view_asset(asset_id):
         except Exception:
             continue
 
-    return render_template(
-        "assets/specific_asset.html",
-        asset=asset,
-        past_issues=past_issues,
-        open_issue_count=open_issue_count,
-        open_issues_url=_build_external_issue_list_url(asset_tag=asset.get("asset_tag")),
-        asset_edit_url=asset_edit_url,
-        asset_qr_image_url=url_for("api_v2.get_asset_qr_png", asset_id=asset["asset_id"]),
+    response = make_response(
+        render_template(
+            "assets/specific_asset.html",
+            asset=asset,
+            past_issues=past_issues,
+            open_issue_count=open_issue_count,
+            open_issues_url=_build_external_issue_list_url(asset_tag=asset.get("asset_tag")),
+            asset_edit_url=asset_edit_url,
+            asset_qr_image_url=url_for("api_v2.get_asset_qr_png", asset_id=asset["asset_id"]),
+        )
     )
+
+    asset_site = site_service.get_site(asset.get("site_id"))
+    if asset_site and asset_site.get("code"):
+        site_service.set_preferred_site_cookie(response, asset_site["code"])
+
+    return response

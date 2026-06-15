@@ -11,13 +11,30 @@
       (function() {
         var continueUrl = {{ continue_url | tojson }};
         var storageKey = {{ splash_storage_key | tojson }};
+        var isMobile = false;
+
+        try {
+          isMobile = window.matchMedia("(max-width: 768px), (pointer: coarse)").matches;
+        } catch (error) {
+          isMobile = false;
+        }
 
         try {
           if (window.sessionStorage.getItem(storageKey) === "1") {
             window.location.replace(continueUrl);
+            return;
           }
         } catch (error) {
           // Storage access is optional; the timed redirect still works.
+        }
+
+        if (isMobile) {
+          try {
+            window.sessionStorage.setItem(storageKey, "1");
+          } catch (error) {
+            // Storage access is optional; immediate mobile redirect still works.
+          }
+          window.location.replace(continueUrl);
         }
       }());
     </script>
@@ -61,11 +78,23 @@
       document.addEventListener("DOMContentLoaded", function() {
         var continueUrl = {{ continue_url | tojson }};
         var storageKey = {{ splash_storage_key | tojson }};
+        var isMobile = false;
+
+        try {
+          isMobile = window.matchMedia("(max-width: 768px), (pointer: coarse)").matches;
+        } catch (error) {
+          isMobile = false;
+        }
 
         try {
           window.sessionStorage.setItem(storageKey, "1");
         } catch (error) {
           // Storage access is optional; the timed redirect still works.
+        }
+
+        if (isMobile) {
+          window.location.replace(continueUrl);
+          return;
         }
 
         window.setTimeout(function() {

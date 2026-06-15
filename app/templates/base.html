@@ -20,7 +20,7 @@
     {% block head_extra %}{% endblock %}
   </head>
 
-  <body>
+  <body class="{% block body_class %}{% endblock %}">
     {% set location_selector_url = url_for('app.choose_location', next=preferred_site_return_to) %}
     {% set current_location_label = current_site.code ~ ": " ~ current_site.fullname if current_site else "All Sites" %}
     {% set location_selector_action = "Change Location" if current_site else "Choose Location" %}

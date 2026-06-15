@@ -119,6 +119,20 @@ body { overflow: hidden; }
   font-weight: 600;
 }
 
+.location-selector-page .content {
+  overflow-y: auto;
+  overflow-x: visible;
+  -webkit-overflow-scrolling: touch;
+}
+
+.location-selector-page .location-selection {
+  max-height: none;
+}
+
+.location-selector-page .location-step-shell {
+  min-height: 0;
+}
+
 /* =========================================================
    Main layout
    ========================================================= */
@@ -353,6 +367,10 @@ body { overflow: hidden; }
   }
 
   body.sidebar-open .sidebar-overlay { display: block; }
+
+  .location-selector-page .content {
+    overflow-y: auto;
+  }
 }
 
 @media (max-width: 768px) {
