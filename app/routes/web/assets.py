@@ -303,7 +303,10 @@ def view_asset(asset_id):
     )
 
     asset_site = site_service.get_site(asset.get("site_id"))
-    if asset_site and asset_site.get("code"):
-        site_service.set_preferred_site_cookie(response, asset_site["code"])
+    asset_site_code = ((asset.get("site_shorthand") or "").strip().upper()) or (
+        (asset_site or {}).get("code")
+    )
+    if asset_site_code:
+        site_service.set_preferred_site_cookie(response, asset_site_code)
 
     return response

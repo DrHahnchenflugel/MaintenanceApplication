@@ -89,6 +89,9 @@ def set_selected_location():
     site_code = request.form.get("site_code")
     next_target = _next_target_from_request(request.form.get("next"))
 
+    if not selection_mode:
+        selection_mode = "site" if (site_code or "").strip() else ""
+
     if selection_mode not in {"all", "site"}:
         abort(400, description="Invalid location selection.")
 

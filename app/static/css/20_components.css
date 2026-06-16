@@ -320,6 +320,23 @@
   letter-spacing: 0.01em;
 }
 
+.selection-card__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  min-height: 28px;
+  margin-bottom: 12px;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(255, 102, 0, 0.14);
+  border: 1px solid rgba(255, 102, 0, 0.22);
+  color: #ffd2b5;
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
 .selection-card-button__meta,
 .selection-card__meta {
   display: block;
@@ -365,6 +382,14 @@
   border-color: var(--line);
   background: linear-gradient(180deg, var(--panel-2), var(--panel));
   transform: none;
+}
+
+.selection-card--site {
+  min-height: 140px;
+}
+
+.selection-card-grid--sites {
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
 }
 
 .location-selection__actions {

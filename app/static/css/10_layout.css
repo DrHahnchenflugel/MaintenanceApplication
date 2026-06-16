@@ -119,9 +119,30 @@ body { overflow: hidden; }
   font-weight: 600;
 }
 
+body.location-selector-page {
+  overflow: auto !important;
+  height: auto !important;
+  min-height: 100dvh;
+}
+
+.location-selector-page .layout {
+  min-height: 100dvh;
+  height: auto !important;
+}
+
+.location-selector-page .main {
+  height: auto !important;
+  min-height: 100dvh;
+  overflow: visible !important;
+}
+
 .location-selector-page .content {
-  overflow-y: auto;
-  overflow-x: visible;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  max-height: none !important;
+  height: auto !important;
+  min-height: 0;
+  padding-bottom: 4rem;
   -webkit-overflow-scrolling: touch;
 }
 
@@ -369,7 +390,7 @@ body { overflow: hidden; }
   body.sidebar-open .sidebar-overlay { display: block; }
 
   .location-selector-page .content {
-    overflow-y: auto;
+    overflow-y: auto !important;
   }
 }
 
